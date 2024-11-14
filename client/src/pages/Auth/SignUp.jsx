@@ -53,7 +53,7 @@ function SignUp() {
 
     return (
         <div className="form-container">
-            <h2>Genelogin</h2>
+            <h2>Sign Up</h2>
             {!otpSent ? (
                 <div className="input-group">
                     <input
