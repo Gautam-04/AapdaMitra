@@ -1,0 +1,108 @@
+/* SignUp Page */
+.form-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-field {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.input-field.valid {
+    border-color: #28a745;
+}
+
+.password-input-container {
+    position: relative;
+}
+
+.password-input-container input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+
+.toggle-password-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.password-conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.password-conditions small {
+    flex: 1 1 calc(50% - 10px);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.valid-text {
+    color: #28a745;
+}
+
+.invalid-text {
+    color: #dc3545;
+}
+
+.submit-btn {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.submit-btn:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.otp-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.otp-inputs {
+    display: flex;
+    gap: 5px;
+}
+
+.otp-input {
+    width: 50px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 18px;
+}
+
+.otp-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
