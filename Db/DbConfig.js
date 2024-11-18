@@ -3,7 +3,7 @@ import {SihDb} from '../backend/constants.js'
 
 async function connectDb(){
 try {
-    const Connection = await mongoose.connect(`${process.env.MONGODB_URL}/${SihDb}`)
+    const Connection = await mongoose.connect(`${process.env.MONGODB_URL_LOCAL}/${SihDb}?authSource=admin`)
     console.log(`MongoDb is connected to the port: ${Connection.connection.host}`)
 } catch (error) {
     console.log(`MongoDb cannot be connected`, error)
