@@ -61,16 +61,15 @@ try {
             }
 
             const options = {
+                httpOnly: true,
                 secure: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000,
+                maxAge: 24*60*60*1000
             };
-            const accessToken = generateToken(user._id);
+            const accessToken = generateToken(createdUser._id);
 
             otpStore.delete(email);
 
-            return res.status(200)
-                .cookie("accessToken", accessToken, options)
-                .json({ message: "User registered successfully", createdUser, accessToken });
+            return res.status(200).cookie("accessToken", accessToken, options).json({ message: "User registered successfully", createdUser, accessToken });
         } else {
             return res.status(400).json({ message: "Invalid OTP or OTP has expired" });
         }
@@ -101,7 +100,7 @@ if(!isPasswordValid){
 
 const options = {
     httpOnly: true,
-    secure: true,
+    secure: false,
     maxAge: 24*60*60*1000
 }
 

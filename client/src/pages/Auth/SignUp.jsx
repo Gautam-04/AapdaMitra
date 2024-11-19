@@ -1,54 +1,103 @@
 import { useState } from "react";
 import { FaCheckDouble, FaEye, FaEyeSlash } from "react-icons/fa";
-import './auth.css'; // Ensure this import points to your CSS file
-import { Link } from "react-router-dom";
+import './auth.css'; // Ensure this points to your CSS file
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { UserState } from "../../context/UserContext";
+import { Button, Spinner } from "react-bootstrap"; // Import Bootstrap components
 
 function SignUp() {
-    const [mobileNo, setMobileNo] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false); // State for loading spinner
     const [hasUpperCase, setHasUpperCase] = useState(false);
     const [hasLowerCase, setHasLowerCase] = useState(false);
     const [hasNumber, setHasNumber] = useState(false);
     const [hasSpecialChar, setHasSpecialChar] = useState(false);
+    const [hasValidLength, setHasValidLength] = useState(false); // State for length check
+    const navigate = useNavigate();
+    const { setUser } = UserState();
 
     const handlePasswordChange = (e) => {
         const newPassword = e.target.value;
         setPassword(newPassword);
-
-        // Check individual conditions
         setHasUpperCase(/[A-Z]/.test(newPassword));
         setHasLowerCase(/[a-z]/.test(newPassword));
         setHasNumber(/\d/.test(newPassword));
         setHasSpecialChar(/[!@#$%^&*]/.test(newPassword));
+        setHasValidLength(newPassword.length >= 8);
     };
 
     const handleOtpChange = (element, index) => {
         if (isNaN(element.value)) return;
-
         const newOtp = [...otp];
         newOtp[index] = element.value;
         setOtp(newOtp);
-
-        // Focus on the next input box
-        if (element.nextSibling) {
-            element.nextSibling.focus();
-        }
+        if (element.nextSibling) element.nextSibling.focus();
     };
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleOtpSend = () => {
-        setOtpSent(true);
+    const handleOtpSend = async (e) => {
+        e.preventDefault();
+        if (!email || !password) {
+            toast.error("Email or password field is not filled");
+            return;
+        }
+        setLoading(true);
+        try {
+            const response = await axios.post('http://localhost:8000/api/v1/user/register', { email });
+            if (response.status === 200) {
+                toast.success(response.data.message);
+                setOtpSent(true);
+            }
+        } catch (error) {
+            const message = error.response?.data?.message || 'Failed to send OTP';
+            toast.error(message);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const verifyOtp = () => {
+    const verifyOtp = async () => {
         const otpValue = otp.join('');
-        console.log("Entered OTP:", otpValue);
+        if (!otpValue || otpValue.length !== 6) {
+            toast.error("Please enter a valid 6-digit OTP");
+            return;
+        }
+        const userData = {
+            email,
+            otp: otpValue,
+            password,
+        };
+        setLoading(true);
+        try {
+            const config = {
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    withCredentials: true,
+                }
+            const response = await axios.post('http://localhost:8000/api/v1/user/verifyotp', userData,config);
+            if (response.status === 200) {
+                toast.success(response.data.message);
+                localStorage.setItem('xxxxxxuserxxxxxx', JSON.stringify(response.data.createdUser));
+                localStorage.setItem('xxxxxxxxxxtokenxxxxxxxxxx', response.data.accessToken);
+                setUser(response.data.createdUser);
+                navigate('/home');
+            }
+        } catch (error) {
+            const message = error.response?.data?.message || 'Failed to verify OTP';
+            toast.error(message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -58,9 +107,9 @@ function SignUp() {
                 <div className="input-group">
                     <input
                         type="text"
-                        placeholder="Enter Mobile Number"
-                        value={mobileNo}
-                        onChange={(e) => setMobileNo(e.target.value)}
+                        placeholder="Enter your Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="input-field"
                     />
                     <div className="password-input-container">
@@ -77,6 +126,9 @@ function SignUp() {
                     </div>
                     {password.length > 0 && (
                         <div className="password-conditions">
+                            <small className={hasValidLength ? 'valid-text' : 'invalid-text'}>
+                                <FaCheckDouble /> At least 8 characters
+                            </small>
                             <small className={hasUpperCase ? 'valid-text' : 'invalid-text'}>
                                 <FaCheckDouble /> 1 uppercase letter
                             </small>
@@ -91,11 +143,15 @@ function SignUp() {
                             </small>
                         </div>
                     )}
-                    <button onClick={handleOtpSend} disabled={!(hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)} className="submit-btn">
-                        Send OTP
+                    <button
+                        onClick={handleOtpSend}
+                        disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)}
+                        className="submit-btn"
+                    >
+                        {loading ? <Spinner animation="border" size="sm" /> : 'Send OTP'}
                     </button>
                     <div className="RedirectContainer">
-                        <p>Have a account? <Link to='/signin'>Login here</Link></p>
+                        <p>Have an account? <Link to='/signin'>Login here</Link></p>
                     </div>
                 </div>
             ) : (
@@ -112,9 +168,12 @@ function SignUp() {
                             />
                         ))}
                     </div>
-                    <button onClick={verifyOtp} className="submit-btn">
-                        Verify OTP
-                    </button>
+                    <Button onClick={verifyOtp} className="submit-btn">
+                        {loading ? <Spinner animation="border" size="sm" /> : 'Verify OTP'}
+                    </Button>
+                    <div className="otp-note">
+                        <p>If you did not receive the OTP, please check your spam folder.</p>
+                    </div>
                 </div>
             )}
         </div>
