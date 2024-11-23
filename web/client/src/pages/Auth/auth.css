@@ -1,30 +1,73 @@
-/* SignUp Page */
-.form-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
+/* Auth Header */
+
+.authContainer {
+    background-color: var(--white);
 }
 
-.input-group {
+.authHeader {
+    background-color: var(--white);
+}
+
+.authHeaderImg {
+    width: auto;
+    height: 4rem;
+    flex-shrink: 0;
+    margin: 1rem 0 0 2.56rem;
+}
+
+
+.AuthContentContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 93vh;
+}
+
+.logoImg {}
+
+
+/* SignUp Page */
+.form-container {
+    width: 33.6875rem;
+    height: 35rem;
+    flex-shrink: 0;
+    border-radius: 0.625rem;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    h2 {
+        color: #2B3674;
+        font-family: Inter;
+        font-size: 2.5rem;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+    }
 }
 
 .input-field {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 100%;
+    width: 29.1875rem;
+    height: 4.0625rem;
+    padding: 1.0625rem 2.125rem;
+    border-radius: 1.875rem;
+    border: 1px solid #000;
+    color: #727EC3;
+    font-family: Outfit, sans-serif;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 200;
+    line-height: normal;
 }
 
-.input-field.valid {
-    border-color: #28a745;
+.input-field:focus {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    outline: none;
+    border: 1px solid var(--dark-blue);
 }
 
 .password-input-container {
@@ -32,22 +75,47 @@
 }
 
 .password-input-container input {
-    width: 100%;
-    padding-right: 2.5rem;
+    width: 29.1875rem;
+    height: 4.0625rem;
+    padding: 1.0625rem 2.125rem;
+    border-radius: 1.875rem;
+    border: 1px solid #000;
+    color: #727EC3;
+    font-family: Outfit, sans-serif;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 200;
+    line-height: normal;
+}
+
+.password-input-container input:focus {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    outline: none;
+    border: 1px solid var(--dark-blue);
 }
 
 .toggle-password-icon {
     position: absolute;
     top: 50%;
-    right: 10px;
+    right: 5%;
     transform: translateY(-50%);
     cursor: pointer;
+}
+
+.forgot_password {
+    width: 29.1875rem;
+    color: red;
+    text-align: end;
 }
 
 .password-conditions {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 10px;
 }
 
 .password-conditions small {
@@ -56,6 +124,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    justify-content: center;
 }
 
 .valid-text {
@@ -67,17 +136,50 @@
 }
 
 .submit-btn {
-    padding: 10px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
+    width: 29.1875rem;
+    height: 4.0625rem;
+    padding: 1rem 11.3125rem;
+    border-radius: 1.875rem;
+    background: var(--dark-blue);
+    color: #FFF;
+    font-family: Outfit, sans-serif;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }
 
-.submit-btn:disabled {
-    background-color: #aaa;
+.register-btn {
+    width: 29.1875rem;
+    height: 4.0625rem;
+    border-radius: 1.875rem;
+    background: var(--dark-blue);
+    color: #FFF;
+    font-family: Outfit, sans-serif;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+
+
+.auth_button {
+    width: 29.1875rem;
+    height: 4.0625rem;
+    padding: 1rem 11.3125rem;
+    border-radius: 1.875rem;
+    border: 1px solid #2B3674;
+    color: #2B3674;
+    font-family: Outfit, sans-serif;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.submit-btn:disabled,
+.register-btn:disabled {
     cursor: not-allowed;
 }
 

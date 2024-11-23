@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { FaCheckDouble, FaEye, FaEyeSlash } from "react-icons/fa";
 import './auth.css';
-import { Link,useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { UserState } from "../../context/UserContext";
 import { Spinner } from "react-bootstrap";
+import NdrfLogo from "../../assets/ndrf_logo.svg"
+import AuthLogo from "../../assets/login_logo.svg"
 
 function SignIn() {
     const [email, setEmail] = useState("");
@@ -62,54 +64,63 @@ function SignIn() {
     };
 
     return (
-        <div className="form-container">
-            <h2>Sign In</h2>
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="Enter Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="input-field"
-                    />
-                    <div className="password-input-container">
+        <div className="authContainer">
+            <header className="authHeader">
+                <img src={NdrfLogo} alt="ndrflogo.svg" className="authHeaderImg"/>
+            </header>
+            <div className="AuthContentContainer">
+                <div className="logoImg">
+                    <img src={AuthLogo} alt="authlogo.svg" />
+                </div>
+                <div className="form-container">
+                    <h2>Sign In</h2>
                         <input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Password"
-                            value={password}
-                            onChange={handlePasswordChange}
+                            type="text"
+                            placeholder="Enter Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="input-field"
                         />
-                        <span onClick={togglePasswordVisibility} className="toggle-password-icon">
-                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </span>
-                    </div>
-                    {password.length > 0 && (
-                        <div className="password-conditions">
-                            <small className={hasValidLength ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> At least 8 characters
-                            </small>
-                            <small className={hasUpperCase ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 uppercase letter
-                            </small>
-                            <small className={hasLowerCase ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 lowercase letter
-                            </small>
-                            <small className={hasNumber ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 number
-                            </small>
-                            <small className={hasSpecialChar ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 special character
-                            </small>
+                        <div className="password-input-container">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password"
+                                value={password}
+                                onChange={handlePasswordChange}
+                                className="input-field"
+                            />
+                            <span onClick={togglePasswordVisibility} className="toggle-password-icon">
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
                         </div>
-                    )}
-                    <button onClick={handleLogin} disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)} className="submit-btn">
-                        {loading ? <Spinner animation="border" size="sm" /> : 'Sign In'}
-                    </button>
-                    <div className="RedirectContainer">
-                        <p>Have a account? <Link to='/signup'>Login here</Link></p>
-                    </div>
+                        <p className="forgot_password">Forgot Password?</p>
+                        {password.length > 0 && (
+                            <div className="password-conditions">
+                                <small className={hasValidLength ? 'valid-text' : 'invalid-text'}>
+                                    <FaCheckDouble /> At least 8 characters
+                                </small>
+                                <small className={hasUpperCase ? 'valid-text' : 'invalid-text'}>
+                                    <FaCheckDouble /> 1 uppercase letter
+                                </small>
+                                <small className={hasLowerCase ? 'valid-text' : 'invalid-text'}>
+                                    <FaCheckDouble /> 1 lowercase letter
+                                </small>
+                                <small className={hasNumber ? 'valid-text' : 'invalid-text'}>
+                                    <FaCheckDouble /> 1 number
+                                </small>
+                                <small className={hasSpecialChar ? 'valid-text' : 'invalid-text'}>
+                                    <FaCheckDouble /> 1 special character
+                                </small>
+                            </div>
+                        )}
+                        <button onClick={handleLogin} disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)} className="submit-btn">
+                            {loading ? <Spinner animation="border" size="sm" /> : 'Sign In'}
+                        </button>
+                        <button onClick={()=>navigate('/register')} className="auth_button">
+                            Register
+                        </button>
                 </div>
+            </div>
         </div>
     );
 }

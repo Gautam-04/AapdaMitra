@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { FaCheckDouble, FaEye, FaEyeSlash } from "react-icons/fa";
 import './auth.css'; // Ensure this points to your CSS file
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { UserState } from "../../context/UserContext";
-import { Button, Spinner } from "react-bootstrap"; // Import Bootstrap components
+import NdrfLogo from "../../assets/ndrf_logo.svg"
+import AuthLogo from "../../assets/login_logo.svg"
+import { Spinner } from "react-bootstrap"; // Import Bootstrap components
 
 function SignUp() {
     const [email, setEmail] = useState("");
@@ -101,10 +103,18 @@ function SignUp() {
     };
 
     return (
-        <div className="form-container">
-            <h2>Sign Up</h2>
+        <div className="authContainer">
+            <header className="authHeader">
+                <img src={NdrfLogo} alt="ndrflogo.svg" className="authHeaderImg"/>
+            </header>
+            <div className="AuthContentContainer">
+                <div className="logoImg">
+                    <img src={AuthLogo} alt="authlogo.svg" />
+                </div>
+                <div className="form-container">
+            <h2>Register</h2>
             {!otpSent ? (
-                <div className="input-group">
+                <>
                     <input
                         type="text"
                         placeholder="Enter your Email"
@@ -124,6 +134,7 @@ function SignUp() {
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
+                    <p className="forgot_password">Forgot Password?</p>
                     {password.length > 0 && (
                         <div className="password-conditions">
                             <small className={hasValidLength ? 'valid-text' : 'invalid-text'}>
@@ -143,17 +154,13 @@ function SignUp() {
                             </small>
                         </div>
                     )}
-                    <button
-                        onClick={handleOtpSend}
-                        disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)}
-                        className="submit-btn"
-                    >
-                        {loading ? <Spinner animation="border" size="sm" /> : 'Send OTP'}
-                    </button>
-                    <div className="RedirectContainer">
-                        <p>Have an account? <Link to='/signin'>Login here</Link></p>
-                    </div>
-                </div>
+                    <button onClick={handleOtpSend} disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)} className="register-btn">
+                            {loading ? <Spinner animation="border" size="sm" /> : 'Send Otp'}
+                        </button>
+                        <button onClick={()=>navigate('/')} className="auth_button">
+                            Login
+                        </button>
+                </>
             ) : (
                 <div className="otp-container">
                     <div className="otp-inputs">
@@ -168,15 +175,18 @@ function SignUp() {
                             />
                         ))}
                     </div>
-                    <Button onClick={verifyOtp} className="submit-btn">
+                    <button onClick={verifyOtp} className="register-btn">
                         {loading ? <Spinner animation="border" size="sm" /> : 'Verify OTP'}
-                    </Button>
+                    </button>
                     <div className="otp-note">
                         <p>If you did not receive the OTP, please check your spam folder.</p>
                     </div>
                 </div>
             )}
         </div>
+            </div>
+        </div>
+        
     );
 }
 

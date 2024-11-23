@@ -1,6 +1,15 @@
+:root {
+  --primary: #fc7753;
+  --secondary: #69140E;
+  --white: #F2F3D9;
+  --blue: #b7c3f3;
+  --dark-blue: #2b3674;
+}
+
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html,
