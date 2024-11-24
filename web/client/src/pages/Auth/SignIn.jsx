@@ -8,6 +8,7 @@ import { UserState } from "../../context/UserContext";
 import { Spinner } from "react-bootstrap";
 import NdrfLogo from "../../assets/ndrf_logo.svg"
 import AuthLogo from "../../assets/login_logo.svg"
+import Footer from "../../components/footer/Footer";
 
 function SignIn() {
     const [email, setEmail] = useState("");
@@ -121,6 +122,7 @@ function SignIn() {
                         </button>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }

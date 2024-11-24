@@ -8,6 +8,7 @@ import { UserState } from "../../context/UserContext";
 import NdrfLogo from "../../assets/ndrf_logo.svg"
 import AuthLogo from "../../assets/login_logo.svg"
 import { Spinner } from "react-bootstrap"; // Import Bootstrap components
+import Footer from "../../components/footer/Footer";
 
 function SignUp() {
     const [email, setEmail] = useState("");
@@ -185,6 +186,7 @@ function SignUp() {
             )}
         </div>
             </div>
+            <Footer />
         </div>
         
     );

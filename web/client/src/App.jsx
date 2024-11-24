@@ -4,8 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/Auth/SignUp";
 import SignIn from "./pages/Auth/SignIn";
 import Home from "./pages/Home/Home"
-import Footer from "./components/footer/Footer";
-import Header from "./components/header/header";
+// import Footer from "./components/footer/Footer";
+// import Header from "./components/header/header";
 import Search from "./pages/Search/Search";
 
 function App() {
