@@ -1,4 +1,3 @@
-import React from 'react';
 import MainLogo from '../../assets/main_logo.svg'; 
 import './header.css';
 
@@ -6,7 +5,7 @@ function Header() {
   return (
     <div className="header">
       <div className="header-logo-container">
-        <img src={MainLogo} alt="Auth Logo" className="header-logo" />
+        <img src={MainLogo} alt="mainlogo.svg" className="header-logo" />
       </div>
 
       <nav className="header-nav-container">
