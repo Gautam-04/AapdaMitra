@@ -78,10 +78,6 @@ body {
   text-align: center;
   padding: 40px 20px;
   width: 100%;
-  height: calc(100vh - 140px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .header-logo {
@@ -92,7 +88,7 @@ body {
 
 .search-bar {
   margin: 20px auto;
-  width: 50%;
+  width: 60%;
 }
 
 .search-input {

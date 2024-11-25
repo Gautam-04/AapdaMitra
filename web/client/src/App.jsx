@@ -4,9 +4,10 @@ import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/Auth/SignUp";
 import SignIn from "./pages/Auth/SignIn";
 import Home from "./pages/Home/Home";
-import Footer from "./components/footer/Footer";
-import Header from "./components/header/header";
+// import Footer from "./components/footer/Footer";
+// import Header from "./components/header/header";
 import Search from "./pages/Search/Search";
+import CardContainer from "./components/cardContainer/cardContainer";
 import Searchbar from "./components/searchbar/searchbar";
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             </>
           }
         />
+        <Route path="/event" element={<CardContainer />} />
       </Routes>
       {/* <Footer /> */}
       <Routes></Routes>
