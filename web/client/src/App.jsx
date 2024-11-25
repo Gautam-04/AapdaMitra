@@ -7,6 +7,7 @@ import Home from "./pages/Home/Home"
 // import Footer from "./components/footer/Footer";
 // import Header from "./components/header/header";
 import Search from "./pages/Search/Search";
+import CardContainer from "./components/cardContainer/cardContainer";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/register" element={<SignUp />} />
         <Route path="/home" element={<Home />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/event" element={<CardContainer />} />
       </Routes>
       {/* <Footer /> */}
       <Routes>
