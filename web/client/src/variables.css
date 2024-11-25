@@ -1,0 +1,12 @@
+/* Add fonts here */
+
+/* Add variables here */
+
+:root {
+  --white: #ffffff;
+  --primary-color: #2b3674;
+  --primary-color-light: #4957a7;
+  --accent-color: #fc7753;
+  --light-gray: #e4e4e4;
+  --font-family: "Inter", sans-serif;
+}
