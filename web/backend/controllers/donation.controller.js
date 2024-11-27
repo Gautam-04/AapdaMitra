@@ -1,6 +1,7 @@
 import { Donation } from "../models/donations.models.js";
 import {createHmac } from 'node:crypto'
 import Razorpay from 'razorpay'
+import { Web3 } from "web3";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -23,6 +24,9 @@ const { amount, userId } = req.body;
   }
 }
 
+
+const Providerurl = 'https://polygon-rpc.com'
+const web3 = new Web3(new Web3.providers.HttpProvider(Providerurl))
 const verifyPayment  = async(req,res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, amount } = req.body;
 
@@ -45,6 +49,34 @@ const verifyPayment  = async(req,res) => {
     });
 
     //implement web3 logic
+    const amountInMatic = 0.01;
+    const amountInWei = web3.utils.toWei(amountInMatic.toString(), 'ether');
+
+    const rootAccount = web3.eth.accounts.privateKeyToAccount(process.env.BLOCKCHAIN_ACCOUNT);
+    web3.eth.accounts.wallet.add(rootAccount);
+    web3.eth.defaultAccount = rootAccount.address;
+
+    const recipientAccountAddress = process.env.RECIPIENT_ACCOUNT_ADDRESS;
+
+    const tx = {
+      from: rootAccount.address,
+      to: recipientAccountAddress,
+      value: amountInWei,
+      gas: 21000,
+    };
+
+    const signedTx = await web3.eth.accounts.signTransaction(tx, process.env.BLOCKCHAIN_ACCOUNT);
+    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+    const dataHash = web3.utils.sha3(JSON.stringify(donation));
+    donation.blockchain = {
+      transactionHash: receipt.transactionHash,
+      blockNumber: receipt.blockNumber,
+      dataHash,
+    };
+
+
+
     await donation.save();
 
     res.json({ success: true, donation });
