@@ -4,11 +4,14 @@ import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/Auth/SignUp";
 import SignIn from "./pages/Auth/SignIn";
 import Home from "./pages/Home/Home";
-// import Footer from "./components/footer/Footer";
-// import Header from "./components/header/header";
+import Footer from "./components/footer/Footer";
+import Header from "./components/header/header";
 import Search from "./pages/Search/Search";
 import CardContainer from "./components/cardContainer/cardContainer";
 import Searchbar from "./components/searchbar/searchbar";
+import MultiTabContainer from "./components/multitabContainer/multiTabContainer";
+import ElasticSearch from "./pages/ElasticSearch/ElasticSearch";
+import VerifyPosts from "./pages/VerifyPosts/VerifyPosts";
 
 function App() {
   return (
@@ -19,20 +22,11 @@ function App() {
         <Route path="/register" element={<SignUp />} />
         <Route path="/home" element={<Home />} />
         <Route path="/search" element={<Search />} />
-        <Route
-          path="/test"
-          element={
-            <>
-              <Header />
-              <Searchbar />
-              <Footer />
-            </>
-          }
-        />
+        <Route path="/elastic" element={<ElasticSearch />} />
         <Route path="/event" element={<CardContainer />} />
+        <Route path="/verifyposts" element={<VerifyPosts />} />
       </Routes>
       {/* <Footer /> */}
-      <Routes></Routes>
       <ToastContainer
         position="top-right"
         autoClose={2000}

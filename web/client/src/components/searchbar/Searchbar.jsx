@@ -86,6 +86,7 @@ function Searchbar() {
       setResponseObjects(responseData);
       // setResponseCounts(newResponseCounts);
     } catch (error) {
+      toast.error("Something went wrong. Try again later.");
       console.error(error.message);
     }
   };
