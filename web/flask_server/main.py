@@ -10,12 +10,14 @@ PORT = os.environ['PORT']
 
 # Blueprints
 from blueprints.testBlueprint.test import test
+from blueprints.elastic.elastic import search
 
 app = Flask(__name__)
 CORS(app,supports_credentials=True)
 
 # Register Blueprints
 app.register_blueprint(test)
+app.register_blueprint(search)
 
 if __name__ == "__main__":
-    app.run(port=PORT, debug=True)
+    app.run(port=PORT, debug=False)

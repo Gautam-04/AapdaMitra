@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./multiTabContainer.css";
 
 const MultiTabContainer = () => {
-  const [openTabs, setOpenTabs] = useState([]);
+  const [openTabs, setOpenTabs] = useState(["Social Media", "News"]);
 
   const socialMediaData = [
     {
@@ -15,7 +15,7 @@ const MultiTabContainer = () => {
       disasterType: "Flood",
       source: "The Hindu",
       image: "https://via.placeholder.com/400x300",
-    }
+    },
   ];
 
   const newsData = [
@@ -132,7 +132,9 @@ const MultiTabContainer = () => {
       <div className="tabs">
         <div className="tab-wrapper">
           <button
-            className={`tab ${openTabs.includes("Social Media") ? "active" : ""}`}
+            className={`tab ${
+              openTabs.includes("Social Media") ? "active" : ""
+            }`}
             onClick={() => toggleTab("Social Media")}
           >
             <span className="tab-text">Social Media</span>
