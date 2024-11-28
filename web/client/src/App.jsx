@@ -1,13 +1,18 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/Auth/SignUp";
 import SignIn from "./pages/Auth/SignIn";
-import Home from "./pages/Home/Home"
-// import Footer from "./components/footer/Footer";
-// import Header from "./components/header/header";
+import Home from "./pages/Home/Home";
+import Footer from "./components/footer/Footer";
+import Header from "./components/header/header";
 import Search from "./pages/Search/Search";
 import CardContainer from "./components/cardContainer/cardContainer";
+import Searchbar from "./components/searchbar/searchbar";
+import MultiTabContainer from "./components/multitabContainer/multiTabContainer";
+import ElasticSearch from "./pages/ElasticSearch/ElasticSearch";
+import VerifyPosts from "./pages/VerifyPosts/VerifyPosts";
+import Donation from "./pages/Donation/Donation";
 
 function App() {
   return (
@@ -18,28 +23,28 @@ function App() {
         <Route path="/register" element={<SignUp />} />
         <Route path="/home" element={<Home />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/elastic" element={<ElasticSearch />} />
         <Route path="/event" element={<CardContainer />} />
+        <Route path="/verifyposts" element={<VerifyPosts />} />
+        <Route path="/track-donation" element={<Donation />} />
       </Routes>
       {/* <Footer /> */}
-      <Routes>
-        
-      </Routes>
       <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          limit={1}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-          transition={Slide}
+        position="top-right"
+        autoClose={2000}
+        limit={1}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Slide}
       />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
