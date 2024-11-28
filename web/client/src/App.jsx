@@ -12,6 +12,7 @@ import Searchbar from "./components/searchbar/searchbar";
 import MultiTabContainer from "./components/multitabContainer/multiTabContainer";
 import ElasticSearch from "./pages/ElasticSearch/ElasticSearch";
 import VerifyPosts from "./pages/VerifyPosts/VerifyPosts";
+import Donation from "./pages/Donation/Donation";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/elastic" element={<ElasticSearch />} />
         <Route path="/event" element={<CardContainer />} />
         <Route path="/verifyposts" element={<VerifyPosts />} />
+        <Route path="/track-donation" element={<Donation />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer

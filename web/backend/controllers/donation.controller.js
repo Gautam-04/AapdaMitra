@@ -86,10 +86,10 @@ const verifyPayment  = async(req,res) => {
   }
 }
 
-const getDonations = async() => {
+const getDonations = async(req,res) => {
     try {
     const donations = await Donation.find();
-    res.json({ success: true, donations });
+    res.status(200).json({ success: true, donations });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Server Error' });

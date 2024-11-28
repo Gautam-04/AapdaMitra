@@ -7,6 +7,6 @@ const routes = Router();
 
 routes.route('/create-order').post(createOrder)
 routes.route('/verify-payment').post(verifyPayment)
-routes.route('/get-donations').post(getDonations)
+routes.route('/get-donations').get(getDonations)
 
 export default routes
