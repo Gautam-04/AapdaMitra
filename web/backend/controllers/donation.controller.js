@@ -49,31 +49,31 @@ const verifyPayment  = async(req,res) => {
     });
 
     //implement web3 logic
-    const amountInMatic = 0.01;
-    const amountInWei = web3.utils.toWei(amountInMatic.toString(), 'ether');
+    // const amountInMatic = 0.01;
+    // const amountInWei = web3.utils.toWei(amountInMatic.toString(), 'ether');
 
-    const rootAccount = web3.eth.accounts.privateKeyToAccount(process.env.BLOCKCHAIN_ACCOUNT);
-    web3.eth.accounts.wallet.add(rootAccount);
-    web3.eth.defaultAccount = rootAccount.address;
+    // const rootAccount = web3.eth.accounts.privateKeyToAccount(process.env.BLOCKCHAIN_ACCOUNT);
+    // web3.eth.accounts.wallet.add(rootAccount);
+    // web3.eth.defaultAccount = rootAccount.address;
 
-    const recipientAccountAddress = process.env.RECIPIENT_ACCOUNT_ADDRESS;
+    // const recipientAccountAddress = process.env.RECIPIENT_ACCOUNT_ADDRESS;
 
-    const tx = {
-      from: rootAccount.address,
-      to: recipientAccountAddress,
-      value: amountInWei,
-      gas: 21000,
-    };
+    // const tx = {
+    //   from: rootAccount.address,
+    //   to: recipientAccountAddress,
+    //   value: amountInWei,
+    //   gas: 21000,
+    // };
 
-    const signedTx = await web3.eth.accounts.signTransaction(tx, process.env.BLOCKCHAIN_ACCOUNT);
-    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    // const signedTx = await web3.eth.accounts.signTransaction(tx, process.env.BLOCKCHAIN_ACCOUNT);
+    // const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-    const dataHash = web3.utils.sha3(JSON.stringify(donation));
-    donation.blockchain = {
-      transactionHash: receipt.transactionHash,
-      blockNumber: receipt.blockNumber,
-      dataHash,
-    };
+    // const dataHash = web3.utils.sha3(JSON.stringify(donation));
+    // donation.blockchain = {
+    //   transactionHash: receipt.transactionHash,
+    //   blockNumber: receipt.blockNumber,
+    //   dataHash,
+    // };
 
 
 
