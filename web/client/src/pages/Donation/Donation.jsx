@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState, useMemo } from 'react';
 import Footer from '../../components/footer/Footer';
 import Header from '../../components/header/header';
@@ -6,7 +7,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { MaterialReactTable } from 'material-react-table';
 
-function Donation() {
+function Donation({fundraiserId}) {
     const [donations, setDonations] = useState([]);
 
     // Fetch Donations
@@ -15,9 +16,10 @@ function Donation() {
             const config = {
                 headers: {
                     "Content-Type": "application/json"
-                }
+                },
+                // params: fundraiserId ? { fundraiserId } : {},
             };
-            const response = await axios.get('/api/v1/donation/get-donations', config);
+            const response = await axios.get('/api/v1/donation/get-donations?fundraiserId=6749a1b8aa1bd88ce1b860bc', config);
             if (response.status === 200) {
                 setDonations(response.data.donations);
                 console.log(response.data.donations)

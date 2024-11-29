@@ -7,7 +7,7 @@ import { Router } from "express";
 const Citizen = mongoose.model('Citizen',mongoose.Schema({
     'name': {type: String, required: true},
     'email': {type: String, required: true, unique: true}
-},{timeStamps: true}))
+},{timestamps: true}))
 
 const Issue = mongoose.model('Issue', mongoose.Schema({
     'photo': {type: String, default: ''},
@@ -32,13 +32,13 @@ const Sos = mongoose.model('Sos',mongoose.Schema({
         default: 'Other'
     }
 },{
-    timeStamps: true
+    timestamps: true
 }))
 
 
 //setup
 function generateToken(id){
-    return jwt.sign({id},process.env.ACCESS_TOKEN_SECRET,{expiresIn: process.env.REFRESH_TOKEN_EXPIRY})
+    return jwt.sign({id},process.env.ACCESS_TOKEN_SECRET,{expiresIn: process.env.MOBILE_REFRESH_TOKEN_EXPIRY})
 }
 
 const transporter = nodemailer.createTransport({
@@ -217,7 +217,7 @@ const sendSos = async(req,res) => {
         return res.status(400).json({message: 'Give location permission'})
     }
 
-    const newSos = await Issue.create({
+    const newSos = await Sos.create({
         name,
         email,
         location,
@@ -240,15 +240,113 @@ const getSos = async(req,res) => {
         return res.status(200).json(allSos);
 }
 
+const perHrSosCount = async (req, res) => {
+    try {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const hourlyData = [];
+
+        for (let hour = 0; hour < 24; hour++) {
+            const startHour = new Date(startOfDay);
+            startHour.setHours(hour);
+
+            const endHour = new Date(startHour);
+            endHour.setHours(hour + 1);
+
+            const sosCount = await Sos.countDocuments({
+                createdAt: {
+                    $gte: startHour,
+                    $lt: endHour,
+                },
+            });
+
+            hourlyData.push({
+                hour: `${hour.toString().padStart(2, '0')}:00-${(hour + 1).toString().padStart(2, '0')}:00`,
+                count: sosCount,
+            });
+        }
+
+        return res.status(200).json(hourlyData);
+    } catch (error) {
+        console.error('Error in perHrSosCount:', error);
+        return res.status(500).json({ 
+            message: 'Error fetching hourly SOS counts',
+            error: error.message 
+        });
+    }
+}
+
+const perMonthSosCount = async (req, res) => {
+    try {
+        const currentYear = new Date().getFullYear();
+        const monthlyData = [];
+
+        const monthNames = [
+            'January', 'February', 'March', 'April', 
+            'May', 'June', 'July', 'August', 
+            'September', 'October', 'November', 'December'
+        ];
+
+        for (let month = 0; month < 12; month++) {
+            const startOfMonth = new Date(currentYear, month, 1);
+            const endOfMonth = new Date(currentYear, month + 1, 1);
+
+            const sosCount = await Sos.countDocuments({
+                createdAt: {
+                    $gte: startOfMonth,
+                    $lt: endOfMonth
+                }
+            });
+
+            // const dailyData = [];
+            // for (let day = 1; day <= new Date(currentYear, month + 1, 0).getDate(); day++) {
+            //     const startOfDay = new Date(currentYear, month, day);
+            //     const endOfDay = new Date(currentYear, month, day + 1);
+
+            //     const dailyCount = await Sos.countDocuments({
+            //         createdAt: {
+            //             $gte: startOfDay,
+            //             $lt: endOfDay
+            //         }
+            //     });
+
+            //     dailyData.push({
+            //         date: `${currentYear}-${month + 1}-${day}`,
+            //         count: dailyCount
+            //     });
+            // }
+
+            monthlyData.push({
+                month: monthNames[month],
+                year: currentYear,
+                totalMonthlyCount: sosCount,
+                // dailyCounts: dailyData
+            });
+        }
+
+        return res.status(200).json(monthlyData);
+    } catch (error) {
+        console.error('Error in perMonthSosCount:', error);
+        return res.status(500).json({ 
+            message: 'Error fetching monthly SOS counts',
+            error: error.message 
+        });
+    }
+};
+
+
 //raise a req controller
 
 //routes
+import {getFundraiser} from './controllers/donation.controller.js'
 const routes = Router();
 
 routes.route('/register-citizen').post(citizenRegister)
 routes.route('/verify-reg-citizen').post(verifyRegisteredUser)
 routes.route('/login-mobile').post(citizenLogin)
 routes.route('/verify-login-citizen').post(verifyLoggedInUser)
+routes.route('/get-fundraisers').get(getFundraiser)
 routes.route('/add-issue').post(AddIssue)
 routes.route('/send-sos').post(sendSos)
 
@@ -256,6 +354,8 @@ routes.route('/send-sos').post(sendSos)
 //for admin routes
 routes.route('/get-all-issue').get(getAllIssue)
 routes.route('/get-all-sos').get(getSos)
+routes.route('/per-hr-sos').get(perHrSosCount)
+routes.route('/per-month-sos').get(perMonthSosCount)
 
 
 export default routes
