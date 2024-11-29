@@ -11,15 +11,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  english_words: ^4.0.0
-  provider: ^6.0.0
+  flutter_svg: ^2.0.16
+  google_fonts: ^4.0.3
+  shared_preferences: ^2.1.0
+  image_picker: ^0.8.8+7 # Added image_picker dependency
+  permission_handler: ^10.2.0 # Added permission_handler for runtime permissions
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^2.0.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

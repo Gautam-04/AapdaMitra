@@ -21,9 +21,13 @@ app.use(cookieParser());
 
 //routes
 import userRoutes from './routes/user.routes.js'
+import ndrfRoutes from './ndrfUser.js'
 import donationRoutes from './routes/donation.routes.js'
+import mobileRoutes from './mobile.js'
 
 app.use("/v1/user",userRoutes)
+app.use("/v1/ndrfuser",ndrfRoutes)
 app.use("/v1/donation",donationRoutes)
+app.use("/v1/mobile",mobileRoutes)
 
 export {app}

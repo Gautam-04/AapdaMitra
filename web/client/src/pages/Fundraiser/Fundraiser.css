@@ -1,0 +1,14 @@
+.fundraiser-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.fundraiser-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.fundraiser-cards .card {
+    margin: 10px;
+}

@@ -1,4 +1,4 @@
-import { Donation } from "../models/donations.models.js";
+import { Donation,Fundraiser } from "../models/donations.models.js";
 import {createHmac } from 'node:crypto'
 import Razorpay from 'razorpay'
 import { Web3 } from "web3";
@@ -24,58 +24,113 @@ const { amount, userId } = req.body;
   }
 }
 
+class BlockchainService {
+    constructor() {
+        this.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
+    }
 
-const Providerurl = 'https://polygon-rpc.com'
-const web3 = new Web3(new Web3.providers.HttpProvider(Providerurl))
+    async signTransaction(fromAddress, toAddress, data) {
+        try {
+            const gasPrice = await this.web3.eth.getGasPrice();
+            const gasLimit = await this.web3.eth.estimateGas({
+                from: fromAddress,
+                to: toAddress,
+                value: '0x0',
+                data: data
+            });
+
+            const nonce = await this.web3.eth.getTransactionCount(fromAddress);
+
+            const txObject = {
+                nonce: this.web3.utils.toHex(nonce),
+                to: toAddress,
+                value: '0x0',
+                gasLimit: this.web3.utils.toHex(gasLimit),
+                gasPrice: this.web3.utils.toHex(gasPrice),
+                data: data
+            };
+
+            const dataHash = await this.web3.utils.sha3(JSON.stringify(data));
+
+            const privateKey = process.env.BLOCKCHAIN_PRIVATE_KEY;
+            const signedTx = await this.web3.eth.accounts.signTransaction(txObject, privateKey);
+            const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+            console.log(receipt)
+
+            return {
+                transactionHash: receipt.transactionHash,
+                blockNumber: receipt.blockHash,
+                dataHash: dataHash
+            };
+        } catch (error) {
+            throw new Error(`Blockchain transaction failed: ${error.message}`);
+        }
+    }
+
+    async getAccounts() {
+        return await this.web3.eth.getAccounts();
+    }
+}
+
 const verifyPayment  = async(req,res) => {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, amount } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, amount, fundraiserId} = req.body;
 
   try {
     const generated_signature = createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
-
     if (generated_signature !== razorpay_signature) {
       return res.status(400).json({ success: false, message: 'Invalid Signature' });
     }
+    console.log(generated_signature,razorpay_signature)
 
-    const donationCount = await Donation.countDocuments();
-    const donation = new Donation({
-      serialNumber: donationCount + 1,
-      paymentId: razorpay_payment_id,
-      userId,
-      amount,
-    });
+        const blockchainService = new BlockchainService();
+        const accounts = await blockchainService.getAccounts();
+        const fromAddress = accounts[0];
 
-    //implement web3 logic
-    const amountInMatic = 0.01;
-    const amountInWei = web3.utils.toWei(amountInMatic.toString(), 'ether');
-
-    const rootAccount = web3.eth.accounts.privateKeyToAccount(process.env.BLOCKCHAIN_ACCOUNT);
-    web3.eth.accounts.wallet.add(rootAccount);
-    web3.eth.defaultAccount = rootAccount.address;
-
-    const recipientAccountAddress = process.env.RECIPIENT_ACCOUNT_ADDRESS;
-
-    const tx = {
-      from: rootAccount.address,
-      to: recipientAccountAddress,
-      value: amountInWei,
-      gas: 21000,
-    };
-
-    const signedTx = await web3.eth.accounts.signTransaction(tx, process.env.BLOCKCHAIN_ACCOUNT);
-    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-
-    const dataHash = web3.utils.sha3(JSON.stringify(donation));
-    donation.blockchain = {
-      transactionHash: receipt.transactionHash,
-      blockNumber: receipt.blockNumber,
-      dataHash,
-    };
+        const donationCount = await Donation.countDocuments();
+        const serialNumber = donationCount + 1;
+        const donationData = blockchainService.web3.utils.asciiToHex(JSON.stringify({
+            serialNumber,
+            paymentId: razorpay_payment_id,
+            userId,
+            amount
+        }));
 
 
+        const blockchainReceipt = await blockchainService.signTransaction(
+            fromAddress,
+            process.env.BLOCKCHAIN_ACCOUNT,
+            donationData
+        );
+
+        const donation = new Donation({
+            serialNumber,
+            paymentId: razorpay_payment_id,
+            userId,
+            amount,
+            blockchain: {
+                transactionHash: blockchainReceipt.transactionHash,
+                blockNumber: blockchainReceipt.blockNumber,
+                dataHash: blockchainReceipt.dataHash,
+            }
+        });
+
+        if (fundraiserId) {
+      const fundraiser = await Fundraiser.findById(fundraiserId);
+      if (!fundraiser) {
+        return res.status(404).json({ success: false, message: "Fundraiser not found" });
+      }
+      fundraiser.donations.push(donation._id);
+      await fundraiser.save();
+    }
+
+// donation.blockchain = {
+//   transactionHash: receipt.transactionHash,
+//   blockNumber: receipt.blockNumber,
+//   dataHash,
+// };
 
     await donation.save();
 
@@ -87,13 +142,53 @@ const verifyPayment  = async(req,res) => {
 }
 
 const getDonations = async(req,res) => {
-    try {
-    const donations = await Donation.find();
+    const { fundraiserId } = req.query; // Optional filter by fundraiser
+  try {
+    const query = fundraiserId ? { _id: fundraiserId } : {};
+    const donations = await Fundraiser.find(query).populate("donations");
     res.status(200).json({ success: true, donations });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+}
+
+const createFundraiser = async (req, res) => {
+  const { title, fullForm, description, logo } = req.body;
+  try {
+    const fundraiser = new Fundraiser({ title, fullForm, description, logo });
+    await fundraiser.save();
+    res.status(201).json({ success: true, fundraiser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const deleteFundraiser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const fundraiser = await Fundraiser.findByIdAndDelete(id);
+    if (!fundraiser) {
+      return res.status(404).json({ success: false, message: "Fundraiser not found" });
+    }
+    // Optionally delete associated donations
+    await Donation.deleteMany({ _id: { $in: fundraiser.donations } });
+    res.status(200).json({ success: true, message: "Fundraiser deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const getFundraiser = async(req,res) => {
+  try {
+    const fundraiser = await Fundraiser.find();
+    res.status(200).json({ success: true, fundraiser });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 }
 
-export {createOrder,verifyPayment,getDonations}
+export {createOrder,verifyPayment,getDonations,createFundraiser,deleteFundraiser,getFundraiser}
