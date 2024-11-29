@@ -9,7 +9,7 @@ import json
 es = Elasticsearch('http://mongo.chinmaydesai.site:9200')
 print("Connected to ElasticSearch\t", es.ping())
 
-INDEX_NAME = "disasters_dummy_data"
+INDEX_NAME = "scraped_tweets"
 
 search = Blueprint("search", __name__)
 

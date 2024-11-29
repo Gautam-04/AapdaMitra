@@ -1,0 +1,119 @@
+.analytics-wrapper {
+  background-color: whitesmoke;
+  padding-block: 1rem;
+}
+
+.analytics-cards {
+  width: 100%;
+  /* background-color: salmon; */
+  /* height: 50vh; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.2rem;
+  padding-block: 0.5rem;
+  gap: 1.5rem;
+}
+
+.analytics-card {
+  font-family: "Inter", sans-serif !important;
+  width: 20%;
+  max-width: 275px;
+  aspect-ratio: 1/1;
+  min-height: 0 !important;
+  border: none;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 2px 2px 4px var(--light-gray);
+  margin: 0;
+  padding: 1rem;
+}
+
+.card-content-section {
+  display: flex;
+  /* justify-content: space-around; */
+  align-items: center;
+  flex-direction: column;
+}
+
+.card-text {
+  font-size: clamp(2rem, 2.5vw, 2.5rem) !important;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.card-title {
+  text-wrap: nowrap;
+  font-size: 1rem;
+  line-height: 1rem !important;
+  font-weight: 400;
+}
+
+.analytics-card-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.analysis-charts {
+  width: 100%;
+  height: 50vh;
+  /* padding: 1.2rem; */
+  /* background-color: salmon; */
+  display: flex;
+  gap: 1rem;
+  padding-block: 1rem;
+  justify-content: center;
+  align-items: center;
+  /* background-color: salmon; */
+}
+
+.charts-disaster-distribution {
+  background-color: white;
+  box-shadow: 2px 2px 4px var(--light-gray);
+  /* padding: 2rem; */
+  border-radius: 25px;
+  width: 40% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.charts-sos-history {
+  position: relative;
+  background-color: white;
+  height: 100%;
+  box-shadow: 2px 2px 4px var(--light-gray);
+  /* padding: 2rem; */
+  border-radius: 25px;
+  width: 55%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container {
+  max-height: 100%;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.map-wrapper {
+  height: 78vh;
+  border-radius: 25px;
+  padding: 1rem;
+  overflow: hidden;
+}
+.leaflet-container {
+  height: 100% !important;
+  background: white;
+  border-radius: 25px;
+}
