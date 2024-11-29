@@ -10,6 +10,7 @@ import { RiRefund2Fill } from "react-icons/ri";
 import { IoSearch } from "react-icons/io5";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { icon } from "leaflet";
+import Fundraiser from "../../components/Fundraiser/Fundraiser";
 
 const Dashboard = () => {
   const [dashboardPage, setDashboardPage] = useState("Analytics");
@@ -76,6 +77,7 @@ const Dashboard = () => {
         <div className="dashboard-content">
           {dashboardPage === "Analytics" && <Analytics />}
           {dashboardPage === "Search" && <Search />}
+          {dashboardPage === "Donations" && <Fundraiser />}
         </div>
       </div>
       <Footer />

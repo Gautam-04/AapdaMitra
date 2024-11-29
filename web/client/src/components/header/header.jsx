@@ -1,29 +1,58 @@
-import MainLogo from '../../assets/main_logo.svg'; 
-import './header.css';
+import { Link } from "react-router-dom";
+import MainLogo from "../../assets/main_logo.svg";
+import "./header.css";
 
 function Header() {
   return (
     <div className="header">
       <div className="header-logo-container">
-        <img src={MainLogo} alt="mainlogo.svg" className="header-logo" />
+        <Link
+          to={"/dashboard"}
+          style={{ textDecoration: "None", color: "black" }}
+        >
+          <img src={MainLogo} alt="mainlogo.svg" className="header-logo" />
+        </Link>
       </div>
 
       <nav className="header-nav-container">
-        <div className="header-nav-item">HOME</div>
-        <div className="header-nav-item">ANALYSIS</div>
-        <div className="header-nav-item">ABOUT US</div>
-        <div className="header-nav-item">NDRF</div>
-        <div className="header-nav-item">CAMPAIGNS</div>
+        <div className="header-nav-item">
+          <Link
+            to={"/dashboard"}
+            style={{ textDecoration: "None", color: "black" }}
+          >
+            HOME
+          </Link>
+        </div>
+        <div className="header-nav-item">
+          <Link
+            to={"/elastic"}
+            style={{ textDecoration: "None", color: "black" }}
+          >
+            SEARCH
+          </Link>
+        </div>
+        <div className="header-nav-item">
+          <Link
+            to={"/donations/:0"}
+            style={{ textDecoration: "None", color: "black" }}
+          >
+            DONATIONS
+          </Link>{" "}
+        </div>
+        <div className="header-nav-item">
+          <Link
+            to={"https://www.ndrf.gov.in/"}
+            style={{ textDecoration: "None", color: "black" }}
+          >
+            NDRF
+          </Link>{" "}
+        </div>
       </nav>
 
-
       <div className="header-right-section">
-
-        <i className="far fa-bell header-bell" aria-hidden="true"></i>
-
         <div className="header-profile-container">
           <img
-            src="https://via.placeholder.com/46x57"
+            src="https://avatar.iran.liara.run/public/boy?username=Ash"
             alt="Profile Icon"
             className="header-profile-image"
           />
@@ -34,5 +63,3 @@ function Header() {
 }
 
 export default Header;
-
-

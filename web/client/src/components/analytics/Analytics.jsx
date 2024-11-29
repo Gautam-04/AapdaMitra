@@ -11,6 +11,7 @@ import { MdOutlinePendingActions } from "react-icons/md";
 import { MdCrisisAlert } from "react-icons/md";
 import { IoDownload } from "react-icons/io5";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+import { Icon } from "leaflet";
 
 Chart.register(CategoryScale);
 
@@ -162,7 +163,7 @@ const Analytics = () => {
       icon: <FaClipboardCheck className="analytics-card-icon" />,
     },
     {
-      title: "SOS raised today",
+      title: "SOS raised Today",
       statistic: 20,
       color: "#FBFBDF",
       icon: <MdCrisisAlert className="analytics-card-icon" />,
@@ -174,6 +175,25 @@ const Analytics = () => {
       icon: <IoDownload className="analytics-card-icon" />,
     },
   ];
+
+  const floodIcon = new Icon({
+    iconUrl:
+      "https://assets.publishing.service.gov.uk/media/653915a7e6c9680014aa9ab1/flood-alert-icon-960.png",
+    iconSize: [100, 66],
+  });
+
+  const earquakeIcon = new Icon({
+    iconUrl:
+      "https://png.pngtree.com/png-clipart/20230825/original/pngtree-traffic-sign-with-earthquake-picture-image_8517813.png",
+    iconSize: [72, 60],
+  });
+
+  const cycloneIcon = new Icon({
+    iconUrl:
+      "https://png.pngtree.com/png-vector/20240611/ourmid/pngtree-unveiling-nature-s-fury-satellite-views-of-hurricane-png-image_12634675.png",
+    iconSize: [80, 80],
+  });
+
   return (
     <div className="analytics-wrapper">
       <div className="analytics-cards">
@@ -207,10 +227,14 @@ const Analytics = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors&ensp;'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Marker position={[51.505, -0.09]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
+          <Marker position={[29, 77]} icon={earquakeIcon}>
+            <Popup>Earthquake</Popup>
+          </Marker>
+          <Marker position={[19, 74]} icon={floodIcon}>
+            <Popup>Flood</Popup>
+          </Marker>
+          <Marker position={[21, 87]} icon={cycloneIcon}>
+            <Popup>Cyclone</Popup>
           </Marker>
         </MapContainer>
       </div>

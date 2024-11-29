@@ -16,7 +16,7 @@ import Donation from "./pages/Donation/Donation";
 import SummarizePosts from "./pages/SummarizePosts/SummarizePosts";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Search from "./components/Search/Search";
-import Fundraiser from "./pages/Fundraiser/Fundraiser";
+// import Fundraiser from "./pages/Fundraiser/Fundraiser";
 
 function App() {
   return (
@@ -31,7 +31,7 @@ function App() {
         <Route path="/event" element={<CardContainer />} />
         <Route path="/verifyposts" element={<VerifyPosts />} />
         <Route path="/summarizeposts" element={<SummarizePosts />} />
-        <Route path="/fundraising" element={<Fundraiser />} />
+        {/* <Route path="/fundraising" element={<Fundraiser />} /> */}
         <Route path="/donations/:fundraiserId" element={<Donation />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
