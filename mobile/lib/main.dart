@@ -3,10 +3,11 @@ import 'package:mobile/screens/auth_screen.dart';
 import 'package:mobile/screens/home_screen.dart';
 import 'package:mobile/screens/donation_screen.dart';
 import 'package:mobile/screens/raiseIssue_screen.dart';
-import 'package:mobile/screens/manuals_screen.dart'; // Ensure this file exists
+import 'package:mobile/screens/manuals_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -18,16 +19,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Future<bool> _isUserLoggedInFuture;
+  late Future<bool> _isLoggedInFuture;
 
   @override
   void initState() {
     super.initState();
-    _isUserLoggedInFuture = _checkUserLoggedInStatus();
+    _isLoggedInFuture = _checkLoginStatus();
   }
 
-  /// Checks if the user is logged in by accessing shared preferences
-  Future<bool> _checkUserLoggedInStatus() async {
+  /// Check if the user is logged in
+  Future<bool> _checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('isLoggedIn') ?? false;
   }
@@ -37,26 +38,22 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Aapda Mitra | NDRF',
       theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/', // Initial route for authentication logic
+      initialRoute: '/',
       routes: {
         '/': (context) => FutureBuilder<bool>(
-              future: _isUserLoggedInFuture,
+              future: _isLoggedInFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(
                     body: Center(child: CircularProgressIndicator()),
                   );
-                }
-
-                if (snapshot.hasError) {
+                } else if (snapshot.hasError) {
                   return _buildErrorScreen();
-                }
-
-                if (snapshot.hasData && snapshot.data == true) {
+                } else if (snapshot.data == true) {
                   return const HomeScreen(); // Navigate to HomeScreen if logged in
+                } else {
+                  return const AuthScreen(); // Navigate to AuthScreen if not logged in
                 }
-
-                return const AuthScreen(); // Show AuthScreen if not logged in
               },
             ),
         '/home_screen': (context) => const HomeScreen(),
@@ -84,7 +81,7 @@ class _MyAppState extends State<MyApp> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  _isUserLoggedInFuture = _checkUserLoggedInStatus();
+                  _isLoggedInFuture = _checkLoginStatus(); // Retry fetching login status
                 });
               },
               child: const Text('Retry'),
