@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useMemo } from 'react';
 import Footer from '../../components/footer/Footer';
 import Header from '../../components/header/header';
@@ -6,9 +6,11 @@ import './Donation.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { MaterialReactTable } from 'material-react-table';
+import { useParams } from 'react-router-dom';
 
-function Donation({fundraiserId}) {
+function Donation() {
     const [donations, setDonations] = useState([]);
+    const { fundraiserId } = useParams();
 
     // Fetch Donations
     const fetchDonations = async () => {
@@ -17,12 +19,12 @@ function Donation({fundraiserId}) {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                // params: fundraiserId ? { fundraiserId } : {},
+                params: { fundraiserId },
             };
-            const response = await axios.get('/api/v1/donation/get-donations?fundraiserId=6749a1b8aa1bd88ce1b860bc', config);
+            const response = await axios.get('/api/v1/donation/get-donations', config);
             if (response.status === 200) {
-                setDonations(response.data.donations);
-                console.log(response.data.donations)
+                setDonations(response.data?.donations[0]?.donations);
+                console.log(response.data.donations[0].donations)
             }
         } catch (error) {
             toast.error('Error fetching donations. Try again later.');
@@ -62,7 +64,7 @@ function Donation({fundraiserId}) {
         {
             accessorKey: 'amount',
             header: 'Amount (INR)',
-            Cell: ({ cell }) => `Rs. ${cell.getValue().toFixed(2)}`, 
+            Cell: ({ cell }) => `Rs. ${cell.getValue()?.toFixed(2)}`, 
             size: 100,
             muiTableBodyCellProps: {
             align: "center",

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import { Router } from "express";
 
+
 //models
 const Citizen = mongoose.model('Citizen',mongoose.Schema({
     'name': {type: String, required: true},
@@ -226,6 +227,15 @@ const sendSos = async(req,res) => {
     if(!newSos){
         return res.status(400).json({message: 'Sos not raised'})
     }
+
+    const io = req.app.get('io')
+    io.emit('newSos',{
+            id: newSos._id,
+            name: newSos.name,
+            location: newSos.location,
+            emergencyType: newSos.emergencyType,
+            createdAt: newSos.createdAt
+        })
 
     return res.status(200).json({message: 'Sos sent'})
 }

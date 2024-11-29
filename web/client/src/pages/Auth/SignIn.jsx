@@ -9,6 +9,7 @@ import { Spinner } from "react-bootstrap";
 import NdrfLogo from "../../assets/ndrf_logo.svg"
 import AuthLogo from "../../assets/login_logo.svg"
 import Footer from "../../components/footer/Footer";
+import { useTranslation } from "react-i18next";
 
 function SignIn() {
     const [email, setEmail] = useState("");
@@ -22,6 +23,8 @@ function SignIn() {
     const [hasValidLength, setHasValidLength] = useState(false); 
     const navigate = useNavigate();
     const { setUser } = UserState();
+
+    const {t} = useTranslation()
 
     const handlePasswordChange = (e) => {
         const newPassword = e.target.value;
@@ -74,7 +77,7 @@ function SignIn() {
                     <img src={AuthLogo} alt="authlogo.svg" />
                 </div>
                 <div className="form-container">
-                    <h2>Sign In</h2>
+                    <h2>{t("sign_in")}</h2>
                         <input
                             type="text"
                             placeholder="Enter Email"
