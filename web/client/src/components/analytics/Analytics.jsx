@@ -23,7 +23,7 @@ const Analytics = () => {
     },
   ];
 
-  const {t} = useTranslation()
+  const { t } = useTranslation();
 
   const SOSTimelineData = [
     {

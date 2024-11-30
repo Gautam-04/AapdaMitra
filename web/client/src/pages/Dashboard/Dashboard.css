@@ -7,6 +7,7 @@
 
 .dashboard-sidebar {
   height: 100%;
+  flex: 0 0 auto;
   width: 22%;
   max-width: 350px;
   /* background: cyan; */
@@ -38,9 +39,18 @@
 }
 
 .dashboard-content {
-  /* flex: 1 1 auto; */
-  min-width: 78%;
+  flex: 1 1 auto;
+  /* min-width: 78%; */
   /* width: 100%; */
   min-height: 100%;
   /* overflow-y: scroll; */
+}
+
+.dashboard-sos {
+  background: cyan;
+  width: 40%;
+}
+
+.sos-toggle {
+  margin-block: 4rem;
 }
