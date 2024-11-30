@@ -11,7 +11,7 @@ class Footer extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: (index) {
-        onTap(index); // Update the current index in the parent widget
+        onTap(index); // Notify the parent widget of the index change
         switch (index) {
           case 0:
             Navigator.pushReplacementNamed(context, '/home_screen');
@@ -29,7 +29,7 @@ class Footer extends StatelessWidget {
       },
       selectedItemColor: Colors.blue, // Highlight selected item
       unselectedItemColor: Colors.black54, // Color for unselected items
-      backgroundColor: Colors.white, // Background color of the footer
+      backgroundColor: Colors.white, // Footer background color
       showUnselectedLabels: true, // Show labels for unselected items
       type: BottomNavigationBarType.fixed, // Ensures equidistant items
       items: const [
