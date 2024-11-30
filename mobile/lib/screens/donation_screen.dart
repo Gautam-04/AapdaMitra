@@ -5,6 +5,7 @@ import 'package:mobile/widgets/footer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DonationPage extends StatefulWidget {
   const DonationPage({Key? key}) : super(key: key);
@@ -19,6 +20,8 @@ class _DonationPageState extends State<DonationPage> {
   List<Map<String, dynamic>> _fundraisers = [];
   String _errorMessage = '';
   late Razorpay _razorpay;
+  final TextEditingController _amountController = TextEditingController();
+  String _loggedInUserName = ""; // Hold the logged-in user's name.
 
   @override
   void initState() {
@@ -27,13 +30,29 @@ class _DonationPageState extends State<DonationPage> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    _fetchLoggedInUser();
     _fetchFundraisers();
   }
 
   @override
   void dispose() {
     _razorpay.clear();
+    _amountController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchLoggedInUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _loggedInUserName = prefs.getString('userName') ?? 'Guest'; // Get username.
+      });
+    } catch (e) {
+      print('Error fetching logged-in user: $e');
+      setState(() {
+        _errorMessage = 'Failed to load user information.';
+      });
+    }
   }
 
   Future<void> _fetchFundraisers() async {
@@ -59,13 +78,47 @@ class _DonationPageState extends State<DonationPage> {
     }
   }
 
-  void _navigateTo(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+  Future<void> _showDonationPopup(String fundraiserId) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Enter Donation Amount'),
+          content: TextField(
+            controller: _amountController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(hintText: 'Enter amount'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _createOrder(fundraiserId);
+              },
+              child: const Text('Donate'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  Future<void> _createOrder(String fundraiserId, int amount) async {
+  Future<void> _createOrder(String fundraiserId) async {
+    final amount = int.tryParse(_amountController.text.trim()) ?? 0;
+
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid amount.")),
+      );
+      return;
+    }
+
     final url = Uri.parse("http://10.0.2.2:8000/v1/donation/create-order");
     try {
       final response = await http.post(
@@ -74,7 +127,7 @@ class _DonationPageState extends State<DonationPage> {
         body: jsonEncode({
           "amount": amount,
           "fundraiserId": fundraiserId,
-          "userId": "123", // Replace with logged-in user's ID
+          "userName": _loggedInUserName, // Pass the logged-in user's name.
         }),
       );
 
@@ -117,12 +170,10 @@ class _DonationPageState extends State<DonationPage> {
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     print("Payment Successful: ${response.paymentId}");
-    await _verifyPayment(
-      response.orderId!,
-      response.paymentId!,
-      response.signature!,
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Donation Successful! Thank you.")),
     );
   }
 
@@ -135,43 +186,6 @@ class _DonationPageState extends State<DonationPage> {
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     print("External Wallet Selected: ${response.walletName}");
-  }
-
-  Future<void> _verifyPayment(
-      String orderId, String paymentId, String signature) async {
-    final url = Uri.parse("http://10.0.2.2:8000/v1/donation/verify-payment");
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "razorpay_order_id": orderId,
-          "razorpay_payment_id": paymentId,
-          "razorpay_signature": signature,
-          "userId": "123", // Replace with the logged-in user's ID
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Donation Successful! Thank you.")),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Payment verification failed.")),
-        );
-      }
-    } catch (e) {
-      print("Error verifying payment: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Error occurred during verification.")),
-      );
-    }
-  }
-
-  void _onDonate(String fundraiserId) async {
-    final amount = 500; // Replace with a dynamic amount or prompt user input
-    await _createOrder(fundraiserId, amount);
   }
 
   @override
@@ -204,79 +218,14 @@ class _DonationPageState extends State<DonationPage> {
                               itemBuilder: (context, index) {
                                 final fundraiser = _fundraisers[index];
                                 return Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  elevation: 6.0,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: Image.network(
-                                                fundraiser['logo'] ?? '',
-                                                height: 40,
-                                                width: 40,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return const Icon(
-                                                    Icons.broken_image,
-                                                    size: 40,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                fundraiser['fullForm'] ?? '',
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          fundraiser['title'] ?? '',
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          fundraiser['description'] ?? '',
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        ElevatedButton(
-                                          onPressed: () =>
-                                              _onDonate(fundraiser['_id']),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.blue,
-                                            minimumSize: const Size(
-                                                double.infinity, 45),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'Donate Now',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
+                                  child: ListTile(
+                                    title: Text(fundraiser['title'] ?? ''),
+                                    subtitle:
+                                        Text(fundraiser['description'] ?? ''),
+                                    trailing: ElevatedButton(
+                                      onPressed: () =>
+                                          _showDonationPopup(fundraiser['_id']),
+                                      child: const Text('Donate Now'),
                                     ),
                                   ),
                                 );
@@ -288,7 +237,11 @@ class _DonationPageState extends State<DonationPage> {
       ),
       bottomNavigationBar: Footer(
         currentIndex: _currentIndex,
-        onTap: _navigateTo,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }

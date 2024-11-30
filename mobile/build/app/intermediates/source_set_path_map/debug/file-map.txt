@@ -33,8 +33,9 @@ com.example.mobile.app-packageDebugResources-31 D:\AapdaMitra\mobile\build\app\i
 com.example.mobile.app-merged_res-32 D:\AapdaMitra\mobile\build\app\intermediates\merged_res\debug
 com.example.mobile.app-packaged_res-33 D:\AapdaMitra\mobile\build\flutter_plugin_android_lifecycle\intermediates\packaged_res\debug
 com.example.mobile.app-packaged_res-34 D:\AapdaMitra\mobile\build\fluttertoast\intermediates\packaged_res\debug
-com.example.mobile.app-packaged_res-35 D:\AapdaMitra\mobile\build\image_picker_android\intermediates\packaged_res\debug
-com.example.mobile.app-packaged_res-36 D:\AapdaMitra\mobile\build\path_provider_android\intermediates\packaged_res\debug
-com.example.mobile.app-packaged_res-37 D:\AapdaMitra\mobile\build\permission_handler_android\intermediates\packaged_res\debug
-com.example.mobile.app-packaged_res-38 D:\AapdaMitra\mobile\build\razorpay_flutter\intermediates\packaged_res\debug
-com.example.mobile.app-packaged_res-39 D:\AapdaMitra\mobile\build\shared_preferences_android\intermediates\packaged_res\debug
+com.example.mobile.app-packaged_res-35 D:\AapdaMitra\mobile\build\geolocator_android\intermediates\packaged_res\debug
+com.example.mobile.app-packaged_res-36 D:\AapdaMitra\mobile\build\image_picker_android\intermediates\packaged_res\debug
+com.example.mobile.app-packaged_res-37 D:\AapdaMitra\mobile\build\path_provider_android\intermediates\packaged_res\debug
+com.example.mobile.app-packaged_res-38 D:\AapdaMitra\mobile\build\permission_handler_android\intermediates\packaged_res\debug
+com.example.mobile.app-packaged_res-39 D:\AapdaMitra\mobile\build\razorpay_flutter\intermediates\packaged_res\debug
+com.example.mobile.app-packaged_res-40 D:\AapdaMitra\mobile\build\shared_preferences_android\intermediates\packaged_res\debug

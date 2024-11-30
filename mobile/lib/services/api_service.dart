@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // Base API URL (adjust according to your backend)
+  // Base API URL
   static const String _baseUrl = 'http://10.0.2.2:8000/v1/mobile';
 
   // Register Citizen API
@@ -104,8 +104,7 @@ class ApiService {
         if (data['success'] == true && data['fundraiser'] != null) {
           return List<Map<String, dynamic>>.from(data['fundraiser']);
         } else {
-          throw Exception(
-              'Invalid response structure: ${response.body}');
+          throw Exception('Invalid response structure: ${response.body}');
         }
       } else {
         throw Exception(
@@ -115,6 +114,32 @@ class ApiService {
       // Handle network or parsing errors
       print('Error fetching fundraisers: $e');
       throw Exception('Error fetching fundraisers: $e');
+    }
+  }
+
+  // Send SOS API
+   static Future<Map<String, dynamic>> sendSos({
+    required String name,
+    required String email,
+    required String location,
+    required String emergencyType,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl/send-sos');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'name': name,
+        'email': email,
+        'location': location,
+        'emergencyType': emergencyType,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to send SOS: ${response.body}');
     }
   }
 }
