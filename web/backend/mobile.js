@@ -24,18 +24,19 @@ const Issue = mongoose.model('Issue', mongoose.Schema({
     timeStamps: true
 }))
 
-const Sos = mongoose.model('Sos',mongoose.Schema({
-    'name': {type: String, required: true, default: ''},
-    'email': {type: String, required: true, default: ''},
-    'location': {type: String, trim: true, required: true, default: ''},
-    'emergencyType': {
-        type: String, 
-        enum: ['Natural Disaster', 'Medical', 'Fire', 'Infrastructure', 'Other'],
-        default: 'Other'
-    }
-},{
-    timestamps: true
-}))
+    const Sos = mongoose.model('Sos',mongoose.Schema({
+        'name': {type: String, required: true, default: ''},
+        'email': {type: String, required: true, default: ''},
+        'location': {type: String, trim: true, required: true, default: ''},
+        'verified': {type: Boolean,default: false},
+        'emergencyType': {
+            type: String, 
+            enum: ['Natural Disaster', 'Medical', 'Fire', 'Infrastructure', 'Other'],
+            default: 'Other'
+        }
+    },{
+        timestamps: true
+    }))
 
 
 //setup
@@ -348,6 +349,33 @@ const perMonthSosCount = async (req, res) => {
     }
 };
 
+const verifySos = async(req,res) => {
+    try {
+        const { id } = req.body;
+        if (!id) {
+            return res.status(400).json({ message: 'ID is required' });
+        }
+
+        const sos = await Sos.findById(id);
+        if (!sos) {
+            return res.status(404).json({ message: 'SOS record not found' });
+        }
+
+        sos.verified = !sos.verified;
+        await sos.save();
+
+        res.status(200).json({ 
+            message: 'Verified status updated successfully', 
+            data: sos 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            message: 'An error occurred while updating verified status', 
+            error: error.message 
+        });
+    }
+}
+
 
 //raise a req controller
 
@@ -369,6 +397,7 @@ routes.route('/get-all-issue').get(getAllIssue)
 routes.route('/get-all-sos').get(getSos)
 routes.route('/per-hr-sos').get(perHrSosCount)
 routes.route('/per-month-sos').get(perMonthSosCount)
+routes.route('/verify-sos').get(verifySos)
 
 
 export default routes
