@@ -15,10 +15,11 @@ print("Connected to TwitterAPI Successfully")
 def index():
     return "Twitter Bot."
 
-@twitterBot.route("/reply")
+@twitterBot.post("/reply")
 def replyToPost():
     tweet_id = request.form.get("tweet_id")
     content = request.form.get("content")
+    print(tweet_id, content)
     if tweet_id and content:
         client.create_tweet(text=content, in_reply_to_tweet_id=tweet_id)
         return {"Status": "Success"}

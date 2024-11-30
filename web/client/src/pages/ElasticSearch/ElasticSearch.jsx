@@ -143,6 +143,13 @@ const ElasticSearch = () => {
     }
   };
 
+  const resetIndexes = (posts) => {
+    const newPosts = [];
+    const onlyValues = Objects.values(posts);
+    console.log(onlyValues);
+    return onlyValues;
+  };
+
   return (
     <div>
       <Header />
@@ -453,15 +460,17 @@ const ElasticSearch = () => {
               <Link
                 className="selected-posts-verify"
                 to={"/verifyposts"}
-                state={{ posts: selectedPosts }}
+                state={{
+                  posts: Object.values(selectedPosts),
+                }}
               >
                 VERIFY
               </Link>
               <Link
                 className="selected-posts-summarize"
-                to={{
-                  pathname: "/summarizeposts",
-                  state: selectedPosts,
+                to={"/summarizeposts"}
+                state={{
+                  posts: Object.values(selectedPosts),
                 }}
               >
                 SUMMARIZE
