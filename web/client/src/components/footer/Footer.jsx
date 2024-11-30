@@ -2,7 +2,9 @@ import NdrfBanner from "../../assets/ndrf_banner.svg"
 import MainLogo from "../../assets/main_logo.svg"
 import { FaEnvelope, FaPhoneAlt  } from "react-icons/fa";
 import './footer.css'
+import { useTranslation } from "react-i18next";
 function Footer() {
+  const {t} = useTranslation();
   return (
     <>
         <div className="banner">
@@ -12,7 +14,7 @@ function Footer() {
       <div className="footer-left">
         <img src={MainLogo} alt="mainLogo.svg" />
         <p className="footer-description">
-          "AapdaMitra" is a software designed to help government and private agencies by providing real-time data collection from sources like social media, news websites, and open platforms.
+          {t("footer_description")}
         </p>
         <div className="contact-icons">
           <FaEnvelope /> 
@@ -21,25 +23,25 @@ function Footer() {
       </div>
       <div className="footer-middle">
         <div>
-          <h4>General</h4>
+          <h4>{t("footer_middle_div_1")}</h4>
           <ul>
-            <li>Home</li>
-            <li>Events</li>
-            <li>Analysis</li>
-            <li>NDRF</li>
+            <li>{t("footer_middle_div_2")}</li>
+            <li>{t("footer_middle_div_3")}</li>
+            <li>{t("footer_middle_div_4")}</li>
+            <li>{t("footer_middle_div_5")}</li>
           </ul>
         </div>
         <div>
-          <h4>NDRF</h4>
+          <h4>{t("footer_middle_div_5")}</h4>
           <ul>
-            <li>Home</li>
-            <li>About Us</li>
-            <li>Contact Us</li>
+            <li>{t("footer_middle_div_7")}</li>
+            <li>{t("footer_middle_div_8")}</li>
+            <li>{t("footer_middle_div_9")}</li>
           </ul>
         </div>
       </div>
       <div className="footer-right">
-        <p>NDRF Helpline Number: +91-9711077372</p>
+        <p>{t("footer_middle_div_10")}: +91-9711077372</p>
       </div>
     </footer>
     </>

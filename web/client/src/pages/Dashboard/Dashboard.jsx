@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react/jsx-key */
+import { useState } from "react";
 import "./Dashboard.css";
 import Header from "../../components/header/header";
 import Footer from "../../components/footer/Footer";
@@ -11,24 +12,26 @@ import { IoSearch } from "react-icons/io5";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { icon } from "leaflet";
 import Fundraiser from "../../components/Fundraiser/Fundraiser";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
   const [dashboardPage, setDashboardPage] = useState("Analytics");
+  const {t} = useTranslation();
   const sidebarContent = [
     {
-      name: "Analytics",
+      name: t("dashboard_analytics"),
       icon: <MdOutlineAnalytics className="sidebar-icon" />,
       to: "Analytics",
       color: "white",
     },
     {
-      name: "Search",
+      name: t("dashboard_search"),
       icon: <IoSearch className="sidebar-icon" />,
       to: "Search",
       color: "white",
     },
     {
-      name: "Donations",
+      name: t("dashboard_donations"),
       icon: <RiRefund2Fill className="sidebar-icon" />,
       to: "Donations",
       color: "white",

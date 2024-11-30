@@ -6,6 +6,10 @@ import { Router } from 'express';
 const NdrfEmployeeSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
+    Name: {type: String},
+    email: {type: String, unique: true},
+    phoneNo: {type: String, unique: true},
+    address: {type: String},
     password: { type: String, required: true },
   },
   {timestamps: true }
@@ -30,6 +34,27 @@ function generateToken(id) {
   return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
   });
+}
+
+//ndrfMiddleware
+const ndrfAuth = async(req,res,next) => {
+  const userId = req.cookies?.accessToken;
+
+if(!userId){
+    return res.status(400).json({message: "No token found Login again"});
+}
+
+const decodedToken = jwt.verify(userId,process.env.ACCESS_TOKEN_SECRET)
+const user = await NdrfEmployee.findById(decodedToken?.id).select("-password");
+
+if(!user){
+    console.log(user)
+    return res.status(400).json({message: "Token is not valid"})
+}
+
+req.user = user;
+
+next();
 }
 
 // Controller
@@ -67,8 +92,40 @@ const loginNdrfUser = async (req, res) => {
     .json({ message: 'Logged in successfully', accessToken,  loggedInUser});
 };
 
+const getProfile = async(req,res) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User profile fetched successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return res.status(500).json({ message: "Server error while fetching profile" });
+  }
+}
+
+const logout = async(req,res) => {
+  const options = {
+        httpOnly: true,
+        secure: true,
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .json({message: "LoggedOut Successfully"});
+}
+
 
 const routes = Router();
 routes.route('/ndrf-login').post(loginNdrfUser);
+routes.route('/profile').post(ndrfAuth,getProfile)
+routes.route('/logout').get(logout);
 
 export default routes;

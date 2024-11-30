@@ -18,7 +18,8 @@ const Issue = mongoose.model('Issue', mongoose.Schema({
         type: String, 
         enum: ['Natural Disaster', 'Medical', 'Fire', 'Infrastructure', 'Other'], 
         default: 'Other'
-    }
+    },
+    'location' : {type: String, trim: true},
 },{
     timeStamps: true
 }))
