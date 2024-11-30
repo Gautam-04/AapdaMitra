@@ -183,13 +183,15 @@ const verifyLoggedInUser = async (req,res) => {
 }
 
 const AddIssue = async(req,res) => {
-    const {photo,title,description,emergencyType} = req.body
+    const {photo,title,description,emergencyType,location} = req.body
 
     const newIssue = await Issue.create({
         photo,
         title,
         description,
-        emergencyType})
+        emergencyType,
+        location
+    })
 
     if(!newIssue){
         return res.status(400).json({message: 'New Issue not raised'})
