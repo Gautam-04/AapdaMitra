@@ -12,10 +12,12 @@ import { FaPlus } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { BiSolidBookOpen } from "react-icons/bi";
 import "./Fundraiser.css";
+import { useTranslation } from "react-i18next";
 
 function Fundraiser() {
   const [fundraisers, setFundraisers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const {t} = useTranslation();
   const [newFundraiser, setNewFundraiser] = useState({
     title: "",
     fullForm: "",
@@ -105,13 +107,13 @@ function Fundraiser() {
     <>
       <div className="fundraiser-container">
         <div className="fundraiser-title-button-wrapper">
-          <div className="fundraiser-title">Manage Donations </div>
+          <div className="fundraiser-title">{t("fundraiser_title")}</div>
           <Button
             variant="primary"
             className="create-new-fund"
             onClick={() => setShowModal(true)}
           >
-            <span> Create New Fundraiser</span> <FaPlus />
+            <span>{t("fundraiser_create_fund")}</span> <FaPlus />
           </Button>
         </div>
 
@@ -156,12 +158,12 @@ function Fundraiser() {
       {/* Modal for Creating Fundraiser */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Create New Fundraiser</Modal.Title>
+          <Modal.Title>{t("fundraiser_create_fund")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Title</Form.Label>
+              <Form.Label>{t("fundraiser_create_fund_title")}</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter fundraiser title"
@@ -172,7 +174,7 @@ function Fundraiser() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Full Form</Form.Label>
+              <Form.Label>{t("fundraiser_create_fund_ff")}</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter full form"
@@ -186,7 +188,7 @@ function Fundraiser() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
+              <Form.Label>{t("fundraiser_create_fund_desc")}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -201,17 +203,17 @@ function Fundraiser() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Logo File</Form.Label>
+              <Form.Label>{t("fundraiser_create_fund_file")}</Form.Label>
               <Form.Control type="file" onChange={handleFileUpload} />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
+            {t("fundraiser_create_close")}
           </Button>
           <Button variant="primary" onClick={createFundraiser}>
-            Create Fundraiser
+            {t("fundraiser_create_create_button")}
           </Button>
         </Modal.Footer>
       </Modal>

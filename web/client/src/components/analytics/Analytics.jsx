@@ -12,6 +12,7 @@ import { MdCrisisAlert } from "react-icons/md";
 import { IoDownload } from "react-icons/io5";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
+import { useTranslation } from "react-i18next";
 
 Chart.register(CategoryScale);
 
@@ -21,6 +22,8 @@ const Analytics = () => {
       geocode: [21.86, 69.48],
     },
   ];
+
+  const {t} = useTranslation()
 
   const SOSTimelineData = [
     {
@@ -134,7 +137,7 @@ const Analytics = () => {
     labels: SOSTimelineData.map((data) => data.time),
     datasets: [
       {
-        label: "SOS Requests",
+        label: t("analytics_sos_request"),
         data: SOSTimelineData.map((data) => data.requests),
         backgroundColor: [
           "rgba(75,192,192,1)",
@@ -151,25 +154,25 @@ const Analytics = () => {
 
   const analyticsData = [
     {
-      title: "Total Unverified Posts",
+      title: t("analytics_unverified_posts"),
       statistic: 58,
       color: "#C6E7FF",
       icon: <MdOutlinePendingActions className="analytics-card-icon" />,
     },
     {
-      title: "Total Verified Posts",
+      title: t("analytics_verified_post"),
       statistic: 80,
       color: "#D4F6FF",
       icon: <FaClipboardCheck className="analytics-card-icon" />,
     },
     {
-      title: "SOS raised Today",
+      title: t("analytics_sos_raised"),
       statistic: 20,
       color: "#FBFBDF",
       icon: <MdCrisisAlert className="analytics-card-icon" />,
     },
     {
-      title: "Posts Scraped Today",
+      title: t("analytics_posts_scraped"),
       statistic: 150,
       color: "#FFDDAA",
       icon: <IoDownload className="analytics-card-icon" />,
