@@ -2,24 +2,32 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mobile">
 
-    <!-- Permissions for accessing camera and storage -->
+    <!-- Permissions for internet access -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <!-- Permissions for camera and storage access -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-    <!-- Specify the minimum SDK version and the target SDK version -->
+
+    <!-- Permissions for accessing location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Optional: Needed if the app requires location access in the background -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Specify the minimum and target SDK versions -->
     <uses-sdk
         android:minSdkVersion="21"
         android:targetSdkVersion="33" />
-    
+
     <application
         android:label="mobile"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
-        
+
         <!-- Ensure you're using the Flutter v2 embedding -->
         <meta-data
             android:name="flutterEmbedding"

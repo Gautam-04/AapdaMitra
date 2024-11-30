@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // For encoding JSON
 import 'home_screen.dart';
 import 'package:mobile/services/api_service.dart';
 
@@ -132,10 +134,36 @@ class _AuthScreenState extends State<AuthScreen> {
   /// Save user data and navigate to HomeScreen
   Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
     final prefs = await SharedPreferences.getInstance();
+    final userName = response['createdUser']['name']; // Extract username
+
     await prefs.setString('userToken', response['accessToken']);
     await prefs.setString('userEmail', response['createdUser']['email']);
-    await prefs.setString('userName', response['createdUser']['name']);
+    await prefs.setString('userName', userName);
     await prefs.setBool('isLoggedIn', true);
+
+    // Send username to another page via POST request
+    const endpointUrl = 'https://example.com/api/receive-username'; // Replace with actual URL
+    try {
+      final postResponse = await http.post(
+        Uri.parse(endpointUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': userName}),
+      );
+
+      if (postResponse.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Username sent successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to send username')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred while sending username')),
+      );
+    }
 
     Navigator.of(context).pushReplacementNamed('/home_screen');
   }

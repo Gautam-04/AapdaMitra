@@ -38,27 +38,9 @@ class _ManualsScreenState extends State<ManualsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Header(),
+            const Header(), // Keeping the header from your original code
             Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.menu_book, size: 100, color: Colors.blue),
-                    SizedBox(height: 20),
-                    Text(
-                      'Manuals are under construction!',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Please check back later.',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
+              child: EarthquakeManualPage(), // Added the EarthquakeManualPage here
             ),
           ],
         ),
@@ -67,6 +49,58 @@ class _ManualsScreenState extends State<ManualsScreen> {
         currentIndex: _currentIndex,
         onTap: _navigateTo,
       ),
+    );
+  }
+}
+
+class EarthquakeManualPage extends StatelessWidget {
+  final List<String> manualImages = [
+    'assets/images/image 2.png',
+    'assets/images/image 4.png',
+    'assets/images/image 5.png',
+    'assets/images/image 6.png',
+    'assets/images/image 7.png',
+    'assets/images/image 8.png',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: GridView.builder(
+              itemCount: manualImages.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Two cards per row
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
+              ),
+              itemBuilder: (context, index) {
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  elevation: 4,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0), // Add padding around the image
+                      child: Image.asset(
+                        manualImages[index],
+                        height: 240, // Image height
+                        width: 260, // Image width
+                        fit: BoxFit.contain, // Ensures the image fits within the available space
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        
+      ],
     );
   }
 }
