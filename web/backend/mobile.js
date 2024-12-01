@@ -682,6 +682,13 @@ const perMonthSosCount = async (req, res) => {
 
 const verifySos = async (req, res) => {
   try {
+    const emergencyNumbers = {
+    "Natural Disaster": ["9321604801"],
+      "Medical": ["7045649922"],
+      "Fire": ["9137166421"],
+      "Infrastructure": ["9321604801"],
+      "Other": ["9321604801"]
+  };
     const { id } = req.body;
     if (!id) {
       return res.status(400).json({ message: "ID is required" });
@@ -694,6 +701,12 @@ const verifySos = async (req, res) => {
 
     sos.verified = !sos.verified;
     await sos.save();
+    const emergencyType = sos.emergencyType; 
+    const numberToSend = emergencyNumbers[emergencyType];
+    var message = `Alert!! There is an emergency at the location ${sos.location}`
+    console.log({numberToSend})
+
+    await sendSMS(message,numberToSend)
 
     res.status(200).json({
       message: "Verified status updated successfully",
@@ -935,7 +948,7 @@ routes.route("/get-all-issue").get(getAllIssue);
 routes.route("/get-all-sos").get(getSos);
 routes.route("/per-hr-sos").get(perHrSosCount);
 routes.route("/per-month-sos").get(perMonthSosCount);
-routes.route("/verify-sos").get(verifySos);
+routes.route("/verify-sos").post(verifySos);
 routes.route("/send-notification").post(warningNotification);
 routes.route("/send-message").post(smsTesting);
 
