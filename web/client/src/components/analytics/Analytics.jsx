@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Analytics.css";
 import Chart from "chart.js/auto";
 import LineChart from "../lineChart/LineChart";
 import DoughnutChart from "../doughnutChart/DoughnutChart";
 import { CategoryScale } from "chart.js";
-
 import { Card } from "react-bootstrap";
 import { FaClipboardCheck } from "react-icons/fa";
 import { MdOutlinePendingActions } from "react-icons/md";
@@ -13,10 +12,49 @@ import { IoDownload } from "react-icons/io5";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 Chart.register(CategoryScale);
 
 const Analytics = () => {
+  const [SOSTimelineData, setSOSTimelineData] = useState([]);
+
+  const getPastSixHoursData = (data) => {
+    var tempObj = [];
+    const d = new Date();
+    var currHour = d.getHours();
+    if (currHour < 10) {
+      currHour = "0" + currHour + ":00-0" + (currHour + 1) + ":00";
+    } else {
+      currHour = currHour + ":00-" + (currHour + 1) + ":00";
+    }
+    for (var i = 0; i < data.length; i++) {
+      if (data[i]["hour"] === currHour) {
+        if (i - 6 < 0) {
+          tempObj = data.splice(24 + i - 5, 25);
+        }
+        tempObj = tempObj.concat(data.splice(Math.max(0, i - 5), i + 1));
+      }
+    }
+    for (var i = 0; i < tempObj.length; i++) {
+      tempObj[i]["id"] = i;
+    }
+    return tempObj;
+  };
+
+  const fetchSOSTimelineData = async () => {
+    try {
+      const response = await axios.get("/api/v1/mobile/per-hr-sos");
+      if (response.status === 200) {
+        setSOSTimelineData(getPastSixHoursData(response.data));
+      }
+    } catch (error) {
+      toast.error("Error fetching SOS Timeline Data. Try again later.");
+      console.error(error);
+    }
+  };
+
   const mapMarkers = [
     {
       geocode: [21.86, 69.48],
@@ -24,34 +62,6 @@ const Analytics = () => {
   ];
 
   const { t } = useTranslation();
-
-  const SOSTimelineData = [
-    {
-      id: 1,
-      time: "8:00",
-      requests: 5,
-    },
-    {
-      id: 2,
-      time: "9:00",
-      requests: 0,
-    },
-    {
-      id: 3,
-      time: "10:00",
-      requests: 0,
-    },
-    {
-      id: 4,
-      time: "11:00",
-      requests: 20,
-    },
-    {
-      id: 5,
-      time: "12:00",
-      requests: 10,
-    },
-  ];
 
   const disasterDistributionData = [
     {
@@ -134,11 +144,11 @@ const Analytics = () => {
   });
 
   const [lineChartSchema, setLineChartSchema] = useState({
-    labels: SOSTimelineData.map((data) => data.time),
+    labels: SOSTimelineData.map((data) => data["hour"]),
     datasets: [
       {
         label: t("analytics_sos_request"),
-        data: SOSTimelineData.map((data) => data.requests),
+        data: SOSTimelineData.map((data) => data["count"]),
         backgroundColor: [
           "rgba(75,192,192,1)",
           "#ecf0f1",
@@ -196,6 +206,31 @@ const Analytics = () => {
       "https://png.pngtree.com/png-vector/20240611/ourmid/pngtree-unveiling-nature-s-fury-satellite-views-of-hurricane-png-image_12634675.png",
     iconSize: [80, 80],
   });
+
+  useEffect(() => {
+    fetchSOSTimelineData();
+  }, []);
+
+  useEffect(() => {
+    setLineChartSchema({
+      labels: SOSTimelineData.map((data) => data["hour"]),
+      datasets: [
+        {
+          label: t("analytics_sos_request"),
+          data: SOSTimelineData.map((data) => data["count"]),
+          backgroundColor: [
+            "rgba(75,192,192,1)",
+            "#ecf0f1",
+            "#50AF95",
+            "#f3ba2f",
+            "#2a71d0",
+          ],
+          borderColor: "black",
+          borderWidth: 1,
+        },
+      ],
+    });
+  }, [SOSTimelineData]);
 
   return (
     <div className="analytics-wrapper">

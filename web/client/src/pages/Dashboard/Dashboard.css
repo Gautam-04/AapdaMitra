@@ -8,7 +8,7 @@
 .dashboard-sidebar {
   height: 100%;
   flex: 0 0 auto;
-  width: 22%;
+  width: 20%;
   max-width: 350px;
   /* background: cyan; */
   position: sticky;
@@ -24,6 +24,7 @@
   /* border: 1px solid black; */
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 .sidebar-content-wrapper {
@@ -40,15 +41,15 @@
 
 .dashboard-content {
   flex: 1 1 auto;
-  /* min-width: 78%; */
-  /* width: 100%; */
+  width: 50%;
   min-height: 100%;
   /* overflow-y: scroll; */
 }
 
 .dashboard-sos {
-  background: cyan;
-  width: 40%;
+  background: white;
+  width: 25%;
+  max-width: 350px;
 }
 
 .sos-toggle {

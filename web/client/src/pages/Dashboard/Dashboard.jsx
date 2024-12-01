@@ -49,6 +49,7 @@ const Dashboard = () => {
               <div
                 className="sidebar-item"
                 onClick={() => setDashboardPage(sidebarItem.to)}
+                key={idx}
                 style={{
                   backgroundColor: `${
                     sidebarItem.to === dashboardPage

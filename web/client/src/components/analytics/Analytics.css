@@ -61,16 +61,18 @@
 
 .analysis-charts {
   width: 100%;
-  min-width: 50vh;
   height: fit-content;
+  /* min-height: 40vh; */
   flex-wrap: wrap;
-  /* padding: 1.2rem; */
+  padding: 1.2rem;
   /* background-color: salmon; */
   display: flex;
   gap: 1rem;
   padding-block: 1rem;
   justify-content: center;
   align-items: center;
+  position: relative;
+
   /* background-color: salmon; */
 }
 
@@ -81,27 +83,33 @@
   border-radius: 25px;
   width: 40% !important;
   min-width: 390px;
-  /* flex: 1 1 auto; */
+  aspect-ratio: 5 / 4;
+  flex: 1 1 auto;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  position: relative;
+  max-width: 90%;
+  /* position: relative; */
 }
 
 .charts-sos-history {
   position: relative;
   background-color: white;
   /* min-height: ; */
-  height: 100%;
+  max-width: 90%;
+  max-height: 60%;
+  /* height: 100% !important; */
   box-shadow: 2px 2px 4px var(--light-gray);
+  aspect-ratio: 16 / 9.25;
   /* padding: 2rem; */
   border-radius: 25px;
   width: 55%;
-  /* flex: 1 1 auto; */
+  flex: 1 1 auto;
   display: flex;
   justify-content: center;
   align-items: center;
+  /* position: relative; */
 }
 
 .chart-container {

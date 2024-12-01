@@ -60,13 +60,6 @@ function Header() {
       </nav>
 
       <div className="header-right-section">
-        <div className="header-profile-container">
-          <img
-            src="https://avatar.iran.liara.run/public/boy?username=Ash"
-            alt="Profile Icon"
-            className="header-profile-image"
-          />
-        </div>
         <Dropdown className="change-language">
           <Dropdown.Toggle id="dropdown-basic">Change Language</Dropdown.Toggle>
 
@@ -81,6 +74,13 @@ function Header() {
             ))}
           </Dropdown.Menu>
         </Dropdown>
+        <div className="header-profile-container">
+          <img
+            src="https://avatar.iran.liara.run/public/boy?username=Ash"
+            alt="Profile Icon"
+            className="header-profile-image"
+          />
+        </div>
       </div>
     </div>
   );
