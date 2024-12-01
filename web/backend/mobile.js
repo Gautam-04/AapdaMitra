@@ -142,13 +142,11 @@ const verifyRegisteredUser = async (req, res) => {
 
       otpStore.delete(email);
 
-      return res
-        .status(200)
-        .json({
-          message: "User registered successfully",
-          createdUser,
-          accessToken,
-        });
+      return res.status(200).json({
+        message: "User registered successfully",
+        createdUser,
+        accessToken,
+      });
     } else {
       return res
         .status(400)
@@ -214,13 +212,11 @@ const verifyLoggedInUser = async (req, res) => {
 
       otpStore.delete(email);
 
-      return res
-        .status(200)
-        .json({
-          message: "User loggedin successfully",
-          loggedInUser,
-          accessToken,
-        });
+      return res.status(200).json({
+        message: "User loggedin successfully",
+        loggedInUser,
+        accessToken,
+      });
     } else {
       return res
         .status(400)
@@ -284,13 +280,14 @@ const sendSos = async (req, res) => {
   }
 
   const io = req.app.get("io");
-  io.emit("newSos", {
+  const x = {
     id: newSos._id,
     name: newSos.name,
     location: newSos.location,
     emergencyType: newSos.emergencyType,
     createdAt: newSos.createdAt,
-  });
+  };
+  io.emit("newSos", x);
 
   return res.status(200).json({ message: "Sos sent" });
 };
