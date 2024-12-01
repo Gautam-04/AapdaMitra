@@ -7,6 +7,7 @@ import 'package:mobile/widgets/header.dart';
 import 'package:mobile/widgets/footer.dart';
 import 'package:mobile/screens/verifiedPost_screen.dart';
 import 'package:mobile/screens/sos_screen.dart';
+import 'package:mobile/screens/manuals_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -178,8 +179,11 @@ class _ActionButtons extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Navigate to Manual")),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManualsScreen(),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(

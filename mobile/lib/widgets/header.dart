@@ -14,7 +14,13 @@ class Header extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context); // This will take you back to the previous screen
+              // Check if there's a previous screen to pop back to
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                // If no previous screen, go to home screen explicitly
+                Navigator.pushReplacementNamed(context, '/home_screen');
+              }
             },
           ),
           // Centered Logo

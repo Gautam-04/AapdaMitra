@@ -13,7 +13,9 @@ app.use(cors({
 
 app.use(express.json())
 
-app.use(express.urlencoded({extended: true,limit: '16kb'}));
+app.use(express.urlencoded({extended: true,limit: '100mb'}));
+
+app.use(express.text({limit: "200mb"}))
 
 app.use(express.static('public'));
 
