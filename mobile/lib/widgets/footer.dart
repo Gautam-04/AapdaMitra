@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/donation_screen.dart';
+import 'package:mobile/screens/home_screen.dart';
+import 'package:mobile/screens/manuals_screen.dart';
+import 'package:mobile/screens/raiseIssue_screen.dart';
 
 class Footer extends StatelessWidget {
   final int currentIndex;
@@ -14,16 +18,16 @@ class Footer extends StatelessWidget {
         onTap(index); // Notify the parent widget of the index change
         switch (index) {
           case 0:
-            Navigator.pushReplacementNamed(context, '/home_screen');
+            _navigateWithoutAnimation(context, '/home_screen');
             break;
           case 1:
-            Navigator.pushReplacementNamed(context, '/donation_screen');
+            _navigateWithoutAnimation(context, '/donation_screen');
             break;
           case 2:
-            Navigator.pushReplacementNamed(context, '/raiseIssue_screen');
+            _navigateWithoutAnimation(context, '/raiseIssue_screen');
             break;
           case 3:
-            Navigator.pushReplacementNamed(context, '/manuals_screen');
+            _navigateWithoutAnimation(context, '/manuals_screen');
             break;
         }
       },
@@ -32,24 +36,68 @@ class Footer extends StatelessWidget {
       backgroundColor: Colors.white, // Footer background color
       showUnselectedLabels: true, // Show labels for unselected items
       type: BottomNavigationBarType.fixed, // Ensures equidistant items
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Image.asset(
+            'assets/images/footer_home.png',
+            width: 24,
+            height: 24,
+          ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.volunteer_activism),
+          icon: Image.asset(
+            'assets/images/footer_donation.png',
+            width: 24,
+            height: 24,
+          ),
           label: 'Donations',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.report_problem),
+          icon: Image.asset(
+            'assets/images/footer_raiseIssue.png',
+            width: 24,
+            height: 24,
+          ),
           label: 'Raise Issue',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.menu_book),
+          icon: Image.asset(
+            'assets/images/footer_manual.png',
+            width: 24,
+            height: 24,
+          ),
           label: 'Manuals',
         ),
       ],
     );
   }
+
+  void _navigateWithoutAnimation(BuildContext context, String routeName) {
+    Navigator.of(context).pushAndRemoveUntil(
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => _getScreen(context, routeName),
+        transitionDuration: Duration.zero, // Remove the animation duration
+        reverseTransitionDuration: Duration.zero,
+      ),
+      (route) => false, // Clear all previous routes
+    );
+  }
+
+  Widget _getScreen(BuildContext context, String routeName) {
+    // Define your routes to return the appropriate widget here
+    switch (routeName) {
+      case '/home_screen':
+        return const HomeScreen();
+      case '/donation_screen':
+        return const DonationPage();
+      case '/raiseIssue_screen':
+        return const RaiseIssueScreen();
+      case '/manuals_screen':
+        return const ManualsScreen();
+      default:
+        throw Exception("Route not defined: $routeName");
+    }
+  }
 }
+

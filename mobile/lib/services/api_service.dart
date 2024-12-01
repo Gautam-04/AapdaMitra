@@ -86,39 +86,26 @@ class ApiService {
   // Fetch Fundraisers API
   static Future<List<Map<String, dynamic>>> fetchFundraisers() async {
     final Uri url = Uri.parse('$_baseUrl/get-fundraisers');
-    try {
-      final response = await http.get(
-        url,
-        headers: {'Content-Type': 'application/json'},
-      );
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      // Log the response for debugging
-      print('Request URL: $url');
-      print('Response Status: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // Validate the response structure
-        if (data['success'] == true && data['fundraiser'] != null) {
-          return List<Map<String, dynamic>>.from(data['fundraiser']);
-        } else {
-          throw Exception('Invalid response structure: ${response.body}');
-        }
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true && data['fundraiser'] != null) {
+        return List<Map<String, dynamic>>.from(data['fundraiser']);
       } else {
-        throw Exception(
-            'Failed to load fundraisers: ${response.statusCode} - ${response.body}');
+        throw Exception('Invalid response structure: ${response.body}');
       }
-    } catch (e) {
-      // Handle network or parsing errors
-      print('Error fetching fundraisers: $e');
-      throw Exception('Error fetching fundraisers: $e');
+    } else {
+      throw Exception(
+          'Failed to load fundraisers: ${response.statusCode} - ${response.body}');
     }
   }
 
   // Send SOS API
-   static Future<Map<String, dynamic>> sendSos({
+  static Future<Map<String, dynamic>> sendSos({
     required String name,
     required String email,
     required String location,
@@ -140,6 +127,34 @@ class ApiService {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to send SOS: ${response.body}');
+    }
+  }
+
+  // Add Issue API
+  static Future<Map<String, dynamic>> addIssue({
+    required String photoBase64,
+    required String title,
+    required String description,
+    required String emergencyType,
+    required String location,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl/add-issue');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'photo': photoBase64,
+        'title': title,
+        'description': description,
+        'emergencyType': emergencyType,
+        'location': location,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to raise issue: ${response.body}');
     }
   }
 }

@@ -54,30 +54,24 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         break;
       case 1:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Navigate to Manual")),
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ManualsScreen()),
         );
         break;
       case 2:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Navigate to Alerts")),
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SOSScreen()),
         );
         break;
       case 3:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Navigate to Profile")),
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RaiseIssueScreen()),
         );
         break;
     }
-  }
-
-  void _navigateToRaiseIssue() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const RaiseIssueScreen(),
-      ),
-    );
   }
 
   @override
@@ -103,9 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _IssuesRaisedButton(),
+                  _IssuesRaisedButton(),  // Static button
                   const SizedBox(height: 20),
-                  _ActionButtons(onRaiseIssue: _navigateToRaiseIssue),
+                  _ActionButtons(),
                   const SizedBox(height: 10),
                   _SOSAndDonationButtons(),
                   const SizedBox(height: 20),
@@ -145,9 +139,7 @@ class _IssuesRaisedButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ElevatedButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Navigate to Issues")),
-          );
+          // No action for now
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
@@ -166,10 +158,6 @@ class _IssuesRaisedButton extends StatelessWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  final VoidCallback onRaiseIssue;
-
-  const _ActionButtons({required this.onRaiseIssue});
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -203,7 +191,14 @@ class _ActionButtons extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: ElevatedButton(
-              onPressed: onRaiseIssue,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RaiseIssueScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 side: const BorderSide(color: Colors.blue),
@@ -304,7 +299,8 @@ class VerifiedPostsList extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => VerifiedPostsScreen(posts: verifiedPosts),
+                  builder: (context) =>
+                      VerifiedPostsScreen(posts: verifiedPosts),
                 ),
               );
             },
@@ -343,8 +339,15 @@ class VerifiedPostCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  '${post['title']}\n${post['date']}',
-                  style: const TextStyle(fontSize: 14),
+                  post['title']!,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  post['date']!,
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
             ],
@@ -362,17 +365,11 @@ class _ChatbotButton extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => ChatbotPage(),
-          ),
+          MaterialPageRoute(builder: (context) => ChatbotPage()),
         );
       },
-      child: Image.asset(
-        'assets/images/Bot_Image.png',
-        fit: BoxFit.cover,
-        height: 56,
-        width: 56,
-      ),
+      backgroundColor: Colors.blue,
+      child: const Icon(Icons.chat_bubble),
     );
   }
 }
