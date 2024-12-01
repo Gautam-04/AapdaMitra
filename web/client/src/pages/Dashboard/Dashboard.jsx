@@ -6,17 +6,19 @@ import Footer from "../../components/footer/Footer";
 import Analytics from "../../components/analytics/Analytics";
 import Searchbar from "../../components/searchbar/searchbar";
 import Search from "../../components/Search/Search";
-import { MdOutlineAnalytics } from "react-icons/md";
+import { MdCrisisAlert, MdOutlineAnalytics } from "react-icons/md";
 import { RiRefund2Fill } from "react-icons/ri";
 import { IoSearch } from "react-icons/io5";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { icon } from "leaflet";
 import Fundraiser from "../../components/Fundraiser/Fundraiser";
 import { useTranslation } from "react-i18next";
+import SOSDisplay from "../../components/sosDisplay/SOSDisplay";
 
 const Dashboard = () => {
   const [dashboardPage, setDashboardPage] = useState("Analytics");
-  const {t} = useTranslation();
+  const [SOSToggle, setSOSToggle] = useState(true);
+  const { t } = useTranslation();
   const sidebarContent = [
     {
       name: t("dashboard_analytics"),
@@ -47,6 +49,7 @@ const Dashboard = () => {
               <div
                 className="sidebar-item"
                 onClick={() => setDashboardPage(sidebarItem.to)}
+                key={idx}
                 style={{
                   backgroundColor: `${
                     sidebarItem.to === dashboardPage
@@ -76,12 +79,39 @@ const Dashboard = () => {
               </div>
             );
           })}
+          <div className="sos-toggle">
+            <div
+              className="sidebar-item"
+              onClick={() => setSOSToggle((prev) => !prev)}
+              style={{
+                backgroundColor: `${
+                  SOSToggle ? "var(--primary-color)" : "white"
+                }`,
+                color: `${SOSToggle ? "white" : "var(--primary-color)"}`,
+                fontWeight: `${setSOSToggle ? 600 : 400}`,
+              }}
+            >
+              <div className="sidebar-content-wrapper">
+                <div className="sidebar-item-icon">
+                  <MdCrisisAlert className="sidebar-icon" />
+                </div>
+                <div className="sidebar-item-text">
+                  {SOSToggle ? "Hide SOS" : "Show SOS"}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="dashboard-content">
           {dashboardPage === "Analytics" && <Analytics />}
           {dashboardPage === "Search" && <Search />}
           {dashboardPage === "Donations" && <Fundraiser />}
         </div>
+        {SOSToggle && (
+          <div className="dashboard-sos">
+            <SOSDisplay />
+          </div>
+        )}
       </div>
       <Footer />
     </>

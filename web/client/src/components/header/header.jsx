@@ -1,18 +1,17 @@
 import { Link } from "react-router-dom";
 import MainLogo from "../../assets/main_logo.svg";
-import Dropdown from 'react-bootstrap/Dropdown';
+import Dropdown from "react-bootstrap/Dropdown";
 import "./header.css";
 import { changeLanguage } from "i18next";
 import { useTranslation } from "react-i18next";
 
 function Header() {
-
-  const {i18n} = useTranslation()
+  const { i18n } = useTranslation();
 
   const languages = [
-    {code: "en",Lang: "English"},
-    {code: "hi", Lang: "Hindi"}
-  ]
+    { code: "en", Lang: "English" },
+    { code: "hi", Lang: "Hindi" },
+  ];
 
   return (
     <div className="header">
@@ -61,14 +60,7 @@ function Header() {
       </nav>
 
       <div className="header-right-section">
-        <div className="header-profile-container">
-          <img
-            src="https://avatar.iran.liara.run/public/boy?username=Ash"
-            alt="Profile Icon"
-            className="header-profile-image"
-          />
-        </div>
-        <Dropdown>
+        <Dropdown className="change-language">
           <Dropdown.Toggle id="dropdown-basic">Change Language</Dropdown.Toggle>
 
           <Dropdown.Menu>
@@ -82,6 +74,13 @@ function Header() {
             ))}
           </Dropdown.Menu>
         </Dropdown>
+        <div className="header-profile-container">
+          <img
+            src="https://avatar.iran.liara.run/public/boy?username=Ash"
+            alt="Profile Icon"
+            className="header-profile-image"
+          />
+        </div>
       </div>
     </div>
   );

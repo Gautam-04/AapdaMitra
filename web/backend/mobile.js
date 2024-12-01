@@ -1,76 +1,117 @@
-import mongoose from 'mongoose'
-import jwt from 'jsonwebtoken'
-import nodemailer from 'nodemailer'
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 import { Router } from "express";
-import admin from 'firebase-admin'
-import axios from 'axios'
+import admin from "firebase-admin";
+import axios from "axios";
 
 // Send Push Notification
 const serviceAccountJSON = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccountJSON)
+  credential: admin.credential.cert(serviceAccountJSON),
 });
 
-
-
 //models
-const Citizen = mongoose.model('Citizen',mongoose.Schema({
-    'name': {type: String, required: true},
-    'email': {type: String, required: true, unique: true}
-},{timestamps: true}))
-
-const AppUsers = mongoose.model('AppUser',mongoose.Schema({
-email: {type: String, required: true, unique: true},
-name: {type: String, required: true},
-mobileNo: {type: String, required: true,unique: true},
-state: {type: String, required: true},
-gender: {type: String, required: true},
-aadharNo: {type: String, required: true}
-}, {timestamps: true}))
-
-const Issue = mongoose.model('Issue', mongoose.Schema({
-    'photo': {type: String, default: ''},
-    'title' : {type: String, trim: true, default: 'Untitled Issue'},
-    'description': {type: String, trim: true, default: 'No description provided.'},
-    'emergencyType': {
-        type: String, 
-        enum: ['Natural Disaster', 'Medical', 'Fire', 'Infrastructure', 'Other'], 
-        default: 'Other'
+const Citizen = mongoose.model(
+  "Citizen",
+  mongoose.Schema(
+    {
+      name: { type: String, required: true },
+      email: { type: String, required: true, unique: true },
     },
-    'location' : {type: String, trim: true},
-},{
-    timeStamps: true
-}))
+    { timestamps: true }
+  )
+);
 
-const Sos = mongoose.model('Sos',mongoose.Schema({
-        'name': {type: String, required: true, default: ''},
-        'email': {type: String, required: true, default: ''},
-        'location': {type: String, trim: true, required: true, default: ''},
-        'verified': {type: Boolean,default: false},
-        'emergencyType': {
-            type: String, 
-            enum: ['Natural Disaster', 'Medical', 'Fire', 'Infrastructure', 'Other'],
-            default: 'Other'
-        }
-    },{
-        timestamps: true
-}))
+const AppUsers = mongoose.model(
+  "AppUser",
+  mongoose.Schema(
+    {
+      email: { type: String, required: true, unique: true },
+      name: { type: String, required: true },
+      mobileNo: { type: String, required: true, unique: true },
+      state: { type: String, required: true },
+      gender: { type: String, required: true },
+      aadharNo: { type: String, required: true },
+    },
+    { timestamps: true }
+  )
+);
 
-const verifiedPostSchema = new mongoose.Schema({
-  title: String,
-  body: String,
-  location: String,
-  date: String,
-  type: String,
-  source: String,
-  imageUrl: String,
-  postId: String,
-  priority: String,
-  likes: { type: Number, default: 0 },
-  dislikes: { type: Number, default: 0 }
-}, {timestamps: true});
+const Issue = mongoose.model(
+  "Issue",
+  mongoose.Schema(
+    {
+      photo: { type: String, default: "" },
+      title: { type: String, trim: true, default: "Untitled Issue" },
+      description: {
+        type: String,
+        trim: true,
+        default: "No description provided.",
+      },
+      emergencyType: {
+        type: String,
+        enum: [
+          "Natural Disaster",
+          "Medical",
+          "Fire",
+          "Infrastructure",
+          "Other",
+        ],
+        default: "Other",
+      },
+      location: { type: String, trim: true },
+    },
+    {
+      timeStamps: true,
+    }
+  )
+);
+
+const Sos = mongoose.model(
+  "Sos",
+  mongoose.Schema(
+    {
+      name: { type: String, required: true, default: "" },
+      email: { type: String, required: true, default: "" },
+      location: { type: String, trim: true, required: true, default: "" },
+      verified: { type: Boolean, default: false },
+      emergencyType: {
+        type: String,
+        enum: [
+          "Natural Disaster",
+          "Medical",
+          "Fire",
+          "Infrastructure",
+          "Other",
+        ],
+        default: "Other",
+      },
+    },
+    {
+      timestamps: true,
+    }
+  )
+);
+
+const verifiedPostSchema = new mongoose.Schema(
+  {
+    title: String,
+    body: String,
+    location: String,
+    date: String,
+    type: String,
+    source: String,
+    imageUrl: String,
+    postId: String,
+    priority: String,
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
 
 // Function to increment likes
 verifiedPostSchema.methods.incrementLikes = async function () {
@@ -93,15 +134,17 @@ verifiedPostSchema.statics.updatePost = async function (postId, updatedData) {
   );
 };
 
-const VerifiedPosts = mongoose.model('Post', verifiedPostSchema);
+const VerifiedPosts = mongoose.model("Post", verifiedPostSchema);
 
 //setup
-function generateToken(id){
-    return jwt.sign({id},process.env.ACCESS_TOKEN_SECRET,{expiresIn: process.env.MOBILE_REFRESH_TOKEN_EXPIRY})
+function generateToken(id) {
+  return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.MOBILE_REFRESH_TOKEN_EXPIRY,
+  });
 }
 
 // const transporter = nodemailer.createTransport({
-//     host: 'smtp.rediffmail.com', 
+//     host: 'smtp.rediffmail.com',
 //     port: 465, // Use 465 for SSL, 587 for TLS
 //     secure: true, // Set to true for SSL (port 465), false for TLS (port 587)
 //     auth: {
@@ -113,202 +156,236 @@ function generateToken(id){
 // const otpStore = new Map();
 
 const CONFIG = {
-    POST_API_URL: 'https://eve.idfy.com/v3/tasks/async/verify_with_source/aadhaar_lite',//POST req costs 3 creds
-    GET_API_URL: 'https://eve.idfy.com/v3/tasks', //GET doesnt cost but requires req_id generated from POST
-    TASK_ID: '74f4c926-250c-43ca-9c53-453e87ceacd1',//redundant id can be used for all reqs ... no need to changes
-    GROUP_ID: '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e',// No need to change
-    MAX_ATTEMPTS: 10,
-    RETRY_DELAY: 5000
+  POST_API_URL:
+    "https://eve.idfy.com/v3/tasks/async/verify_with_source/aadhaar_lite", //POST req costs 3 creds
+  GET_API_URL: "https://eve.idfy.com/v3/tasks", //GET doesnt cost but requires req_id generated from POST
+  TASK_ID: "74f4c926-250c-43ca-9c53-453e87ceacd1", //redundant id can be used for all reqs ... no need to changes
+  GROUP_ID: "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e", // No need to change
+  MAX_ATTEMPTS: 10,
+  RETRY_DELAY: 5000,
 };
 
 //aadhar app logics
 async function verifyAadhaar(aadharNo) {
-    if (!aadharNo || aadharNo.length !== 12) {
-        throw new Error('Invalid Aadhaar number. ');
+  if (!aadharNo || aadharNo.length !== 12) {
+    throw new Error("Invalid Aadhaar number. ");
+  }
+
+  try {
+    const axiosInstance = axios.create({
+      headers: {
+        "api-key": process.env.API_KEY,
+        "account-id": process.env.ACC_ID,
+        "Content-Type": "application/json",
+      },
+      timeout: 30000,
+    });
+
+    const postResponse = await axiosInstance.post(CONFIG.POST_API_URL, {
+      task_id: CONFIG.TASK_ID,
+      group_id: CONFIG.GROUP_ID,
+      data: { aadhaar_number: aadharNo },
+    });
+
+    const requestId = postResponse.data.request_id;
+    let verificationResult;
+
+    let attempts = 0;
+
+    while (attempts < CONFIG.MAX_ATTEMPTS) {
+      attempts++;
+      const getResponse = await axiosInstance.get(
+        `${CONFIG.GET_API_URL}?request_id=${requestId}`
+      );
+      verificationResult = getResponse.data[0];
+
+      if (
+        verificationResult.status === "completed" ||
+        verificationResult.status === "failed"
+      )
+        break;
+
+      await new Promise((resolve) => setTimeout(resolve, CONFIG.RETRY_DELAY));
     }
 
-    try {
-        const axiosInstance = axios.create({
-            headers: {
-                'api-key': process.env.API_KEY,
-                'account-id': process.env.ACC_ID,
-                'Content-Type': 'application/json'
-            },
-            timeout: 30000
-        });
+    const isVerified =
+      verificationResult?.result?.source_output?.status === "id_found";
 
-        const postResponse = await axiosInstance.post(CONFIG.POST_API_URL, {
-            task_id: CONFIG.TASK_ID,
-            group_id: CONFIG.GROUP_ID,
-            data: { aadhaar_number: aadharNo }
-        });
-
-        const requestId = postResponse.data.request_id;
-        let verificationResult;
-
-        let attempts = 0;
-
-        while (attempts < CONFIG.MAX_ATTEMPTS) {
-            attempts++;
-            const getResponse = await axiosInstance.get(`${CONFIG.GET_API_URL}?request_id=${requestId}`);
-            verificationResult = getResponse.data[0];
-
-            if (verificationResult.status === 'completed' || verificationResult.status === 'failed') break;
-
-            await new Promise(resolve => setTimeout(resolve, CONFIG.RETRY_DELAY));
-        }
-
-        const isVerified = verificationResult?.result?.source_output?.status === 'id_found';
-
-        return {
-            verified: isVerified,
-            details: verificationResult?.result?.source_output || {},
-            requestId,
-            status: verificationResult?.status,
-            fullResult: verificationResult
-        };
-
-    } catch (error) {
-        throw new Error(`Verification process failed: ${error.message}`);
-    }
-}
-
-
-async function verifyMobile(NAME,mobileNo){
-    const config = {
-        POST_API_URL: 'https://eve.idfy.com/v3/tasks/async/verify_with_source/ind_mobile_number', // POST req costs 3 creds
-        GET_API_URL: 'https://eve.idfy.com/v3/tasks', // GET doesn't cost but requires req_id from POST
-        task_id: "74f4c926-250c-43ca-9c53-453e87ceacd1",
-        group_id: "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
-        MAX_ATTEMPTS: 10, // Maximum attempts to poll the GET API
-        POLLING_INTERVAL: 3000 // 3 seconds between attempts
+    return {
+      verified: isVerified,
+      details: verificationResult?.result?.source_output || {},
+      requestId,
+      status: verificationResult?.status,
+      fullResult: verificationResult,
     };
-
-    try {
-        const axiosInstance = axios.create({
-            headers: {
-                'api-key': process.env.API_KEY,
-                'Content-Type': 'application/json',
-                'account-id': process.env.ACC_ID
-            },
-            timeout: 30000
-        });
-
-        // Step 1: Initiate the verification process with a POST request
-        const postResponse = await axiosInstance.post(config.POST_API_URL, {
-            task_id: config.task_id,
-            group_id: config.group_id,
-            data: { mobile_number: mobileNo }
-        });
-
-        if (!postResponse.data || !postResponse.data.request_id) {
-            console.error("No request ID returned from POST API.");
-            return false;
-        }
-
-        const requestId = postResponse.data.request_id;
-
-        // Step 2: Poll the GET API for verification status
-        for (let attempt = 0; attempt < config.MAX_ATTEMPTS; attempt++) {
-            await new Promise(resolve => setTimeout(resolve, config.POLLING_INTERVAL)); // Wait before next attempt
-
-            const getResponse = await axiosInstance.get(`${config.GET_API_URL}?request_id=${requestId}`);
-            const getResponseData = getResponse.data[0];
-            if (getResponseData && getResponseData.status === "completed") {
-                // Check if the name matches
-                const mobileNumberDetails = getResponseData.result?.source_output?.mobile_number_details;
-                if (mobileNumberDetails && mobileNumberDetails.name) {
-                    const responseNameParts = mobileNumberDetails.name.toLowerCase().split(/\s+/);
-                    const providedNameParts = NAME.toLowerCase().split(/\s+/);
-
-                    const isNameMatched = providedNameParts.some(part =>
-                        responseNameParts.includes(part)
-                    );
-
-                    return isNameMatched;
-                } else {
-                    console.error("No name found in verification response. Details:", mobileNumberDetails);
-                    return false;
-                }
-            } else if (getResponseData.status === "failed") {
-                console.error("Verification task failed.");
-                return false;
-            }
-        }
-
-        console.error("Max polling attempts reached without result.");
-        return false;
-
-    } catch (error) {
-        console.error("Error in verifyMobile:", error.message);
-        return false;
-    }
+  } catch (error) {
+    throw new Error(`Verification process failed: ${error.message}`);
+  }
 }
 
+async function verifyMobile(NAME, mobileNo) {
+  const config = {
+    POST_API_URL:
+      "https://eve.idfy.com/v3/tasks/async/verify_with_source/ind_mobile_number", // POST req costs 3 creds
+    GET_API_URL: "https://eve.idfy.com/v3/tasks", // GET doesn't cost but requires req_id from POST
+    task_id: "74f4c926-250c-43ca-9c53-453e87ceacd1",
+    group_id: "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
+    MAX_ATTEMPTS: 10, // Maximum attempts to poll the GET API
+    POLLING_INTERVAL: 3000, // 3 seconds between attempts
+  };
 
+  try {
+    const axiosInstance = axios.create({
+      headers: {
+        "api-key": process.env.API_KEY,
+        "Content-Type": "application/json",
+        "account-id": process.env.ACC_ID,
+      },
+      timeout: 30000,
+    });
+
+    // Step 1: Initiate the verification process with a POST request
+    const postResponse = await axiosInstance.post(config.POST_API_URL, {
+      task_id: config.task_id,
+      group_id: config.group_id,
+      data: { mobile_number: mobileNo },
+    });
+
+    if (!postResponse.data || !postResponse.data.request_id) {
+      console.error("No request ID returned from POST API.");
+      return false;
+    }
+
+    const requestId = postResponse.data.request_id;
+
+    // Step 2: Poll the GET API for verification status
+    for (let attempt = 0; attempt < config.MAX_ATTEMPTS; attempt++) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, config.POLLING_INTERVAL)
+      ); // Wait before next attempt
+
+      const getResponse = await axiosInstance.get(
+        `${config.GET_API_URL}?request_id=${requestId}`
+      );
+      const getResponseData = getResponse.data[0];
+      if (getResponseData && getResponseData.status === "completed") {
+        // Check if the name matches
+        const mobileNumberDetails =
+          getResponseData.result?.source_output?.mobile_number_details;
+        if (mobileNumberDetails && mobileNumberDetails.name) {
+          const responseNameParts = mobileNumberDetails.name
+            .toLowerCase()
+            .split(/\s+/);
+          const providedNameParts = NAME.toLowerCase().split(/\s+/);
+
+          const isNameMatched = providedNameParts.some((part) =>
+            responseNameParts.includes(part)
+          );
+
+          return isNameMatched;
+        } else {
+          console.error(
+            "No name found in verification response. Details:",
+            mobileNumberDetails
+          );
+          return false;
+        }
+      } else if (getResponseData.status === "failed") {
+        console.error("Verification task failed.");
+        return false;
+      }
+    }
+
+    console.error("Max polling attempts reached without result.");
+    return false;
+  } catch (error) {
+    console.error("Error in verifyMobile:", error.message);
+    return false;
+  }
+}
 
 //controllers
 //aadhar based auth controllers
-const registerAadhar = async(req,res) => {
-    const {email,name,mobileNo,aadharNo} = req.body;
-    try {
-
+const registerAadhar = async (req, res) => {
+  const { email, name, mobileNo, aadharNo } = req.body;
+  try {
     const isNameMatched = await verifyMobile(name, mobileNo);
-        if (!isNameMatched) {
-            return res.status(400).json({
-                message: "Name verification failed. Please ensure the name matches the registered mobile number and aadhar number."
-            });
-        }
+    if (!isNameMatched) {
+      return res.status(400).json({
+        message:
+          "Name verification failed. Please ensure the name matches the registered mobile number and aadhar number.",
+      });
+    }
 
     const result = await verifyAadhaar(aadharNo);
-    console.log('Info: Final verification result', { verified: result.verified });
+    console.log("Info: Final verification result", {
+      verified: result.verified,
+    });
 
     const user = await AppUsers.create({
-        name,
-        email,
-        mobileNo,
-        state: result?.details?.state || " ",
-        gender: result?.details?.gender || " ",
-        aadharNo
-    })
+      name,
+      email,
+      mobileNo,
+      state: result?.details?.state || " ",
+      gender: result?.details?.gender || " ",
+      aadharNo,
+    });
 
-    if(!user){
-        return res.status(400).json({message: 'User not created. Try Again!!'})
+    if (!user) {
+      return res.status(400).json({ message: "User not created. Try Again!!" });
     }
 
-    const createdUser = await AppUsers.findById(user._id).select("-aadharNo")
+    const createdUser = await AppUsers.findById(user._id).select("-aadharNo");
 
     const accessToken = generateToken(createdUser._id);
-    return res.status(200).json({message: "User Registered Successfully", createdUser,accessToken})
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Cannot Login with Aadhar", error });
+    return res
+      .status(200)
+      .json({
+        message: "User Registered Successfully",
+        createdUser,
+        accessToken,
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Cannot Login with Aadhar", error });
+  }
+};
+
+const loginAadhar = async (req, res) => {
+  const { mobileNo } = req.body;
+
+  try {
+    if (!mobileNo) {
+      return res
+        .status(400)
+        .json({ message: "Both Fields are required to be saved" });
     }
-}
 
-const loginAadhar = async(req,res) => {
-    const {mobileNo} = req.body;
-
-    try {
-        if(!mobileNo){
-            return res.status(400).json({message: "Both Fields are required to be saved"})
-        }
-
-        const existedUser = await AppUsers.findOne({mobileNo})
-        if(!existedUser){
-            return res.status(400).json({message: 'No user with the Mobile No found'})
-        }
-
-        const createdUser = await AppUsers.findById(existedUser._id).select("-aadharNo")
-
-        const accessToken = generateToken(createdUser._id)
-
-        return res.status(200).json({message: 'User Logged In successfully',createdUser,accessToken})
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Cannot Login with Aadhar", error });
+    const existedUser = await AppUsers.findOne({ mobileNo });
+    if (!existedUser) {
+      return res
+        .status(400)
+        .json({ message: "No user with the Mobile No found" });
     }
-}
+
+    const createdUser = await AppUsers.findById(existedUser._id).select(
+      "-aadharNo"
+    );
+
+    const accessToken = generateToken(createdUser._id);
+
+    return res
+      .status(200)
+      .json({
+        message: "User Logged In successfully",
+        createdUser,
+        accessToken,
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Cannot Login with Aadhar", error });
+  }
+};
 //auth controllers
 // const citizenRegister = async(req,res) =>{
 //     const {email} = req.body;
@@ -320,8 +397,8 @@ const loginAadhar = async(req,res) => {
 //             return res.status(400).json({ message: "User already registered with this mobile number" });
 //         }
 
-//         const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
-//         otpStore.set(email, otp); 
+//         const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//         otpStore.set(email, otp);
 
 //         await transporter.sendMail({
 //             from: process.env.RediffMail_id,
@@ -374,15 +451,15 @@ const loginAadhar = async(req,res) => {
 //         if(!email){
 //             return res.status(400).json({message: "Email Field are empty"})
 //         }
-        
+
 //         const existedUser = await Citizen.findOne({email})
-        
+
 //         if(!existedUser){
 //             return res.status(400).json({message: "User does not exist by this username/email"})
 //         }
 
-//         const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
-//         otpStore.set(email, otp); 
+//         const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//         otpStore.set(email, otp);
 
 //         await transporter.sendMail({
 //             from: process.env.RediffMail_id,
@@ -429,214 +506,228 @@ const loginAadhar = async(req,res) => {
 //     }
 // }
 
-const AddIssue = async(req,res) => {
-    const {photo,title,description,emergencyType,location} = req.body
+const AddIssue = async (req, res) => {
+  const { photo, title, description, emergencyType, location } = req.body;
 
-    const newIssue = await Issue.create({
-        photo,
-        title,
-        description,
-        emergencyType,
-        location
-    })
+  const newIssue = await Issue.create({
+    photo,
+    title,
+    description,
+    emergencyType,
+    location,
+  });
 
-    if(!newIssue){
-        return res.status(400).json({message: 'New Issue not raised'})
-    }
+  if (!newIssue) {
+    return res.status(400).json({ message: "New Issue not raised" });
+  }
 
-    return res.status(200).json({message: 'Issue raised successfully'})
-}
-
-const getAllIssue = async(req,res) => {
-    const allIssue = await Issue.find({});
-
-    if (allIssue.length === 0) {
-            return res.status(404).json({ message: 'There are no issues to retrieve' });
-        }
-
-        return res.status(200).json(allIssue);
-}
-
-const sendSos = async(req,res) => {
-    const {name,email,location,emergencyType} = req.body;
-
-    if(!name || !email){
-        return res.status(400).json({message: 'Login again'})
-    }
-
-    if(!location || !emergencyType){
-        return res.status(400).json({message: 'Give location permission'})
-    }
-
-    const newSos = await Sos.create({
-        name,
-        email,
-        location,
-        emergencyType})
-
-    if(!newSos){
-        return res.status(400).json({message: 'Sos not raised'})
-    }
-
-    const io = req.app.get('io')
-    io.emit('newSos',{
-            id: newSos._id,
-            name: newSos.name,
-            location: newSos.location,
-            emergencyType: newSos.emergencyType,
-            createdAt: newSos.createdAt
-        })
-
-    return res.status(200).json({message: 'Sos sent'})
-}
-
-const getSos = async(req,res) => {
-    const allSos = await Sos.find({});
-
-    if (allSos.length === 0) {
-            return res.status(404).json({ message: 'There are no issues to retrieve' });
-        }
-
-        return res.status(200).json(allSos);
-}
-
-const perHrSosCount = async (req, res) => {
-    try {
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const hourlyData = [];
-
-        for (let hour = 0; hour < 24; hour++) {
-            const startHour = new Date(startOfDay);
-            startHour.setHours(hour);
-
-            const endHour = new Date(startHour);
-            endHour.setHours(hour + 1);
-
-            const sosCount = await Sos.countDocuments({
-                createdAt: {
-                    $gte: startHour,
-                    $lt: endHour,
-                },
-            });
-
-            hourlyData.push({
-                hour: `${hour.toString().padStart(2, '0')}:00-${(hour + 1).toString().padStart(2, '0')}:00`,
-                count: sosCount,
-            });
-        }
-
-        return res.status(200).json(hourlyData);
-    } catch (error) {
-        console.error('Error in perHrSosCount:', error);
-        return res.status(500).json({ 
-            message: 'Error fetching hourly SOS counts',
-            error: error.message 
-        });
-    }
-}
-
-const perMonthSosCount = async (req, res) => {
-    try {
-        const currentYear = new Date().getFullYear();
-        const monthlyData = [];
-
-        const monthNames = [
-            'January', 'February', 'March', 'April', 
-            'May', 'June', 'July', 'August', 
-            'September', 'October', 'November', 'December'
-        ];
-
-        for (let month = 0; month < 12; month++) {
-            const startOfMonth = new Date(currentYear, month, 1);
-            const endOfMonth = new Date(currentYear, month + 1, 1);
-
-            const sosCount = await Sos.countDocuments({
-                createdAt: {
-                    $gte: startOfMonth,
-                    $lt: endOfMonth
-                }
-            });
-
-            // const dailyData = [];
-            // for (let day = 1; day <= new Date(currentYear, month + 1, 0).getDate(); day++) {
-            //     const startOfDay = new Date(currentYear, month, day);
-            //     const endOfDay = new Date(currentYear, month, day + 1);
-
-            //     const dailyCount = await Sos.countDocuments({
-            //         createdAt: {
-            //             $gte: startOfDay,
-            //             $lt: endOfDay
-            //         }
-            //     });
-
-            //     dailyData.push({
-            //         date: `${currentYear}-${month + 1}-${day}`,
-            //         count: dailyCount
-            //     });
-            // }
-
-            monthlyData.push({
-                month: monthNames[month],
-                year: currentYear,
-                totalMonthlyCount: sosCount,
-                // dailyCounts: dailyData
-            });
-        }
-
-        return res.status(200).json(monthlyData);
-    } catch (error) {
-        console.error('Error in perMonthSosCount:', error);
-        return res.status(500).json({ 
-            message: 'Error fetching monthly SOS counts',
-            error: error.message 
-        });
-    }
+  return res.status(200).json({ message: "Issue raised successfully" });
 };
 
-const verifySos = async(req,res) => {
-    try {
-        const { id } = req.body;
-        if (!id) {
-            return res.status(400).json({ message: 'ID is required' });
-        }
+const getAllIssue = async (req, res) => {
+  const allIssue = await Issue.find({});
 
-        const sos = await Sos.findById(id);
-        if (!sos) {
-            return res.status(404).json({ message: 'SOS record not found' });
-        }
+  if (allIssue.length === 0) {
+    return res.status(404).json({ message: "There are no issues to retrieve" });
+  }
 
-        sos.verified = !sos.verified;
-        await sos.save();
+  return res.status(200).json(allIssue);
+};
 
-        res.status(200).json({ 
-            message: 'Verified status updated successfully', 
-            data: sos 
-        });
-    } catch (error) {
-        res.status(500).json({ 
-            message: 'An error occurred while updating verified status', 
-            error: error.message 
-        });
+const sendSos = async (req, res) => {
+  const { name, email, location, emergencyType } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({ message: "Login again" });
+  }
+
+  if (!location || !emergencyType) {
+    return res.status(400).json({ message: "Give location permission" });
+  }
+
+  const newSos = await Sos.create({
+    name,
+    email,
+    location,
+    emergencyType,
+  });
+
+  if (!newSos) {
+    return res.status(400).json({ message: "Sos not raised" });
+  }
+
+  const io = req.app.get("io");
+  const x = {
+    id: newSos._id,
+    name: newSos.name,
+    location: newSos.location,
+    emergencyType: newSos.emergencyType,
+    createdAt: newSos.createdAt,
+  };
+
+  io.emit("newSos", x);
+
+  return res.status(200).json({ message: "Sos sent" });
+};
+
+const getSos = async (req, res) => {
+  const allSos = await Sos.find({});
+
+  if (allSos.length === 0) {
+    return res.status(404).json({ message: "There are no issues to retrieve" });
+  }
+
+  return res.status(200).json(allSos);
+};
+
+const perHrSosCount = async (req, res) => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const hourlyData = [];
+
+    for (let hour = 0; hour < 24; hour++) {
+      const startHour = new Date(startOfDay);
+      startHour.setHours(hour);
+
+      const endHour = new Date(startHour);
+      endHour.setHours(hour + 1);
+
+      const sosCount = await Sos.countDocuments({
+        createdAt: {
+          $gte: startHour,
+          $lt: endHour,
+        },
+      });
+
+      hourlyData.push({
+        hour: `${hour.toString().padStart(2, "0")}:00-${(hour + 1)
+          .toString()
+          .padStart(2, "0")}:00`,
+        count: sosCount,
+      });
     }
-}
+
+    return res.status(200).json(hourlyData);
+  } catch (error) {
+    console.error("Error in perHrSosCount:", error);
+    return res.status(500).json({
+      message: "Error fetching hourly SOS counts",
+      error: error.message,
+    });
+  }
+};
+
+const perMonthSosCount = async (req, res) => {
+  try {
+    const currentYear = new Date().getFullYear();
+    const monthlyData = [];
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    for (let month = 0; month < 12; month++) {
+      const startOfMonth = new Date(currentYear, month, 1);
+      const endOfMonth = new Date(currentYear, month + 1, 1);
+
+      const sosCount = await Sos.countDocuments({
+        createdAt: {
+          $gte: startOfMonth,
+          $lt: endOfMonth,
+        },
+      });
+
+      // const dailyData = [];
+      // for (let day = 1; day <= new Date(currentYear, month + 1, 0).getDate(); day++) {
+      //     const startOfDay = new Date(currentYear, month, day);
+      //     const endOfDay = new Date(currentYear, month, day + 1);
+
+      //     const dailyCount = await Sos.countDocuments({
+      //         createdAt: {
+      //             $gte: startOfDay,
+      //             $lt: endOfDay
+      //         }
+      //     });
+
+      //     dailyData.push({
+      //         date: `${currentYear}-${month + 1}-${day}`,
+      //         count: dailyCount
+      //     });
+      // }
+
+      monthlyData.push({
+        month: monthNames[month],
+        year: currentYear,
+        totalMonthlyCount: sosCount,
+        // dailyCounts: dailyData
+      });
+    }
+
+    return res.status(200).json(monthlyData);
+  } catch (error) {
+    console.error("Error in perMonthSosCount:", error);
+    return res.status(500).json({
+      message: "Error fetching monthly SOS counts",
+      error: error.message,
+    });
+  }
+};
+
+const verifySos = async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ message: "ID is required" });
+    }
+
+    const sos = await Sos.findById(id);
+    if (!sos) {
+      return res.status(404).json({ message: "SOS record not found" });
+    }
+
+    sos.verified = !sos.verified;
+    await sos.save();
+
+    res.status(200).json({
+      message: "Verified status updated successfully",
+      data: sos,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while updating verified status",
+      error: error.message,
+    });
+  }
+};
 
 const warningNotification = async (req, res) => {
-    try {
+  try {
     const { title, description } = req.body;
     if (!title || !description) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        required: ['title', 'description']
+      return res.status(400).json({
+        error: "Missing required fields",
+        required: ["title", "description"],
       });
     }
     const message = {
       notification: {
         title: title,
-        body: description
+        body: description,
       },
-      topic: 'all_users'
+      topic: "all_users",
     };
 
     // Send the message
@@ -644,15 +735,14 @@ const warningNotification = async (req, res) => {
 
     // Successful response
     return res.status(200).json({
-      message: 'Notification sent successfully',
-      messageId: response
+      message: "Notification sent successfully",
+      messageId: response,
     });
-
   } catch (error) {
-    console.error('Error sending notification:', error);
-    return res.status(500).json({ 
-      error: 'Failed to send notification',
-      details: error.message 
+    console.error("Error sending notification:", error);
+    return res.status(500).json({
+      error: "Failed to send notification",
+      details: error.message,
     });
   }
 };
@@ -660,79 +750,104 @@ const warningNotification = async (req, res) => {
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
 //sms function
 const sendSMS = async (message, numbers) => {
-    const url = 'https://www.fast2sms.com/dev/bulkV2';
-    const payload = {
-        message: message,
-        language: 'english',
-        route: 'q', // Transactional route
-        numbers: numbers, // Comma-separated mobile numbers
-    };
+  const url = "https://www.fast2sms.com/dev/bulkV2";
+  const payload = {
+    message: message,
+    language: "english",
+    route: "q", // Transactional route
+    numbers: numbers, // Comma-separated mobile numbers
+  };
 
-    try {
-        const response = await axios.post(url, payload, {
-            headers: {
-                'authorization': FAST2SMS_API_KEY,
-                'Content-Type': 'application/json',
-            },
-        });
-        console.log('SMS sent successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        console.log(error)
-        console.error('Error sending SMS:', error.response?.data || error.message);
-        throw error;
-    }
+  try {
+    const response = await axios.post(url, payload, {
+      headers: {
+        authorization: FAST2SMS_API_KEY,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("SMS sent successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    console.error("Error sending SMS:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
-const smsTesting = async(req,res) => {
-    const { title, description } = req.body;
+const smsTesting = async (req, res) => {
+  const { title, description } = req.body;
 
-    if (!title || !description) {
-        return res.status(400).json({ error: 'Title and description are required' });
+  if (!title || !description) {
+    return res
+      .status(400)
+      .json({ error: "Title and description are required" });
+  }
+
+  const message = `${title}: ${description}`;
+
+  try {
+    // Fetch all phone numbers from the Citizen database
+    const citizens = await Citizen.find({}, "phoneNumber");
+    const phoneNumbers = citizens.map((citizen) => citizen.phoneNumber);
+
+    if (phoneNumbers.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No phone numbers found in the database" });
     }
 
-    const message = `${title}: ${description}`;
-
-    try {
-        // Fetch all phone numbers from the Citizen database
-        const citizens = await Citizen.find({}, 'phoneNumber');
-        const phoneNumbers = citizens.map((citizen) => citizen.phoneNumber);
-
-        if (phoneNumbers.length === 0) {
-            return res.status(404).json({ error: 'No phone numbers found in the database' });
-        }
-
-        // Send SMS
-        const result = await sendSMS(message, 9321604801);
-        res.status(200).json({ message: 'SMS sent successfully', result });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to send SMS', details: error.message });
-    }
-}
-
+    // Send SMS
+    const result = await sendSMS(message, 9321604801);
+    res.status(200).json({ message: "SMS sent successfully", result });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to send SMS", details: error.message });
+  }
+};
 
 //verified posts
-const addVerifiedPost = async(req,res) => {
-const { title,body,location,date,type,source,imageUrl,postId,priority} = req.body;
+const addVerifiedPost = async (req, res) => {
+  const {
+    title,
+    body,
+    location,
+    date,
+    type,
+    source,
+    imageUrl,
+    postId,
+    priority,
+  } = req.body;
   try {
-    const verified = new VerifiedPosts({ title,body,location,date,type,source,imageUrl,postId,priority });
+    const verified = new VerifiedPosts({
+      title,
+      body,
+      location,
+      date,
+      type,
+      source,
+      imageUrl,
+      postId,
+      priority,
+    });
     await verified.save();
     res.status(201).json({ success: true, verified });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
-} 
+};
 
-const getVerifiedPost = async(req,res) => {
-    try {
+const getVerifiedPost = async (req, res) => {
+  try {
     const verified = await VerifiedPosts.find();
     res.status(200).json({ success: true, verified });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: "Server Error" });
   }
-}
+};
 const increaseLike = async (req, res) => {
   try {
     const { postId } = req.body;
@@ -775,7 +890,7 @@ const increaseDislike = async (req, res) => {
 // Update Post
 const updatePost = async (req, res) => {
   try {
-    const { postId,updatedData } = req.body;
+    const { postId, updatedData } = req.body;
 
     const post = await VerifiedPosts.findOneAndUpdate(
       { postId },
@@ -793,38 +908,35 @@ const updatePost = async (req, res) => {
   }
 };
 
-
 //raise a req controller
 
 //routes
-import {getFundraiser} from './controllers/donation.controller.js'
+import { getFundraiser } from "./controllers/donation.controller.js";
 const routes = Router();
 
-routes.route('/verify-aadhar').post(registerAadhar)
-routes.route('/login-with-aadhar').post(loginAadhar)
+routes.route("/verify-aadhar").post(registerAadhar);
+routes.route("/login-with-aadhar").post(loginAadhar);
 // routes.route('/register-citizen').post(citizenRegister)
 // routes.route('/verify-reg-citizen').post(verifyRegisteredUser)
 // routes.route('/login-mobile').post(citizenLogin)
 // routes.route('/verify-login-citizen').post(verifyLoggedInUser)
-routes.route('/get-fundraisers').get(getFundraiser)
-routes.route('/add-issue').post(AddIssue)
-routes.route('/send-sos').post(sendSos)
+routes.route("/get-fundraisers").get(getFundraiser);
+routes.route("/add-issue").post(AddIssue);
+routes.route("/send-sos").post(sendSos);
 //verified posts
-routes.route('/add-post').post(addVerifiedPost)
-routes.route('/get-all-post').get(getVerifiedPost)
-routes.route('/like-post').post(increaseLike)
-routes.route('/dislike-post').post(increaseDislike)
-routes.route('/update-post').post(updatePost)
-
+routes.route("/add-post").post(addVerifiedPost);
+routes.route("/get-all-post").get(getVerifiedPost);
+routes.route("/like-post").post(increaseLike);
+routes.route("/dislike-post").post(increaseDislike);
+routes.route("/update-post").post(updatePost);
 
 //for admin routes
-routes.route('/get-all-issue').get(getAllIssue)
-routes.route('/get-all-sos').get(getSos)
-routes.route('/per-hr-sos').get(perHrSosCount)
-routes.route('/per-month-sos').get(perMonthSosCount)
-routes.route('/verify-sos').get(verifySos)
-routes.route('/send-notification').post(warningNotification)
-routes.route('/send-message').post(smsTesting)
+routes.route("/get-all-issue").get(getAllIssue);
+routes.route("/get-all-sos").get(getSos);
+routes.route("/per-hr-sos").get(perHrSosCount);
+routes.route("/per-month-sos").get(perMonthSosCount);
+routes.route("/verify-sos").get(verifySos);
+routes.route("/send-notification").post(warningNotification);
+routes.route("/send-message").post(smsTesting);
 
-
-export default routes
+export default routes;

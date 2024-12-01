@@ -1,0 +1,92 @@
+.sos-display-wrapper {
+  max-height: 100vh !important;
+  overflow-y: scroll;
+  padding-block: 1.2rem;
+  padding-inline: 1rem;
+  font-family: "Inter", sans-serif;
+  position: sticky;
+  top: 0;
+}
+
+.sos-display-title {
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--primary-color);
+  padding-bottom: 1.2rem;
+}
+
+.sos-display-cards {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+  padding: 0rem;
+  margin: 0;
+  gap: 1rem;
+}
+
+.sos-display-card {
+  width: 100%;
+  margin: 0;
+  padding: 1rem;
+  background-color: rgb(255, 223, 220);
+  box-shadow: 2px 2px 4px var(--light-gray);
+  min-height: 0;
+}
+
+.sos-body-icon-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sos-type-icon {
+  width: 3rem;
+  height: 3rem;
+}
+
+.sos-display-card .card-body .card-title {
+  font-size: 1.2rem !important;
+  line-height: 1.5rem !important;
+  text-wrap: wrap;
+  font-weight: 700;
+}
+
+.sos-display-card .card-body .card-text {
+  font-size: 1.2rem !important;
+  line-height: 1.5rem !important;
+  text-wrap: wrap;
+  font-weight: 700;
+}
+.sos-display-card .card-body .card-title span,
+.sos-display-card .card-body .card-text span {
+  font-size: 1rem !important;
+  /* line-height: 1.5rem !important; */
+  text-wrap: wrap;
+  font-weight: 500;
+}
+
+.sos-resolve {
+  background: white;
+  border: 1px solid var(--warning-red);
+  color: var(--warning-red);
+  font-weight: 600;
+}
+
+.sos-resolve:active,
+.sos-resolve:hover {
+  background: var(--warning-red) !important;
+  border: 1px solid var(--warning-red);
+}
+
+.sos-resolver .map-wrapper {
+  height: 50vh;
+}
+
+.sos-resolver .leaflet-container {
+  height: 100% !important;
+  width: 100%;
+  background: white;
+  border-radius: 25px;
+}
