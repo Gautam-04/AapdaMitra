@@ -60,7 +60,7 @@ class _ManualsScreenState extends State<ManualsScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const InstructionPage(title: 'CPR Manual Instructions'),
+                                const CPRManualPage(),
                           ),
                         );
                       },
@@ -94,7 +94,7 @@ class _ManualsScreenState extends State<ManualsScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const InstructionPage(title: 'Flood Manual Instructions'),
+                                const FloodManualPage(),
                           ),
                         );
                       },
@@ -150,6 +150,7 @@ class ManualButton extends StatelessWidget {
   }
 }
 
+// Fire Extinguisher Manual Page
 class FireExtinguisherManualPage extends StatelessWidget {
   const FireExtinguisherManualPage({Key? key}) : super(key: key);
 
@@ -195,27 +196,6 @@ class FireExtinguisherManualPage extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      // Add chatbot click functionality here
-                    },
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.indigo,
-                      child: CircleAvatar(
-                        radius: 26,
-                        backgroundImage: AssetImage('assets/images/Bot_Image.png'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -234,6 +214,7 @@ class FireExtinguisherManualPage extends StatelessWidget {
   }
 }
 
+// Earthquake Manual Page
 class EarthquakeManualPage extends StatelessWidget {
   const EarthquakeManualPage({Key? key}) : super(key: key);
 
@@ -299,22 +280,131 @@ class EarthquakeManualPage extends StatelessWidget {
   }
 }
 
-class InstructionPage extends StatelessWidget {
-  final String title;
+// Flood Manual Page
+class FloodManualPage extends StatelessWidget {
+  const FloodManualPage({Key? key}) : super(key: key);
 
-  const InstructionPage({required this.title, Key? key}) : super(key: key);
+  final List<String> manualImages = const [
+    'assets/images/flood_1.png',
+    'assets/images/flood_2.png',
+    'assets/images/flood_3.png',
+    'assets/images/flood_4.png',
+    'assets/images/flood_5.png',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Text(
-          'Instructions for $title',
-          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Header(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: GridView.builder(
+                  itemCount: manualImages.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10.0,
+                    crossAxisSpacing: 10.0,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Image.asset(
+                          manualImages[index],
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
+      ),
+      bottomNavigationBar: Footer(
+        currentIndex: 3,
+        onTap: (index) {
+          if (index != 3) {
+            Navigator.pushReplacementNamed(
+              context,
+              ['/home_screen', '/donation_screen', '/raiseIssue_screen'][index],
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+// CPR Manual Page
+class CPRManualPage extends StatelessWidget {
+  const CPRManualPage({Key? key}) : super(key: key);
+
+  final List<String> manualImages = const [
+    'assets/images/cpr_1.png',
+    'assets/images/cpr_2.png',
+    'assets/images/cpr_3.png',
+    'assets/images/cpr_4.png',
+    'assets/images/cpr_5.png',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Header(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: GridView.builder(
+                  itemCount: manualImages.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10.0,
+                    crossAxisSpacing: 10.0,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Image.asset(
+                          manualImages[index],
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Footer(
+        currentIndex: 3,
+        onTap: (index) {
+          if (index != 3) {
+            Navigator.pushReplacementNamed(
+              context,
+              ['/home_screen', '/donation_screen', '/raiseIssue_screen'][index],
+            );
+          }
+        },
       ),
     );
   }
