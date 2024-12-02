@@ -346,14 +346,12 @@
   gap: 208px;
 }
 
-/* Text section on the right */
 .app-text {
   width: 50%;
   color: #000;
   text-align: left;
 }
 
-/* Heading (h2) styling */
 .app-text h2 {
   font-family: "Inter", sans-serif;
   font-size: 36px;
