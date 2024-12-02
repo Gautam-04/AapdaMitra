@@ -328,7 +328,7 @@ const registerAadhar = async (req, res) => {
       verified: result.verified,
     });
 
-    if(result.verified == false){
+    if(result.verified === false){
       return res.status(400).json({message: 'Aadhar No is incorrect'})
     }
 
