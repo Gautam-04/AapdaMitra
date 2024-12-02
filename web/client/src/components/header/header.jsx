@@ -17,7 +17,7 @@ function Header() {
     <div className="header">
       <div className="header-logo-container">
         <Link
-          to={"/dashboard"}
+          to={"/dashboard/analytics"}
           style={{ textDecoration: "None", color: "black" }}
         >
           <img src={MainLogo} alt="mainlogo.svg" className="header-logo" />
@@ -27,7 +27,7 @@ function Header() {
       <nav className="header-nav-container">
         <div className="header-nav-item">
           <Link
-            to={"/dashboard"}
+            to={"/dashboard/analytics"}
             style={{ textDecoration: "None", color: "black" }}
           >
             DASHBOARD

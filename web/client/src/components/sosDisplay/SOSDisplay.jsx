@@ -116,6 +116,23 @@ const SOSDisplay = () => {
         {pendingSOS.map((req, idx) => {
           return (
             <Card key={idx} className="sos-display-card">
+              <div className="sos-date-time-wrapper">
+                <Card.Text>
+                  {/* <span>Date:</span>
+                  <br /> */}
+                  {new Date(req.createdAt).toISOString().split("T")[0]}
+                </Card.Text>
+                <Card.Text>
+                  {/* <span>Time:</span>
+                  <br /> */}
+                  {
+                    new Date(req.createdAt)
+                      .toISOString()
+                      .split("T")[1]
+                      .split(".")[0]
+                  }
+                </Card.Text>
+              </div>
               <div className="sos-body-icon-wrapper">
                 <Card.Body>
                   <Card.Title>
@@ -127,11 +144,6 @@ const SOSDisplay = () => {
                     <span>Location:</span>
                     <br />
                     {req.location}
-                  </Card.Text>
-                  <Card.Text>
-                    <span>Date:</span>
-                    <br />
-                    {new Date(req.createdAt).toISOString().split("T")[0]}
                   </Card.Text>
                 </Card.Body>
                 {emergencyIconMap[req.emergencyType]}

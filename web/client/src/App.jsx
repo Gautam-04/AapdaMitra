@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/Auth/SignUp";
@@ -22,12 +22,14 @@ import { useEffect } from "react";
 import CornerMenu from "./components/cornerMenu/CornerMenu";
 
 function App() {
-  const socket = io();
-  useEffect(() => {
-    socket.on("newSos", (x) => {
-      console.log(x);
-    });
-  });
+  const navigate = useNavigate();
+
+  // const socket = io();
+  // useEffect(() => {
+  //   socket.on("newSos", (x) => {
+  //     console.log(x);
+  //   });
+  // });
   return (
     <>
       {/* <Header /> */}

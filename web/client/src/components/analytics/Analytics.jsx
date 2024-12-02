@@ -8,6 +8,7 @@ import { Card } from "react-bootstrap";
 import { FaClipboardCheck } from "react-icons/fa";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { MdCrisisAlert } from "react-icons/md";
+import { FaHourglassHalf } from "react-icons/fa";
 import { IoDownload } from "react-icons/io5";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
@@ -211,7 +212,7 @@ const Analytics = () => {
       title: t("analytics_posts_scraped"),
       statistic: sosTurnaround,
       color: "#FFDDAA",
-      icon: <IoDownload className="analytics-card-icon" />,
+      icon: <FaHourglassHalf className="analytics-card-icon" />,
     },
   ];
 
