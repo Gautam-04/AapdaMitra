@@ -40,6 +40,7 @@ const AppUsers = mongoose.model(
       state: { type: String, required: true },
       gender: { type: String, required: true },
       aadharNo: { type: String, required: true },
+      fcmToken: { type: String }
     },
     { timestamps: true }
   )
@@ -312,7 +313,7 @@ async function verifyMobile(NAME, mobileNo) {
 //controllers
 //aadhar based auth controllers
 const registerAadhar = async (req, res) => {
-  const { email, name, mobileNo, aadharNo } = req.body;
+  const { email, name, mobileNo, aadharNo, fcmToken} = req.body;
   try {
     const isNameMatched = await verifyMobile(name, mobileNo);
     if (!isNameMatched) {
@@ -327,6 +328,10 @@ const registerAadhar = async (req, res) => {
       verified: result.verified,
     });
 
+    if(result.verified === false){
+      return res.status(400).json({message: 'Aadhar No is incorrect'})
+    }
+
     const user = await AppUsers.create({
       name,
       email,
@@ -334,6 +339,7 @@ const registerAadhar = async (req, res) => {
       state: result?.details?.state || " ",
       gender: result?.details?.gender || " ",
       aadharNo,
+      fcmToken
     });
 
     if (!user) {
@@ -355,7 +361,7 @@ const registerAadhar = async (req, res) => {
 };
 
 const loginAadhar = async (req, res) => {
-  const { mobileNo } = req.body;
+  const { mobileNo, fcmToken} = req.body;
 
   try {
     if (!mobileNo) {
@@ -369,6 +375,13 @@ const loginAadhar = async (req, res) => {
       return res
         .status(400)
         .json({ message: "No user with the Mobile No found" });
+    }
+
+    if (existedUser.fcmToken !== fcmToken) {
+      await AppUsers.updateOne(
+        { _id: existedUser._id },
+        { $set: { fcmToken } }
+      );
     }
 
     const createdUser = await AppUsers.findById(existedUser._id).select(
@@ -767,26 +780,41 @@ const warningNotification = async (req, res) => {
         required: ["title", "description"],
       });
     }
+    const users = await AppUsers.find({}, { fcmToken: 1 });
+
+    const fcmTokens = users.map((user) => user.fcmToken).filter(Boolean);
+
+    if (fcmTokens.length === 0) {
+      return res.status(404).json({ error: "No valid FCM tokens found." });
+    }
+
     const message = {
-      "token":"euq3rXj1RQKYCT5YS6pnTu:APA91bGga9jiInKY24ns1g69lYEoPJNpqU5Fay98rNWEFL88881AfIhtJX0oCoorh-2ehpFu2EOUJYFQ9lQzPkG3jZ5UL7AlIizLxjSyxC2sE7YA5y5-Bxc",
       notification: {
-        title: title,
+        title,
         body: description,
       },
     };
 
-    // Send the message
-    const response = await admin.messaging().send(message);
+    const results = [];
+    for (const token of fcmTokens) {
+      try {
+        const response = await admin.messaging().send({ ...message, token });
+        results.push({ token, status: "success", messageId: response });
+      } catch (error) {
+        results.push({ token, status: "failure", error: error.message });
+        console.error(`Failed to send notification to ${token}:`, error.message);
+      }
+    }
 
-    // Successful response
+    // Return the results
     return res.status(200).json({
-      message: "Notification sent successfully",
-      messageId: response,
+      message: "Notifications processed",
+      results,
     });
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error("Error sending notifications:", error);
     return res.status(500).json({
-      error: "Failed to send notification",
+      error: "Failed to send notifications",
       details: error.message,
     });
   }
@@ -830,6 +858,7 @@ const sosAverageTurnaroundTime = async (req, res) => {
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
     const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
+    // Calculate daily average turnaround time
     const averageDailyTurnaroundTime = await Sos.aggregate([
       {
         $match: {
@@ -852,6 +881,7 @@ const sosAverageTurnaroundTime = async (req, res) => {
       },
     ]);
 
+    // Calculate overall average turnaround time
     const overallTurnAroundTime = await Sos.aggregate([
       {
         $match: {
@@ -871,21 +901,25 @@ const sosAverageTurnaroundTime = async (req, res) => {
           averageTime: { $avg: "$timeDiff" },
         },
       },
-    ]); 
+    ]);
 
-    if (!averageDailyTurnaroundTime.length) {
-      return res.status(404).json({ message: "No verified posts found" });
-    }
+    // Handle cases where no posts are found
+    const averageTimeInSeconds = averageDailyTurnaroundTime.length
+      ? averageDailyTurnaroundTime[0].averageTime / 1000
+      : 0;
 
-    const averageTimeInSeconds = averageDailyTurnaroundTime[0].averageTime / 1000;
-    const overallAverageTimeInSec = overallTurnAroundTime[0].averageTime/1000;
+    const overallAverageTimeInSec = overallTurnAroundTime.length
+      ? overallTurnAroundTime[0].averageTime / 1000
+      : 0;
 
+    // Format the time
     const averageTimeFormatted = formatTime(averageTimeInSeconds);
     const overallAverageTimeFormatted = formatTime(overallAverageTimeInSec);
 
     res.status(200).json({
       message: "Average turnaround time fetched successfully",
-      averageTimeFormatted,overallAverageTimeFormatted
+      averageTimeFormatted,
+      overallAverageTimeFormatted,
     });
   } catch (error) {
     console.error(error);
@@ -894,6 +928,7 @@ const sosAverageTurnaroundTime = async (req, res) => {
     });
   }
 };
+
 
 
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
