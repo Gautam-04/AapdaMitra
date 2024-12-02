@@ -6,7 +6,6 @@ function Navbar() {
       <div className="nav">
         <div>
           <nav className="header-nav-container">
-            {/* <div className="nav-item ndrf_logo"><img src={ndrf} alt="ndrf" className=""/></div> */}
             <div className="nav-item">HOME</div>
             <div className="nav-item">EVENTS</div>
             <div className="nav-item">ANALYSIS</div>
