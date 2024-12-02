@@ -505,6 +505,11 @@ const loginAadhar = async (req, res) => {
 const AddIssue = async (req, res) => {
   const { photo, title, description, emergencyType, location } = req.body;
 
+  // const elasticData = {photo,title,description,emergencyType,location}
+
+  // const response = await axios.post("",elasticData);
+  // console.log(response.message)
+
   const newIssue = await Issue.create({
     photo,
     title,

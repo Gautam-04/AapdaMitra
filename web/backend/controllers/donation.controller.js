@@ -1,3 +1,4 @@
+import { response } from "express";
 import { Donation,Fundraiser } from "../models/donations.models.js";
 import {createHmac } from 'node:crypto'
 import Razorpay from 'razorpay'
@@ -9,7 +10,7 @@ const razorpay = new Razorpay({
 });
 
 const createOrder = async (req,res) => {
-const { amount, userId } = req.body;
+const { amount, userId,  } = req.body;
 
   try {
     const order = await razorpay.orders.create({
@@ -17,10 +18,10 @@ const { amount, userId } = req.body;
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
     });
-    res.json({ success: true, order });
+    return res.json({ success: true, order });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Server Error' });
+    return res.status(500).json({ success: false, message: 'Server Error' });
   }
 }
 
@@ -133,6 +134,7 @@ const verifyPayment  = async(req,res) => {
 // };
 
     await donation.save();
+    console.log(donation)
 
     res.json({ success: true, donation });
   } catch (error) {
