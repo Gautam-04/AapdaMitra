@@ -4,6 +4,11 @@ import nodemailer from "nodemailer";
 import { Router } from "express";
 import admin from "firebase-admin";
 import axios from "axios";
+import Twilio from "twilio"
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = Twilio(accountSid, authToken);
 
 // Send Push Notification
 const serviceAccountJSON = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -759,31 +764,84 @@ const warningNotification = async (req, res) => {
   }
 };
 
+const sosCounter = async(req,res) =>{
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0)); 
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); 
+
+    
+    const sosVerifiedCount = await Sos.countDocuments({
+      verified: false,
+      createdAt: { $gte: startOfDay, $lte: endOfDay }, 
+    });
+
+    const sosResolvedCount = await Sos.countDocuments({
+      verified: true,
+      createdAt: { $gte: startOfDay, $lte: endOfDay }, 
+    });
+
+    return res.status(200).json({
+      unVerifiedCount: sosVerifiedCount,
+      resolvedCount: sosResolvedCount,
+    });
+  } catch (error) {
+    console.log("Error in connecting to the route", error)
+  }
+}
+
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
 //sms function
 const sendSMS = async (message, numbers) => {
-  const url = "https://www.fast2sms.com/dev/bulkV2";
-  const payload = {
-    message: message,
-    language: "english",
-    route: "q", // Transactional route
-    numbers: numbers?.join(','), // Comma-separated mobile numbers
-  };
+if (!numbers || numbers.length === 0) {
+    console.error("No phone numbers provided.");
+    return;
+  }
+
+  // Preprocess numbers to ensure they include '+91'
+  const formattedNumbers = numbers.map(number => {
+    // Add '+91' if it doesn't already have it
+    return number.startsWith('+91') ? number : `+91${number}`;
+  });
 
   try {
-    const response = await axios.post(url, payload, {
-      headers: {
-        authorization: FAST2SMS_API_KEY,
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("SMS sent successfully:", response.data);
-    return response.data;
+    // Send SMS for each number
+    for (const number of formattedNumbers) {
+      await client.messages
+        .create({
+          body: message,
+          messagingServiceSid: process.env.TWILIO_SERVICE_SID,
+          to: number,
+        })
+        .then(message => console.log(`Message sent to ${number}: ${message.sid}`));
+    }
   } catch (error) {
-    console.log(error);
-    console.error("Error sending SMS:", error.response?.data || error.message);
+    console.error("Error sending SMS:", error.message || error);
     throw error;
   }
+
+  // const url = "https://www.fast2sms.com/dev/bulkV2";
+  // const payload = {
+  //   message: message,
+  //   language: "english",
+  //   route: "q", // Transactional route
+  //   numbers: numbers?.join(','), // Comma-separated mobile numbers
+  // };
+
+  // try {
+  //   const response = await axios.post(url, payload, {
+  //     headers: {
+  //       authorization: FAST2SMS_API_KEY,
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   console.log("SMS sent successfully:", response.data);
+  //   return response.data;
+  // } catch (error) {
+  //   console.log(error);
+  //   console.error("Error sending SMS:", error.response?.data || error.message);
+  //   throw error;
+  // }
 };
 
 const smsTesting = async (req, res) => {
@@ -949,6 +1007,7 @@ routes.route("/dislike-post").post(increaseDislike);
 routes.route("/update-post").post(updatePost);
 
 //for admin routes
+routes.route("/sos-count").get(sosCounter);
 routes.route("/get-all-issue").get(getAllIssue);
 routes.route("/get-all-sos").get(getSos);
 routes.route("/per-hr-sos").get(perHrSosCount);
