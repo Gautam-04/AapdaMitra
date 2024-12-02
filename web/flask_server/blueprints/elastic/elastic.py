@@ -347,23 +347,14 @@ def addPost():
             "location": "",
             "url": "",
             "disaster_type": "",
-            "source": ""
+            "source": "AapdaMitra App",
         }
 
         data = request.json
-        print(data)
         for key in data.keys():
             template[key] = data[key]
+
         print(template)
-        # template['post_title'] = request.form.get('post_title', "")
-        # template['post_body'] = request.form.get('post_body',  "")
-        # template['date'] = request.form.get('date',  None)
-        # if template['date']:
-        #     template['date'] = (dateparser.parse(template['date']).date())
-        # template['post_image_b64'] = request.form.get('post_image_b64', "")
-        # template['location'] = request.form.get('location', "")
-        # template['disaster_type'] = request.form.get('disaster_type', "")
-        # template['source'] = 'AapdaMitra App'
 
         es.index(index=INDEX_NAME, document=dict(template))
         return {"onload": "Successful"}

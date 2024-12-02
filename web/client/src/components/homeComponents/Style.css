@@ -1,3 +1,4 @@
+/* Hero Section */
 .hero-section {
   display: flex;
   justify-content: center;
@@ -15,7 +16,6 @@
   max-width: 1200px;
   gap: 4rem;
   margin: 0 auto;
-  /* padding: 0 1rem; */
 }
 
 .hero-text {
@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width:30%
+  width: 20%;
 }
 
 .hero-logo-container {
@@ -32,12 +32,14 @@
 
 .hero-logo {
   width: 562px;
-  height:78px;
+  height: 78px;
   height: auto;
 }
 
 .hero-title {
   margin-bottom: 1rem;
+  font-size: 2.25rem;
+  font-weight: 700;
 }
 
 .hero-description {
@@ -50,15 +52,15 @@
 .hero-image-container {
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  width:70%;
+  width: 80%;
 }
 
 .hero-image {
-  width:800px;
-  /* height:494px; */
-  height:
+  width: 800px;
+  height: auto;
+  right: 0;
   object-fit: contain;
 }
 
@@ -82,6 +84,85 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
+@media (max-width: 1024px) {
+  .hero-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .hero-text {
+    width: 100%;
+  }
+
+  .hero-logo {
+    width: 450px;
+  }
+
+  .hero-image-container {
+    width: 100%;
+  }
+
+  .hero-image {
+    width: 90%;
+    height: auto;
+  }
+
+  .get-started-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 2rem 0;
+  }
+
+  .hero-title {
+    font-size: 1.875rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .hero-logo {
+    width: 350px; /* Reduce logo size */
+  }
+
+  .hero-image {
+    width: 100%; /* Make the image take full width */
+  }
+
+  .get-started-btn {
+    width: 100%; /* Make the button full width on small screens */
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.5rem; /* Further reduce font size */
+  }
+
+  .hero-description {
+    font-size: 0.875rem; /* Further reduce font size */
+  }
+
+  .hero-logo {
+    width: 280px; /* Further reduce logo size */
+  }
+
+  .hero-image {
+    width: 100%; /* Ensure the image is responsive */
+  }
+
+  .get-started-btn {
+    font-size: 0.9rem; /* Smaller button text */
+  }
+}
+
 /* Carousel Page */
 .carousel {
   background-color: #2b3674;
@@ -92,12 +173,12 @@
   justify-content: center; /* Center the content horizontally */
   align-items: center; /* Center the content vertically */
   padding-bottom: 5rem;
-  margin-bottom:7rem;
+  margin-bottom: 7rem;
 }
 
 .carousel .content {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Align text to the left and image to the right */
   align-items: center; /* Ensure content in both sections is vertically centered */
   gap: 10px;
   width: 100%; /* Maintain responsiveness */
@@ -105,9 +186,11 @@
   background-color: #2b3674;
   color: #fff;
   margin-top: 10rem;
+  padding: 5rem;
 }
 
-.carousel .left, .carousel .right {
+.carousel .left,
+.carousel .right {
   height: 100%; /* Ensure both sections match the parent height */
 }
 
@@ -115,85 +198,138 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Align text to the left */
   gap: 1rem; /* Consistent spacing between elements */
+  width: 45%; /* Adjusted width to allow space for the image */
+  margin: 4rem;
 }
 
 .carousel .right {
-  width: 450px; /* Fixed width for the right section */
+  width: 45%; /* Adjusted width for the right section */
   height: 100%; /* Ensure it fills the height */
   display: flex;
   align-items: center; /* Center the image vertically */
   justify-content: center; /* Center the image horizontally */
-  margin-left:50%;
-  margin-right:5rem;
 }
 
 .carousel .right img {
-  width:394px;
-  height:394px;
+  width: 394px;
+  height: 394px;
   max-width: 100%;
-  max-height: 100%; /* Ensure the image scales to fit the fixed height */
   object-fit: contain;
   border-radius: 10px;
-  margin-right:7rem;
 }
 
 .carousel .left h3 {
   font-family: "Inter", sans-serif;
   font-size: 36px;
   font-weight: 700;
-  line-height: 1.2; /* Improved line height */
+  line-height: 56px;
   color: #fff;
-  width: 450px;
+  width: 100%;
   text-align: left;
-  margin: 0; /* Remove default margins */
-  padding-bottom: 3rem;
+  margin: 0;
+  padding-bottom: 1rem;
 }
 
 .carousel .left p {
   font-family: "Inter", sans-serif;
   font-size: 18px;
   font-weight: 300;
-  line-height: 1.6; /* Improved readability */
+  line-height: 1.6;
   color: #fff;
-  width: 350px;
+  width: 450px;
   height: 90px;
   text-align: left;
-  margin: 0; /* Remove default margins */
+  margin: 0;
 }
 
 .carousel .left h2 {
-  font-family: "Inter", sans-serif;
+  font-family: "Mulish", sans-serif;
   font-size: 18px;
   font-weight: 700;
-  line-height: 1; /* Simplified line height */
+  line-height: 1;
   color: #fc7753;
   text-transform: uppercase;
   border: 1.4px solid #fc7753;
   border-radius: 55px;
   padding: 0.75rem 2rem;
-  display: inline-flex; /* Changed from flex to inline-flex */
-  align-items: center; /* Center text vertically */
-  justify-content: center; /* Center text horizontally */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  margin-top: 0; /* Remove top margin */
+  margin-top: 3rem;
 }
 
 .carousel .left h2:hover {
-  background-color: rgba(252, 119, 83, 0.1); /* Softer hover effect */
+  background-color: rgba(252, 119, 83, 0.1);
   color: #fc7753;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .carousel .content {
+    flex-direction: column; /* Stack content vertically on small screens */
+    height: auto; /* Allow height to adjust based on content */
+  }
 
-/* Container for the mobile app section */
+  .carousel .left,
+  .carousel .right {
+    width: 100%; /* Make both sections take full width */
+    text-align: center; /* Center the text */
+  }
+
+  .carousel .left {
+    margin-bottom: 2rem; /* Add margin to separate text and image */
+  }
+
+  .carousel .right img {
+    width: 80%; /* Adjust image width for smaller screens */
+    height: auto;
+    margin: 0 auto; /* Center the image */
+  }
+
+  .carousel .left h3 {
+    font-size: 28px; /* Adjust font size for smaller screens */
+  }
+
+  .carousel .left p {
+    font-size: 16px; /* Adjust font size for smaller screens */
+  }
+
+  .carousel .left h2 {
+    font-size: 16px; /* Adjust font size for smaller screens */
+    padding: 0.6rem 1.5rem; /* Adjust padding */
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel .left h3 {
+    font-size: 24px; /* Adjust font size for very small screens */
+  }
+
+  .carousel .left p {
+    font-size: 14px; /* Adjust font size for very small screens */
+  }
+
+  .carousel .left h2 {
+    font-size: 14px; /* Adjust font size for very small screens */
+    padding: 0.5rem 1.2rem; /* Adjust padding */
+  }
+
+  .carousel .right img {
+    width: 90%; /* Further reduce image size on very small screens */
+  }
+}
+
+/* mobile app section */
 .mobile-app-section {
   width: 100%;
   display: flex;
-  justify-content: center; /* Center the content horizontally */
-  align-items: center; /* Center the content vertically */
+  justify-content: center; 
+  align-items: center; s
   padding: 2rem 10%;
   margin-top: 3rem;
   margin-bottom: 3rem;
@@ -207,16 +343,15 @@
   width: 100%;
   max-width: 1200px; /* Limit max width for better responsiveness */
   color: #000;
+  gap: 208px;
 }
 
-/* Text section on the right */
 .app-text {
   width: 50%;
   color: #000;
   text-align: left;
 }
 
-/* Heading (h2) styling */
 .app-text h2 {
   font-family: "Inter", sans-serif;
   font-size: 36px;
@@ -224,6 +359,8 @@
   line-height: 48px;
   color: #000;
   margin-bottom: 1.5rem; /* Space between heading and paragraph */
+  width: 254px;
+  height: 100.154px;
 }
 
 /* Paragraph styling */
@@ -255,6 +392,8 @@
   transition: all 0.3s ease-in-out;
   font-feature-settings: "kern" 1; /* Subtle letter spacing for style */
   margin-top: 5rem;
+  width: 200px;
+  height: 58.423px;
 }
 
 .download-btn:hover {
@@ -289,18 +428,51 @@
 .government-logos {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; 
   flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  gap: 30px; /* Increased space between logos */
+  gap: 30px; /* Space between logos */
   width: 100%; /* Full width of container */
-  padding: 50px 0; /* Add some vertical padding */
-  margin: 0.5rem auto; /* Add top and bottom margins and center the container horizontally */
+  padding: 50px 0; /* Vertical padding */
+  min-height: 200px; /* Ensure sufficient vertical space for alignment */
+  margin: 0.5rem auto; /* Center container horizontally */
 }
 
 .government-logos img {
-  max-width: 180px; /* Limit logo width */
-  max-height: 180px; /* Limit logo height */
-  object-fit: contain; /* Maintain aspect ratio */
+  max-width: 180px; 
+  max-height: 180px;
+  object-fit: contain; 
+  transition: transform 0.3s ease; 
+}
+
+.government-logos img:hover {
+  transform: scale(1.1); /* Slight zoom on hover for interactivity */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .government-logos {
+    gap: 20px;
+    padding: 30px 0;
+    min-height: 150px;
+  }
+
+  .government-logos img {
+    max-width: 140px; /* Reduce logo size */
+    max-height: 140px; /* Maintain proportion */
+  }
+}
+
+@media (max-width: 600px) {
+  .government-logos {
+    gap: 15px; /* Further reduce space on small screens */
+    padding: 20px 0; /* Reduce vertical padding for smaller screens */
+    min-height: 100px; /* Adjust minimum height for mobile screens */
+  }
+
+  .government-logos img {
+    max-width: 100px; /* Make logos smaller for smaller screens */
+    max-height: 100px; /* Maintain proportion */
+  }
 }
 
 /* Style for the features section */
@@ -319,7 +491,7 @@
   text-align: center;
   font-size: 2.5rem;
   font-weight: 700;
-  font-style:Bold;
+  font-style: Bold;
   color: #2b3674;
   margin-bottom: 1.5rem;
   margin-top: 3rem;
@@ -346,14 +518,15 @@
   padding: 1rem;
   text-align: center;
   width: 150px; /* Fixed width for uniformity */
-  height: 100%; /* Ensure cards take up full height */
+  height: auto; /* Adjust height automatically for content */
   justify-content: center; /* Center content inside the card */
+  box-sizing: border-box; /* Prevent padding from causing overflow */
 }
 
 /* Image styling */
 .feature-card img {
-  width: 37px; /* Set a fixed small width */
-  height: 37px; /* Set a fixed small height */
+  width: 37px; /* Fixed small width */
+  height: 37px; /* Fixed small height */
   margin-bottom: 1rem; /* Add space between image and text */
 }
 
@@ -364,5 +537,40 @@
   font-weight: 600;
   color: #2b3674;
   margin-bottom: 1rem;
-  text-align: center; /* Align text to the left */
+  text-align: center; /* Center the text */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .feature-card {
+    width: 120px; /* Reduce width for medium screens */
+    padding: 0.8rem; /* Adjust padding for medium screens */
+  }
+
+  .feature-card img {
+    width: 30px; /* Reduce image size */
+    height: 30px;
+  }
+
+  .feature-card h3 {
+    font-size: 1rem; /* Decrease font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .feature-card {
+    width: 100%; /* Make cards full width for small screens */
+    max-width: 300px; /* Optional: Set a max-width for uniformity */
+    margin: 0 auto 1rem; /* Add bottom margin for spacing */
+    padding: 0.5rem; /* Further reduce padding */
+  }
+
+  .feature-card img {
+    width: 25px; /* Further reduce image size */
+    height: 25px;
+  }
+
+  .feature-card h3 {
+    font-size: 0.9rem; /* Further decrease font size */
+  }
 }

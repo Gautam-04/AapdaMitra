@@ -52,7 +52,7 @@ const Issue = mongoose.model(
       photo: { type: String, default: "" },
       title: { type: String, trim: true, default: "Untitled Issue" },
       description: {
-        type: String,
+        type: String, 
         trim: true,
         default: "No description provided.",
       },
@@ -510,11 +510,6 @@ const loginAadhar = async (req, res) => {
 const AddIssue = async (req, res) => {
   const { photo, title, description, emergencyType, location } = req.body;
 
-  // const elasticData = {photo,title,description,emergencyType,location}
-
-  // const response = await axios.post("",elasticData);
-  // console.log(response.message)
-
   const newIssue = await Issue.create({
     photo,
     title,
@@ -526,6 +521,39 @@ const AddIssue = async (req, res) => {
   if (!newIssue) {
     return res.status(400).json({ message: "New Issue not raised" });
   }
+
+      const date = newIssue.createdAt;
+      const formattedDate = date.toLocaleDateString("en-GB"); 
+
+    const data = {
+      post_title: newIssue.title || "",
+      post_body: newIssue.description || "",
+      date: formattedDate || "",
+      likes: 0,
+      retweets: 0,
+      post_image_url: "",
+      post_image_b64: newIssue.photo || "",
+      location: newIssue.location || "",
+      url: "",
+      disaster_type: newIssue.emergencyType || "",
+    };
+
+    const elasticResponse = await axios.post("http://localhost:5000/search/add-post", {
+      post_title: newIssue.title || "",
+      post_body: newIssue.description || "",
+      date: date || "",
+      likes: 0,
+      retweets: 0,
+      post_image_url: "",
+      post_image_b64: newIssue.photo || "",
+      location: newIssue.location || "",
+      url: "",
+      disaster_type: newIssue.emergencyType || "",
+    });
+
+    if (!elasticResponse || elasticResponse.status !== 200) {
+      return res.status(500).json({ message: "Failed to sync data with Elasticsearch." });
+    }
 
   return res.status(200).json({ message: "Issue raised successfully" });
 };
@@ -740,11 +768,11 @@ const warningNotification = async (req, res) => {
       });
     }
     const message = {
+      "token":"euq3rXj1RQKYCT5YS6pnTu:APA91bGga9jiInKY24ns1g69lYEoPJNpqU5Fay98rNWEFL88881AfIhtJX0oCoorh-2ehpFu2EOUJYFQ9lQzPkG3jZ5UL7AlIizLxjSyxC2sE7YA5y5-Bxc",
       notification: {
         title: title,
         body: description,
       },
-      topic: "all_users",
     };
 
     // Send the message
@@ -788,6 +816,85 @@ const sosCounter = async (req, res) => {
     console.log("Error in connecting to the route", error);
   }
 };
+
+const formatTime = (totalSeconds) => {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  return `${hours}h ${minutes}m ${seconds}s`;
+};
+
+const sosAverageTurnaroundTime = async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const averageDailyTurnaroundTime = await Sos.aggregate([
+      {
+        $match: {
+          verified: true,
+          createdAt: { $gte: startOfDay, $lte: endOfDay },
+        },
+      },
+      {
+        $project: {
+          timeDiff: {
+            $subtract: ["$updatedAt", "$createdAt"],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          averageTime: { $avg: "$timeDiff" },
+        },
+      },
+    ]);
+
+    const overallTurnAroundTime = await Sos.aggregate([
+      {
+        $match: {
+          verified: true,
+        },
+      },
+      {
+        $project: {
+          timeDiff: {
+            $subtract: ["$updatedAt", "$createdAt"],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          averageTime: { $avg: "$timeDiff" },
+        },
+      },
+    ]); 
+
+    if (!averageDailyTurnaroundTime.length) {
+      return res.status(404).json({ message: "No verified posts found" });
+    }
+
+    const averageTimeInSeconds = averageDailyTurnaroundTime[0].averageTime / 1000;
+    const overallAverageTimeInSec = overallTurnAroundTime[0].averageTime/1000;
+
+    const averageTimeFormatted = formatTime(averageTimeInSeconds);
+    const overallAverageTimeFormatted = formatTime(overallAverageTimeInSec);
+
+    res.status(200).json({
+      message: "Average turnaround time fetched successfully",
+      averageTimeFormatted,overallAverageTimeFormatted
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({
+      message: "Error in getting SOS average response time",
+    });
+  }
+};
+
 
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
 //sms function
@@ -1009,6 +1116,7 @@ routes.route("/update-post").post(updatePost);
 
 //for admin routes
 routes.route("/sos-count").get(sosCounter);
+routes.route("/sos-average-time").get(sosAverageTurnaroundTime)
 routes.route("/get-all-issue").get(getAllIssue);
 routes.route("/get-all-sos").get(getSos);
 routes.route("/per-hr-sos").get(perHrSosCount);
