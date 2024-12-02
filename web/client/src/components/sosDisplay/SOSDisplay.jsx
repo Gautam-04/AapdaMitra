@@ -58,7 +58,8 @@ const SOSDisplay = () => {
     try {
       const response = await axios.get("/api/v1/mobile/get-all-sos");
       if (response.status === 200) {
-        setPendingSOS(filterPendingSOS(response.data.splice(0, 10)));
+        setPendingSOS(filterPendingSOS(response.data));
+        console.log(response.data);
       }
     } catch (error) {
       toast.error("Error fetching SOS Requests. Try again later.");
@@ -126,7 +127,11 @@ const SOSDisplay = () => {
                     <span>Location:</span>
                     <br />
                     {req.location}
-                    {() => stringToDate(req.createdAt)}
+                  </Card.Text>
+                  <Card.Text>
+                    <span>Date:</span>
+                    <br />
+                    {new Date(req.createdAt).toISOString().split("T")[0]}
                   </Card.Text>
                 </Card.Body>
                 {emergencyIconMap[req.emergencyType]}

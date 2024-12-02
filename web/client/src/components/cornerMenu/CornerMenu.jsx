@@ -194,16 +194,11 @@ const CornerMenu = () => {
     if (blank === true) {
       setChatHistory([]);
     } else if (messageContent === "") {
-      // setChatHistory([
-      //   ...chatHistory,
-      //   { role: "user", content: messageContent },
-      // ]);
       return;
-      console.log("Before response", chatHistory);
     }
     try {
       const response = await axios.post(
-        "http://localhost:5000/chatbot/chat",
+        "http://localhost:5000/chatbot/employee-chat",
         { messages: [{ role: "user", content: messageContent }] },
         {
           headers: { "Content-Type": "application/json" },
@@ -232,8 +227,16 @@ const CornerMenu = () => {
   // Create new fundraiser
   const sendBroadcast = async () => {
     try {
+      var mode;
+      if (newBroadcast.mode === "sms") {
+        mode = "send-sms";
+      } else if (newBroadcast.mode === "push") {
+        mode = "send-notification";
+      } else {
+        return;
+      }
       const response = await axios.post(
-        "http://localhost:8000/v1/mobile/send-message",
+        `http://localhost:8000/v1/mobile/${mode}`,
         newBroadcast,
         {
           headers: { "Content-Type": "application/json" },
@@ -393,9 +396,7 @@ const CornerMenu = () => {
                   Select Mode
                 </option>
                 <option value="sms">SMS</option>
-                <option disabled value="push">
-                  Push Notification (through App)
-                </option>
+                <option value="push">Push Notification (through App)</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">

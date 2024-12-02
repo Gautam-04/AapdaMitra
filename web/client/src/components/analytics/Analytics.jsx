@@ -70,21 +70,21 @@ const Analytics = () => {
         setSOSResolvedToday(response.data.resolvedCount);
       }
     } catch (error) {
-      toast.error("Error fetching SOS Timeline Data. Try again later.");
+      toast.error("Error fetching SOS Count Data. Try again later.");
       console.error(error);
     }
   };
 
   const fetchSOSTurnaroundData = async () => {
-    // try {
-    //   const response = await axios.get("/api/v1/mobile/");
-    //   if (response.status === 200) {
-    //     setSOSResolvedToday(response.data.resolvedCount);
-    //   }
-    // } catch (error) {
-    //   toast.error("Error fetching SOS Timeline Data. Try again later.");
-    //   console.error(error);
-    // }
+    try {
+      const response = await axios.get("/api/v1/mobile/sos-average-time");
+      if (response.status === 200) {
+        setSOSTurnaround(response.data.averageTimeFormatted);
+      }
+    } catch (error) {
+      toast.error("Error fetching SOS Turnaround Data. Try again later.");
+      console.error(error);
+    }
   };
 
   const { t } = useTranslation();
