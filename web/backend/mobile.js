@@ -65,7 +65,7 @@ const Issue = mongoose.model(
       location: { type: String, trim: true },
     },
     {
-      timeStamps: true,
+      timestamps: true,
     }
   )
 );

@@ -1,9 +1,9 @@
-#Mon Dec 02 00:48:04 IST 2024
-base.0=D\:\\SIH\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=D\:\\SIH\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
-base.2=D\:\\SIH\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.3=D\:\\SIH\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.4=D\:\\SIH\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
+#Mon Dec 02 08:30:55 IST 2024
+base.0=C\:\\Users\\Gautam\\Desktop\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=C\:\\Users\\Gautam\\Desktop\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
+base.2=C\:\\Users\\Gautam\\Desktop\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.3=C\:\\Users\\Gautam\\Desktop\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.4=C\:\\Users\\Gautam\\Desktop\\AapdaMitra\\mobile\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=0/classes.dex
