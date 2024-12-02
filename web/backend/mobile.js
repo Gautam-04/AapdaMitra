@@ -528,7 +528,6 @@ const AddIssue = async (req, res) => {
       post_title: newIssue.title || "",
       post_body: newIssue.description || "",
       date: date || "",
-      hashtags: "",
       likes: 0,
       retweets: 0,
       post_image_url: "",
@@ -536,11 +535,20 @@ const AddIssue = async (req, res) => {
       location: newIssue.location || "",
       url: "",
       disaster_type: newIssue.emergencyType || "",
-      source: "AapdaMitra App",
-      app_issue_id: newIssue._id,
     };
 
-    const elasticResponse = await axios.post("http://localhost:5000/search/add-post", data);
+    const elasticResponse = await axios.post("http://localhost:5000/search/add-post", {
+      post_title: newIssue.title || "",
+      post_body: newIssue.description || "",
+      date: date || "",
+      likes: 0,
+      retweets: 0,
+      post_image_url: "",
+      post_image_b64: newIssue.photo || "",
+      location: newIssue.location || "",
+      url: "",
+      disaster_type: newIssue.emergencyType || "",
+    });
 
     if (!elasticResponse || elasticResponse.status !== 200) {
       return res.status(500).json({ message: "Failed to sync data with Elasticsearch." });
