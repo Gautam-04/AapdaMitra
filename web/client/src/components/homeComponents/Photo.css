@@ -1,0 +1,81 @@
+.carousel {
+  background-color: #fff;
+  color: #2b3674;
+  display: flex;
+  width: 100%;
+  height: 70vh; /* Full viewport height */
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  padding-bottom: 5rem;
+}
+.photo-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background-color: #2b3674;
+  margin-bottom:20px;
+}
+
+.photo-gallery .gallery-header {
+  margin-bottom: 30px;
+}
+
+.photo-gallery .gallery-header h2 {
+  padding-top:50px;
+  text-align: center;
+  font-size: 2rem;
+  color: white;
+  font-weight: 600;
+}
+
+.photo-gallery .carousel {
+  width: 1000px; /* Increased width */
+  background-color: #2b3674;
+  max-width: 100%;
+}
+
+.photo-gallery .carousel-inner {
+  width: 600px; /* Increased width */
+  height: 400px; /* Increased height */
+}
+
+.photo-gallery .carousel-item {
+  width: 600px; /* Increased width */
+  height: 400px; /* Increased height */
+}
+
+.photo-gallery .carousel-item > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 600px; /* Increased width */
+  height: 400px; /* Increased height */
+}
+
+.photo-gallery .carousel-item img {
+  width: 600px; /* Increased width */
+  height: 400px; /* Increased height */
+  object-fit: cover;
+  object-position: center;
+}
+
+.photo-gallery .carousel-caption {
+  background-color: rgba(0, 0, 0, 0.5);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  text-align: left;
+}
+
+.photo-gallery .carousel-caption h3 {
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.photo-gallery .carousel-caption p {
+  font-size: 0.9rem;
+  color: white;
+}

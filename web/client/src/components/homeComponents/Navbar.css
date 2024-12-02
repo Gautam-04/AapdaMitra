@@ -1,0 +1,54 @@
+.nav {
+  display: flex;
+  align-items: center;
+  background-color: #ff653c;
+  padding: 0 20px; /* Reduced horizontal padding */
+  height: 70px;
+  color: #fff;
+  font-feature-settings: "liga" off, "clig" off;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  justify-content: space-between;
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box; /* Prevent padding from causing overflow */
+}
+
+.login-btn {
+  background: #2b3674;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0.6rem 2rem; /* Reduced padding for better responsiveness */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-feature-settings: "liga" off, "clig" off;
+  font-family: Inter, sans-serif;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 2px;
+  white-space: nowrap; /* Prevent text from wrapping */
+  transition: background-color 0.3s ease; /* Optional: smooth hover effect */
+}
+
+.login-btn:hover {
+  background-color: #1e2554; /* Slightly darker shade for hover state */
+}
+
+/* Optional: Media query for smaller screens */
+@media (max-width: 600px) {
+  .nav {
+    padding: 0 10px; /* Further reduce padding on small screens */
+  }
+
+  .login-btn {
+    padding: 0.6rem 1.5rem; /* Reduce button padding on small screens */
+    font-size: 12px; /* Slightly smaller font size */
+  }
+}

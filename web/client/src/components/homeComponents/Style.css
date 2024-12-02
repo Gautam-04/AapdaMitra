@@ -1,0 +1,368 @@
+.hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 3rem 0;
+  background-color: #f9f9fc;
+}
+
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  gap: 4rem;
+  margin: 0 auto;
+  /* padding: 0 1rem; */
+}
+
+.hero-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width:30%
+}
+
+.hero-logo-container {
+  margin-bottom: 1.5rem;
+}
+
+.hero-logo {
+  width: 562px;
+  height:78px;
+  height: auto;
+}
+
+.hero-title {
+  margin-bottom: 1rem;
+}
+
+.hero-description {
+  color: #6b7280;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 5rem;
+}
+
+.hero-image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width:70%;
+}
+
+.hero-image {
+  width:800px;
+  /* height:494px; */
+  height:
+  object-fit: contain;
+}
+
+.get-started-btn {
+  align-self: flex-start;
+  background-color: #2b3674;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.get-started-btn:hover {
+  background-color: #1e2554;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Carousel Page */
+.carousel {
+  background-color: #2b3674;
+  color: #fff;
+  display: flex;
+  width: 100%;
+  height: 478px; /* Full viewport height */
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  padding-bottom: 5rem;
+  margin-bottom:7rem;
+}
+
+.carousel .content {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Ensure content in both sections is vertically centered */
+  gap: 10px;
+  width: 100%; /* Maintain responsiveness */
+  height: 500px; /* Set a fixed height to all slides */
+  background-color: #2b3674;
+  color: #fff;
+  margin-top: 10rem;
+}
+
+.carousel .left, .carousel .right {
+  height: 100%; /* Ensure both sections match the parent height */
+}
+
+.carousel .left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem; /* Consistent spacing between elements */
+}
+
+.carousel .right {
+  width: 450px; /* Fixed width for the right section */
+  height: 100%; /* Ensure it fills the height */
+  display: flex;
+  align-items: center; /* Center the image vertically */
+  justify-content: center; /* Center the image horizontally */
+  margin-left:50%;
+  margin-right:5rem;
+}
+
+.carousel .right img {
+  width:394px;
+  height:394px;
+  max-width: 100%;
+  max-height: 100%; /* Ensure the image scales to fit the fixed height */
+  object-fit: contain;
+  border-radius: 10px;
+  margin-right:7rem;
+}
+
+.carousel .left h3 {
+  font-family: "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2; /* Improved line height */
+  color: #fff;
+  width: 450px;
+  text-align: left;
+  margin: 0; /* Remove default margins */
+  padding-bottom: 3rem;
+}
+
+.carousel .left p {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.6; /* Improved readability */
+  color: #fff;
+  width: 350px;
+  height: 90px;
+  text-align: left;
+  margin: 0; /* Remove default margins */
+}
+
+.carousel .left h2 {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1; /* Simplified line height */
+  color: #fc7753;
+  text-transform: uppercase;
+  border: 1.4px solid #fc7753;
+  border-radius: 55px;
+  padding: 0.75rem 2rem;
+  display: inline-flex; /* Changed from flex to inline-flex */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-top: 0; /* Remove top margin */
+}
+
+.carousel .left h2:hover {
+  background-color: rgba(252, 119, 83, 0.1); /* Softer hover effect */
+  color: #fc7753;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Container for the mobile app section */
+.mobile-app-section {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  padding: 2rem 10%;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+/* The app content container */
+.app-content {
+  display: flex;
+  justify-content: space-between; /* Space between the image and text */
+  align-items: center; /* Center the content vertically */
+  width: 100%;
+  max-width: 1200px; /* Limit max width for better responsiveness */
+  color: #000;
+}
+
+/* Text section on the right */
+.app-text {
+  width: 50%;
+  color: #000;
+  text-align: left;
+}
+
+/* Heading (h2) styling */
+.app-text h2 {
+  font-family: "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 700; /* Bold text */
+  line-height: 48px;
+  color: #000;
+  margin-bottom: 1.5rem; /* Space between heading and paragraph */
+}
+
+/* Paragraph styling */
+.app-text p {
+  color: #7d7987; /* Lighter color for paragraph text */
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  width: 400px;
+  line-height: 1.6; /* Adjusted line height for readability */
+  margin-bottom: 2rem; /* Space between paragraph and button */
+}
+
+/* Button styling */
+.download-btn {
+  font-family: "Mulish", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 60px;
+  color: #fc7753;
+  background-color: #fff;
+  text-transform: uppercase;
+  border: 1.4px solid #fc7753;
+  border-radius: 55px;
+  padding: 0.5rem 2rem; /* Adjusted padding for better proportion */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+  font-feature-settings: "kern" 1; /* Subtle letter spacing for style */
+  margin-top: 5rem;
+}
+
+.download-btn:hover {
+  background-color: #fc7753;
+  color: #2b3674;
+}
+
+/* Icon inside the button */
+.download-icon {
+  margin-left: 10px;
+}
+
+/* Image section on the left */
+.app-img {
+  width: 50%;
+  display: flex;
+  justify-content: center; /* Center the image horizontally */
+  align-items: center; /* Center the image vertically */
+}
+
+/* Image styling */
+.app-img img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 450px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for a professional feel */
+}
+
+//Govt Logos
+.government-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 30px; /* Increased space between logos */
+  width: 100%; /* Full width of container */
+  padding: 50px 0; /* Add some vertical padding */
+  margin: 0.5rem auto; /* Add top and bottom margins and center the container horizontally */
+}
+
+.government-logos img {
+  max-width: 180px; /* Limit logo width */
+  max-height: 180px; /* Limit logo height */
+  object-fit: contain; /* Maintain aspect ratio */
+}
+
+/* Style for the features section */
+.features-section {
+  display: flex;
+  flex-direction: column; /* Ensure the heading and grid stack properly */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 100%; /* Full viewport height */
+  text-align: center;
+  margin-bottom: 1rem; /* Add bottom margin */
+}
+
+.features-section h2 {
+  font-family: "Inter", sans-serif;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style:Bold;
+  color: #2b3674;
+  margin-bottom: 1.5rem;
+  margin-top: 3rem;
+  width: 100%; /* Full width to ensure alignment */
+}
+
+/* Features grid container */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-template-rows: repeat(2, auto); /* 2 rows */
+  gap: 2.5rem; /* Spacing between cards */
+  justify-items: center; /* Center cards in each cell */
+  height: 400px;
+  margin-left: 10px;
+  margin-right: 50px;
+}
+
+/* Feature card styling */
+.feature-card {
+  display: flex;
+  align-items: center; /* Align items to the center */
+  flex-direction: column; /* Stack image and text vertically */
+  padding: 1rem;
+  text-align: center;
+  width: 150px; /* Fixed width for uniformity */
+  height: 100%; /* Ensure cards take up full height */
+  justify-content: center; /* Center content inside the card */
+}
+
+/* Image styling */
+.feature-card img {
+  width: 37px; /* Set a fixed small width */
+  height: 37px; /* Set a fixed small height */
+  margin-bottom: 1rem; /* Add space between image and text */
+}
+
+/* Heading styling */
+.feature-card h3 {
+  font-family: "Inter", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2b3674;
+  margin-bottom: 1rem;
+  text-align: center; /* Align text to the left */
+}
