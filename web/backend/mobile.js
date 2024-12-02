@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 import { Router } from "express";
 import admin from "firebase-admin";
 import axios from "axios";
-import Twilio from "twilio"
+import Twilio from "twilio";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -693,12 +693,12 @@ const perMonthSosCount = async (req, res) => {
 const verifySos = async (req, res) => {
   try {
     const emergencyNumbers = {
-    "Natural Disaster": ["9321604801"],
-      "Medical": ["7045649922"],
-      "Fire": ["9137166421"],
-      "Infrastructure": ["9321604801"],
-      "Other": ["9321604801"]
-  };
+      "Natural Disaster": ["9321604801"],
+      Medical: ["7045649922"],
+      Fire: ["9137166421"],
+      Infrastructure: ["9321604801"],
+      Other: ["9321604801"],
+    };
     const { id } = req.body;
     if (!id) {
       return res.status(400).json({ message: "ID is required" });
@@ -711,12 +711,12 @@ const verifySos = async (req, res) => {
 
     sos.verified = !sos.verified;
     await sos.save();
-    const emergencyType = sos.emergencyType; 
+    const emergencyType = sos.emergencyType;
     const numberToSend = emergencyNumbers[emergencyType];
-    var message = `Alert!! There is an emergency at the location ${sos.location}`
-    console.log({numberToSend})
+    var message = `Alert!! There is an emergency at the location ${sos.location}`;
+    console.log({ numberToSend });
 
-    await sendSMS(message,numberToSend)
+    await sendSMS(message, numberToSend);
 
     res.status(200).json({
       message: "Verified status updated successfully",
@@ -764,21 +764,20 @@ const warningNotification = async (req, res) => {
   }
 };
 
-const sosCounter = async(req,res) =>{
+const sosCounter = async (req, res) => {
   try {
     const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0)); 
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); 
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
-    
     const sosVerifiedCount = await Sos.countDocuments({
       verified: false,
-      createdAt: { $gte: startOfDay, $lte: endOfDay }, 
+      createdAt: { $gte: startOfDay, $lte: endOfDay },
     });
 
     const sosResolvedCount = await Sos.countDocuments({
       verified: true,
-      createdAt: { $gte: startOfDay, $lte: endOfDay }, 
+      createdAt: { $gte: startOfDay, $lte: endOfDay },
     });
 
     return res.status(200).json({
@@ -786,22 +785,22 @@ const sosCounter = async(req,res) =>{
       resolvedCount: sosResolvedCount,
     });
   } catch (error) {
-    console.log("Error in connecting to the route", error)
+    console.log("Error in connecting to the route", error);
   }
-}
+};
 
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
 //sms function
 const sendSMS = async (message, numbers) => {
-if (!numbers || numbers.length === 0) {
+  if (!numbers || numbers.length === 0) {
     console.error("No phone numbers provided.");
     return;
   }
 
   // Preprocess numbers to ensure they include '+91'
-  const formattedNumbers = numbers.map(number => {
+  const formattedNumbers = numbers.map((number) => {
     // Add '+91' if it doesn't already have it
-    return number.startsWith('+91') ? number : `+91${number}`;
+    return number.startsWith("+91") ? number : `+91${number}`;
   });
 
   try {
@@ -813,7 +812,9 @@ if (!numbers || numbers.length === 0) {
           messagingServiceSid: process.env.TWILIO_SERVICE_SID,
           to: number,
         })
-        .then(message => console.log(`Message sent to ${number}: ${message.sid}`));
+        .then((message) =>
+          console.log(`Message sent to ${number}: ${message.sid}`)
+        );
     }
   } catch (error) {
     console.error("Error sending SMS:", error.message || error);
@@ -846,7 +847,7 @@ if (!numbers || numbers.length === 0) {
 
 const smsTesting = async (req, res) => {
   try {
-    const { title, description,state } = req.body;
+    const { title, description, state } = req.body;
 
     if (!title || !description) {
       return res

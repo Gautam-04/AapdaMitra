@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Button, Card, Modal } from "react-bootstrap";
+import { Button, Card, Form, Modal } from "react-bootstrap";
 import "./SOSDisplay.css";
 import { MdMedicalServices } from "react-icons/md";
 import { FaFire } from "react-icons/fa6";
@@ -13,13 +13,19 @@ import { PiPlant } from "react-icons/pi";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 const provider = new OpenStreetMapProvider();
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import { LatLng } from "leaflet";
+import { Icon, LatLng } from "leaflet";
 
 const SOSDisplay = () => {
   const [pendingSOS, setPendingSOS] = useState([]);
   const [currentSOS, setCurrentSOS] = useState(null);
   const [currentSOSLocation, setCurrentSOSLocation] = useState([23, 80]);
   const [show, setShow] = useState(false);
+
+  const sosIcon = new Icon({
+    iconUrl:
+      "https://www.freeiconspng.com/thumbs/alert-icon/alert-icon-red-11.png",
+    iconSize: [58, 50],
+  });
 
   const handleOpenResolver = (sos) => {
     setCurrentSOS(sos);
@@ -60,13 +66,34 @@ const SOSDisplay = () => {
     }
   };
 
+  const sendSOS = async () => {
+    console.log(currentSOS._id);
+    try {
+      const response = await axios.post(
+        "/api/v1/mobile/verify-sos",
+        { id: currentSOS._id },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (response.status === 200) {
+        toast.success("SOS sent successfully!");
+        handleCloseResolver();
+        fetchSOS();
+      }
+    } catch (error) {
+      toast.error("Error sending SOS. Try again later.");
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchSOS();
   }, []);
 
   const fetchGeoFromLocation = async (location) => {
     const results = await provider.search({ query: location });
-
+    console.log(results);
     setCurrentSOSLocation([results[0]["y"], results[0]["x"]]);
   };
 
@@ -123,17 +150,27 @@ const SOSDisplay = () => {
             <Modal.Title>SOS Resolver</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <div className="sos-resolver-name">
-              <span>Name:</span>
-              {currentSOS.name}
-            </div>
-            <div className="sos-resolver-name">
-              <span>Email:</span>
-              {currentSOS.email}
-            </div>
-            <div className="sos-resolver-name">
-              <span>Location:</span>
-              {currentSOS.location}
+            <div className="sos-details-wrapper">
+              <div className="sos-group-wrapper">
+                <div className="sos-resolver-name">
+                  <span>Name:</span>
+                  {currentSOS.name}
+                </div>
+                <div className="sos-resolver-location">
+                  <span>Location:</span>
+                  {currentSOS.location}
+                </div>
+              </div>
+              <div className="sos-group-wrapper">
+                <div className="sos-resolver-email">
+                  <span>Email:</span>
+                  {currentSOS.email}
+                </div>
+                <div className="sos-resolver-type">
+                  <span>Type:</span>
+                  {currentSOS.emergencyType}
+                </div>
+              </div>
             </div>
             <div className="map-wrapper">
               <MapContainer center={[23, 80]} zoom={5} scrollWheelZoom={false}>
@@ -141,19 +178,39 @@ const SOSDisplay = () => {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors&ensp;'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <Marker position={currentSOSLocation}>
+                <Marker position={currentSOSLocation} icon={sosIcon}>
                   <Popup>{currentSOS.emergencyType}</Popup>
                 </Marker>
                 <SetViewOnClick location={currentSOSLocation} />
               </MapContainer>
             </div>
+            {/* <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Emergency Type</Form.Label>
+                <Form.Select
+                  value={currentSOS.emergencyType}
+                  onChange={(e) =>
+                    setCurrentSOS({
+                      ...currentSOS,
+                      emergencyType: e.target.value,
+                    })
+                  }
+                >
+                  <option defaultValue disabled>
+                    Select Emergency Type
+                  </option>
+                  <option value="Natural Disaster">Natural Disaster</option>
+                  <option value="Medical">Medical</option>
+                  <option value="Fire">Fire</option>
+                  <option value="Infrastructure">Infrastructure</option>
+                  <option value="Other">Other</option>
+                </Form.Select>
+              </Form.Group>
+            </Form> */}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseResolver}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={handleCloseResolver}>
-              Save Changes
+            <Button className="send-sos-button sos-resolve" onClick={sendSOS}>
+              Send SOS
             </Button>
           </Modal.Footer>
         </Modal>

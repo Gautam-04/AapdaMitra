@@ -58,10 +58,10 @@ def generateReport():
             with open(f"blueprints/geminiLLM/images/{image}", 'rb') as f:
                 response["graphs"].append(json.dumps(base64.b64encode(f.read()).decode('utf-8')))
 
-        print(len(response['graphs']))
-        with open("report.md", 'a') as f:
-            for graph in response["graphs"]:
-                f.write(f"\n![Report Graph](data:image/png;base64,{graph[1:-1]})")
+        # print(len(response['graphs']))
+        # with open("report.md", 'a') as f:
+        #     for graph in response["graphs"]:
+                # f.write(f"\n![Report Graph](data:image/png;base64,{graph[1:-1]})")
         #         f.write(f"<img src=data:image/png;base64,{graph[1:-1]} width='250px' alt='Graph' />")
 
         with open("report.md", 'r') as f:

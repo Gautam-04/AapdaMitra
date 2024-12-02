@@ -31,7 +31,7 @@ const Analytics = () => {
     }
     for (var i = 0; i < data.length; i++) {
       if (data[i]["hour"] === currHour) {
-        if (i - 6 < 0) {
+        if (i - 5 <= 0) {
           tempObj = data.splice(24 + i - 5, 25);
         }
         tempObj = tempObj.concat(data.splice(Math.max(0, i - 5), i + 1));
@@ -47,7 +47,7 @@ const Analytics = () => {
     try {
       const response = await axios.get("/api/v1/mobile/per-hr-sos");
       if (response.status === 200) {
-        setSOSTimelineData(getPastSixHoursData(response.data));
+        setSOSTimelineData(response.data);
       }
     } catch (error) {
       toast.error("Error fetching SOS Timeline Data. Try again later.");
@@ -209,6 +209,7 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchSOSTimelineData();
+    console.log(SOSTimelineData);
   }, []);
 
   useEffect(() => {

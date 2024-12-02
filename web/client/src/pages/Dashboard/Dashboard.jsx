@@ -17,7 +17,7 @@ import SOSDisplay from "../../components/sosDisplay/SOSDisplay";
 
 const Dashboard = () => {
   const [dashboardPage, setDashboardPage] = useState("Analytics");
-  const [SOSToggle, setSOSToggle] = useState(true);
+  const [SOSToggle, setSOSToggle] = useState(false);
   const { t } = useTranslation();
   const sidebarContent = [
     {

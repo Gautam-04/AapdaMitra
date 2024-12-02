@@ -5,7 +5,7 @@
   border-radius: 50%;
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -45,7 +45,7 @@
 .corner-menu-dropdown-item {
   font-family: "Inter", sans-serif;
   display: flex;
-  justify-content: right;
+  justify-content: left;
   align-items: center;
   font-weight: 500;
   height: 40px;
@@ -83,7 +83,7 @@
 
 .chatbot-modal .modal-content {
   width: 70vw;
-  min-height: 85vh;
+  /* min-height: 85vh; */
 }
 
 .chatbot-textbox {
@@ -135,4 +135,88 @@
   padding-block: 1rem;
   margin: 0;
   border: none;
+}
+
+.chatbot-modal .modal-header .modal-title {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.chatbot-modal .modal-body {
+  border: none !important;
+  height: 65vh;
+  max-height: 700px;
+  width: 100%;
+}
+
+.chat-messages-wrapper {
+  font-family: "Inter", sans;
+  width: 100%;
+  height: 100% !important;
+  /* position: absolute; */
+  overflow: auto;
+  font-weight: 500;
+}
+
+.chat-messages-wrapper li {
+  list-style: none;
+}
+
+.chat-message-wrapper {
+  padding-block: 0.7rem;
+  width: 100%;
+  display: flex;
+  justify-content: right;
+}
+
+.chat-message-wrapper:has(.bot) {
+  justify-content: left;
+}
+.chat-message {
+  border: 1px solid var(--primary-color);
+  border-radius: 18px;
+  width: fit-content;
+  max-width: 70%;
+  padding: 0.7rem 1.1rem;
+}
+
+.chat-message.bot {
+  background-color: #e6e6e6;
+  border: 0px solid var(--primary-color);
+  color: black;
+}
+.chat-message.user {
+  margin-right: 0.5rem;
+  background-color: var(--primary-color);
+  text-align: right;
+  color: white;
+  /* float: right; */
+}
+
+.broadcast-message-modal {
+  font-family: "Inter", sans;
+}
+
+.broadcast-message-modal .modal-header .modal-title {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.broadcast-send-button {
+  /* height: 40px;
+  width: 15%;
+  border-radius: 0 10px 10px 0;
+  padding: 0;
+  margin: 0; */
+  background-color: var(--primary-color);
+  border: none;
+}
+
+.broadcast-send-button:hover,
+.broadcast-send-button:active {
+  background-color: var(--primary-color-light) !important;
+}
+
+.broadcast-send-button:active svg {
+  transform: scale(0.95);
 }
