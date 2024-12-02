@@ -858,6 +858,7 @@ const sosAverageTurnaroundTime = async (req, res) => {
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
     const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
+    // Calculate daily average turnaround time
     const averageDailyTurnaroundTime = await Sos.aggregate([
       {
         $match: {
@@ -880,6 +881,7 @@ const sosAverageTurnaroundTime = async (req, res) => {
       },
     ]);
 
+    // Calculate overall average turnaround time
     const overallTurnAroundTime = await Sos.aggregate([
       {
         $match: {
@@ -899,21 +901,25 @@ const sosAverageTurnaroundTime = async (req, res) => {
           averageTime: { $avg: "$timeDiff" },
         },
       },
-    ]); 
+    ]);
 
-    if (!averageDailyTurnaroundTime.length) {
-      return res.status(404).json({ message: "No verified posts found" });
-    }
+    // Handle cases where no posts are found
+    const averageTimeInSeconds = averageDailyTurnaroundTime.length
+      ? averageDailyTurnaroundTime[0].averageTime / 1000
+      : 0;
 
-    const averageTimeInSeconds = averageDailyTurnaroundTime[0].averageTime / 1000;
-    const overallAverageTimeInSec = overallTurnAroundTime[0].averageTime/1000;
+    const overallAverageTimeInSec = overallTurnAroundTime.length
+      ? overallTurnAroundTime[0].averageTime / 1000
+      : 0;
 
+    // Format the time
     const averageTimeFormatted = formatTime(averageTimeInSeconds);
     const overallAverageTimeFormatted = formatTime(overallAverageTimeInSec);
 
     res.status(200).json({
       message: "Average turnaround time fetched successfully",
-      averageTimeFormatted,overallAverageTimeFormatted
+      averageTimeFormatted,
+      overallAverageTimeFormatted,
     });
   } catch (error) {
     console.error(error);
@@ -922,6 +928,7 @@ const sosAverageTurnaroundTime = async (req, res) => {
     });
   }
 };
+
 
 
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
