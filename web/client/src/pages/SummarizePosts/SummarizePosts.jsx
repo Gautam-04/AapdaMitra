@@ -65,7 +65,7 @@ const SummarizePosts = () => {
             class="md-format"
             urlTransform={(value) => value}
           />
-          {g && (
+          {/* {g && (
             <div className="graphs">
               <div className="title">Supporting Graphs</div>
               <div className="graphs-container">
@@ -74,7 +74,7 @@ const SummarizePosts = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <button onClick={() => handlePrint()}>Print article</button>

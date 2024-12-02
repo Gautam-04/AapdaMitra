@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Button, Card, Modal } from "react-bootstrap";
+import { Button, Card, Form, Modal } from "react-bootstrap";
 import "./SOSDisplay.css";
 import { MdMedicalServices } from "react-icons/md";
 import { FaFire } from "react-icons/fa6";
@@ -62,6 +62,27 @@ const SOSDisplay = () => {
       }
     } catch (error) {
       toast.error("Error fetching SOS Requests. Try again later.");
+      console.error(error);
+    }
+  };
+
+  const sendSOS = async () => {
+    console.log(currentSOS._id);
+    try {
+      const response = await axios.post(
+        "/api/v1/mobile/verify-sos",
+        { id: currentSOS._id },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (response.status === 200) {
+        toast.success("SOS sent successfully!");
+        handleCloseResolver();
+        fetchSOS();
+      }
+    } catch (error) {
+      toast.error("Error sending SOS. Try again later.");
       console.error(error);
     }
   };
@@ -135,14 +156,20 @@ const SOSDisplay = () => {
                   <span>Name:</span>
                   {currentSOS.name}
                 </div>
+                <div className="sos-resolver-location">
+                  <span>Location:</span>
+                  {currentSOS.location}
+                </div>
+              </div>
+              <div className="sos-group-wrapper">
                 <div className="sos-resolver-email">
                   <span>Email:</span>
                   {currentSOS.email}
                 </div>
-              </div>
-              <div className="sos-resolver-location">
-                <span>Location:</span>
-                {currentSOS.location}
+                <div className="sos-resolver-type">
+                  <span>Type:</span>
+                  {currentSOS.emergencyType}
+                </div>
               </div>
             </div>
             <div className="map-wrapper">
@@ -157,13 +184,33 @@ const SOSDisplay = () => {
                 <SetViewOnClick location={currentSOSLocation} />
               </MapContainer>
             </div>
+            {/* <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Emergency Type</Form.Label>
+                <Form.Select
+                  value={currentSOS.emergencyType}
+                  onChange={(e) =>
+                    setCurrentSOS({
+                      ...currentSOS,
+                      emergencyType: e.target.value,
+                    })
+                  }
+                >
+                  <option defaultValue disabled>
+                    Select Emergency Type
+                  </option>
+                  <option value="Natural Disaster">Natural Disaster</option>
+                  <option value="Medical">Medical</option>
+                  <option value="Fire">Fire</option>
+                  <option value="Infrastructure">Infrastructure</option>
+                  <option value="Other">Other</option>
+                </Form.Select>
+              </Form.Group>
+            </Form> */}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseResolver}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={handleCloseResolver}>
-              Save Changes
+            <Button className="send-sos-button sos-resolve" onClick={sendSOS}>
+              Send SOS
             </Button>
           </Modal.Footer>
         </Modal>

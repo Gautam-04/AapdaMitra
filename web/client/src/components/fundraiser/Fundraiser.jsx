@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 function Fundraiser() {
   const [fundraisers, setFundraisers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [newFundraiser, setNewFundraiser] = useState({
     title: "",
     fullForm: "",
@@ -131,7 +131,10 @@ function Fundraiser() {
               <Card.Body>
                 <Card.Text>{fundraiser.description}</Card.Text>
                 <div className="card-body-bottom">
-                  <Card.Title>{fundraiser.title}</Card.Title>
+                  <Card.Title>
+                    {fundraiser.title.substring(0, 5)}{" "}
+                    {fundraiser.title.length >= 5 && "..."}
+                  </Card.Title>
                   <div className="card-body-bottom-buttons">
                     <Button
                       className="fundraiser-view"

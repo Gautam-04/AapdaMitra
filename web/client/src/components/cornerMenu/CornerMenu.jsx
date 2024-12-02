@@ -7,7 +7,7 @@ import { Button, Dropdown, Form, Modal } from "react-bootstrap";
 import { MdSend } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BiLock } from "react-icons/bi";
+import ReactMarkdown from "react-markdown";
 
 const CornerMenu = () => {
   const [showChatbot, setShowChatbot] = useState(false);
@@ -16,10 +16,163 @@ const CornerMenu = () => {
     title: "",
     description: "",
     mode: "",
+    state: "",
   });
   const [chatHistory, setChatHistory] = useState([]);
   const [messageContent, setMessageContent] = useState("Hello");
-  const chatboxRef = useRef(null);
+  const chatRef = useRef(null);
+  const latestMessageRef = useRef(null);
+
+  const states = [
+    {
+      id: "0",
+      name: "Choose...",
+    },
+    {
+      id: "1",
+      name: "Andaman and Nicobar Islands",
+    },
+    {
+      id: "2",
+      name: "Andhra Pradesh",
+    },
+    {
+      id: "3",
+      name: "Arunachal Pradesh",
+    },
+    {
+      id: "4",
+      name: "Assam",
+    },
+    {
+      id: "5",
+      name: "Bihar",
+    },
+    {
+      id: "6",
+      name: "Chandigarh",
+    },
+    {
+      id: "7",
+      name: "Chhattisgarh",
+    },
+    {
+      id: "8",
+      name: "Dadra and Nagar Haveli and Daman and Diu",
+    },
+    {
+      id: "9",
+      name: "Delhi",
+    },
+    {
+      id: "10",
+      name: "Goa",
+    },
+    {
+      id: "11",
+      name: "Gujarat",
+    },
+    {
+      id: "12",
+      name: "Haryana",
+    },
+    {
+      id: "13",
+      name: "Himachal Pradesh",
+    },
+    {
+      id: "14",
+      name: "Jammu and Kashmir",
+    },
+    {
+      id: "15",
+      name: "Jharkhand",
+    },
+    {
+      id: "16",
+      name: "Karnataka",
+    },
+    {
+      id: "17",
+      name: "Kerala",
+    },
+    {
+      id: "18",
+      name: "Ladakh",
+    },
+    {
+      id: "19",
+      name: "Lakshadweep",
+    },
+    {
+      id: "20",
+      name: "Madhya Pradesh",
+    },
+    {
+      id: "21",
+      name: "Maharashtra",
+    },
+    {
+      id: "22",
+      name: "Manipur",
+    },
+    {
+      id: "23",
+      name: "Meghalaya",
+    },
+    {
+      id: "24",
+      name: "Mizoram",
+    },
+    {
+      id: "25",
+      name: "Nagaland",
+    },
+    {
+      id: "26",
+      name: "Odisha",
+    },
+    {
+      id: "27",
+      name: "Puducherry",
+    },
+    {
+      id: "28",
+      name: "Punjab",
+    },
+    {
+      id: "29",
+      name: "Rajasthan",
+    },
+    {
+      id: "30",
+      name: "Sikkim",
+    },
+    {
+      id: "31",
+      name: "Tamil Nadu",
+    },
+    {
+      id: "32",
+      name: "Telangana",
+    },
+    {
+      id: "33",
+      name: "Tripura",
+    },
+    {
+      id: "34",
+      name: "Uttar Pradesh",
+    },
+    {
+      id: "35",
+      name: "Uttarakhand",
+    },
+    {
+      id: "36",
+      name: "West Bengal",
+    },
+  ];
 
   const handleOpenBroadcastMessage = () => {
     setShowBroadcast(true);
@@ -40,11 +193,12 @@ const CornerMenu = () => {
   const sendMessage = async (blank) => {
     if (blank === true) {
       setChatHistory([]);
-    } else {
+    } else if (messageContent === "") {
       // setChatHistory([
       //   ...chatHistory,
       //   { role: "user", content: messageContent },
       // ]);
+      return;
       console.log("Before response", chatHistory);
     }
     try {
@@ -78,13 +232,17 @@ const CornerMenu = () => {
   // Create new fundraiser
   const sendBroadcast = async () => {
     try {
-      const response = await axios.post("", newBroadcast, {
-        headers: { "Content-Type": "application/json" },
-      });
-      if (response.status === 201) {
+      const response = await axios.post(
+        "http://localhost:8000/v1/mobile/send-message",
+        newBroadcast,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (response.status === 200) {
         toast.success("Broadcast sent successfully!");
         setShowBroadcast(false);
-        setNewBroadcast({ title: "", description: "", mode: "" });
+        setNewBroadcast({ title: "", description: "", mode: "", state: "" });
       }
     } catch (error) {
       toast.error("Error sending broadcast. Try again later.");
@@ -92,6 +250,14 @@ const CornerMenu = () => {
     }
   };
 
+  useEffect(() => {
+    if (latestMessageRef.current) {
+      latestMessageRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [chatHistory]);
   //   useEffect(() => {
   //     sendMessage();
   //   }, [showChatbot]);
@@ -132,11 +298,21 @@ const CornerMenu = () => {
         </Modal.Header>
         <Modal.Body>
           {chatHistory && (
-            <div className="chat-messages-wrapper" ref={chatboxRef}>
+            <div className="chat-messages-wrapper" ref={chatRef}>
               {chatHistory.map((chatItem, idx) => (
-                <div className="chat-message-wrapper">
+                <div
+                  className="chat-message-wrapper"
+                  ref={idx === chatHistory.length - 1 ? latestMessageRef : null}
+                >
                   <li key={idx} className={"chat-message " + chatItem.role}>
-                    {chatItem.content}
+                    {chatItem.role == "bot" ? (
+                      <ReactMarkdown
+                        children={chatItem.content}
+                        class="md-format"
+                      />
+                    ) : (
+                      chatItem.content
+                    )}
                   </li>
                 </div>
               ))}
@@ -150,6 +326,11 @@ const CornerMenu = () => {
             placeholder="Enter message"
             value={messageContent}
             onChange={(e) => setMessageContent(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                sendMessage(false);
+              }
+            }}
           />
           <Button
             className="chatbot-send-button"
@@ -162,7 +343,7 @@ const CornerMenu = () => {
 
       {/* Broadcast Message Modal */}
       <Modal
-        className=""
+        className="broadcast-message-modal"
         show={showBroadcast}
         onHide={handleCloseBroadcastMessage}
       >
@@ -172,7 +353,7 @@ const CornerMenu = () => {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Message Title</Form.Label>
+              <Form.Label>Broadcast Title</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter title"
@@ -183,7 +364,7 @@ const CornerMenu = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Message Description</Form.Label>
+              <Form.Label>Broadcast Description</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -212,14 +393,37 @@ const CornerMenu = () => {
                   Select Mode
                 </option>
                 <option value="sms">SMS</option>
-                <option value="push">Push Notification (through App)</option>
+                <option disabled value="push">
+                  Push Notification (through App)
+                </option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Broadcast State (Select None for all users)
+              </Form.Label>
+              <Form.Select
+                value={newBroadcast.state}
+                onChange={(e) =>
+                  setNewBroadcast({
+                    ...newBroadcast,
+                    state: e.target.value,
+                  })
+                }
+              >
+                <option defaultValue disabled>
+                  Select State
+                </option>
+                {states.map((state, idx) => (
+                  <option key={idx}>{state.name}</option>
+                ))}
               </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={sendBroadcast}>
-            Submit
+          <Button className="broadcast-send-button" onClick={sendBroadcast}>
+            Broadcast
           </Button>
         </Modal.Footer>
       </Modal>
