@@ -90,3 +90,39 @@
   background: white;
   border-radius: 25px;
 }
+
+.sos-details-wrapper {
+  font-family: "Inter", sans-serif;
+  width: 100%;
+  /* background-color: cyan; */
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  background: #2b367421;
+  border: 1px solid var(--light-gray);
+  border-radius: 25px;
+}
+
+.sos-group-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sos-resolver-name,
+.sos-resolver-email,
+.sos-resolver-location {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.sos-resolver-name span,
+.sos-resolver-email span,
+.sos-resolver-location span {
+  font-size: 1rem;
+  color: black;
+  font-weight: 400;
+}

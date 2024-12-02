@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./CornerMenu.css";
 import { FiPlusCircle } from "react-icons/fi";
 import { RiRobot2Fill } from "react-icons/ri";
@@ -7,6 +7,7 @@ import { Button, Dropdown, Form, Modal } from "react-bootstrap";
 import { MdSend } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { BiLock } from "react-icons/bi";
 
 const CornerMenu = () => {
   const [showChatbot, setShowChatbot] = useState(false);
@@ -16,8 +17,9 @@ const CornerMenu = () => {
     description: "",
     mode: "",
   });
-  const [botHistory, setBotHistory] = useState([]);
-  const [messageContent, setMessageContent] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+  const [messageContent, setMessageContent] = useState("Hello");
+  const chatboxRef = useRef(null);
 
   const handleOpenBroadcastMessage = () => {
     setShowBroadcast(true);
@@ -30,35 +32,42 @@ const CornerMenu = () => {
     setShowChatbot(true);
   };
   const handleCloseChatbot = () => {
-    setBotHistory([]);
+    setMessageContent("Hello");
+    setChatHistory([]);
     setShowChatbot(false);
   };
 
   const sendMessage = async (blank) => {
     if (blank === true) {
-      setBotHistory([]);
+      setChatHistory([]);
     } else {
-      setBotHistory([...botHistory, { role: "user", content: messageContent }]);
-      setMessageContent("");
+      // setChatHistory([
+      //   ...chatHistory,
+      //   { role: "user", content: messageContent },
+      // ]);
+      console.log("Before response", chatHistory);
     }
     try {
       const response = await axios.post(
         "http://localhost:5000/chatbot/chat",
-        { messages: botHistory },
+        { messages: [{ role: "user", content: messageContent }] },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
       if (response.status === 200) {
-        // setBotHistory([
-        //   ...botHistory,
-        //   {
-        //     role: "bot",
-        //     content: response.data.message,
-        //   },
-        // ]);
-        console.log(botHistory);
-        console.log(response.data.message);
+        // setMessageContent("");
+        setChatHistory([
+          ...chatHistory,
+          { role: "user", content: messageContent },
+          {
+            role: "bot",
+            content: response.data.message,
+          },
+        ]);
+        setMessageContent("");
+        // console.log("After response", chatHistory);
+        // console.log(response.data.message);
       }
     } catch (error) {
       toast.error("Error sending message. Try again later.");
@@ -99,14 +108,15 @@ const CornerMenu = () => {
             className="corner-menu-dropdown-item"
             onClick={handleOpenBroadcastMessage}
           >
-            Brodcast a Message{" "}
             <FaBroadcastTower className="corner-menu-dropdown-icon" />
+            Brodcast a Message
           </Dropdown.Item>
           <Dropdown.Item
             className="corner-menu-dropdown-item"
             onClick={handleOpenChatbot}
           >
-            AapdaMitraBot <RiRobot2Fill className="corner-menu-dropdown-icon" />
+            <RiRobot2Fill className="corner-menu-dropdown-icon" />
+            AapdaMitraBot
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
@@ -120,14 +130,26 @@ const CornerMenu = () => {
         <Modal.Header closeButton>
           <Modal.Title>AapdaMitraBot</Modal.Title>
         </Modal.Header>
-        <Modal.Body></Modal.Body>
+        <Modal.Body>
+          {chatHistory && (
+            <div className="chat-messages-wrapper" ref={chatboxRef}>
+              {chatHistory.map((chatItem, idx) => (
+                <div className="chat-message-wrapper">
+                  <li key={idx} className={"chat-message " + chatItem.role}>
+                    {chatItem.content}
+                  </li>
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal.Body>
         <Modal.Footer>
           <input
             className="chatbot-textbox"
             type="text"
             placeholder="Enter message"
             value={messageContent}
-            onChange={(e) => setMessageContent((prev) => e.target.value)}
+            onChange={(e) => setMessageContent(e.target.value)}
           />
           <Button
             className="chatbot-send-button"
