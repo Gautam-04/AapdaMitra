@@ -1,20 +1,22 @@
+/* Carousel Section */
 .carousel {
   background-color: #fff;
   color: #2b3674;
   display: flex;
   width: 100%;
-  height: 70vh; /* Full viewport height */
-  justify-content: center; /* Center the content horizontally */
-  align-items: center; /* Center the content vertically */
+  height: 70vh;
+  justify-content: center;
+  align-items: center;
   padding-bottom: 5rem;
 }
+
 .photo-gallery {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   background-color: #2b3674;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 }
 
 .photo-gallery .gallery-header {
@@ -22,11 +24,12 @@
 }
 
 .photo-gallery .gallery-header h2 {
-  padding-top:50px;
+  padding-top: 50px;
   text-align: center;
   font-size: 2rem;
   color: white;
   font-weight: 600;
+  margin-bottom:100px;
 }
 
 .photo-gallery .carousel {
@@ -36,28 +39,29 @@
 }
 
 .photo-gallery .carousel-inner {
-  width: 600px; /* Increased width */
-  height: 400px; /* Increased height */
+  width: 700px; /* Increased width */
+  height: 500px; /* Increased height */
 }
 
 .photo-gallery .carousel-item {
-  width: 600px; /* Increased width */
-  height: 400px; /* Increased height */
+  width: 700px; /* Increased width */
+  height: 500px; /* Increased height */
 }
 
 .photo-gallery .carousel-item > div {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 600px; /* Increased width */
-  height: 400px; /* Increased height */
+  width: 700px; /* Increased width */
+  height: 500px; /* Increased height */
 }
 
 .photo-gallery .carousel-item img {
-  width: 600px; /* Increased width */
-  height: 400px; /* Increased height */
+  width: 100%; /* Ensure image stretches to full width */
+  height: 100%; /* Ensure image stretches to full height */
   object-fit: cover;
   object-position: center;
+  border-radius: 15px; /* Add rounded borders to images */
 }
 
 .photo-gallery .carousel-caption {
@@ -78,4 +82,71 @@
 .photo-gallery .carousel-caption p {
   font-size: 0.9rem;
   color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .photo-gallery .carousel {
+    width: 90%; /* Adjust carousel width for tablets */
+  }
+
+  .photo-gallery .carousel-inner,
+  .photo-gallery .carousel-item,
+  .photo-gallery .carousel-item > div {
+    width: 100%; /* Ensure carousel items take full width */
+    height: auto; /* Allow height to adjust proportionally */
+  }
+
+  .photo-gallery .carousel-item img {
+    width: 100%; /* Make images responsive */
+    height: auto;
+    border-radius: 10px; /* Slightly reduce border radius for smaller screens */
+  }
+
+  .photo-gallery .gallery-header h2 {
+    font-size: 1.75rem; /* Reduce font size for tablets */
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel {
+    height: 60vh; /* Reduce carousel height for mobile */
+  }
+
+  .photo-gallery .carousel {
+    width: 100%; /* Make carousel width 100% for mobile screens */
+  }
+
+  .photo-gallery .carousel-inner,
+  .photo-gallery .carousel-item,
+  .photo-gallery .carousel-item > div {
+    width: 100%;
+    height: auto;
+  }
+
+  .photo-gallery .carousel-item img {
+    width: 100%; /* Ensure images take full width */
+    height: auto;
+    border-radius: 8px; /* Further reduce border radius for smaller screens */
+  }
+
+  .photo-gallery .gallery-header h2 {
+    font-size: 1.5rem; /* Further reduce font size for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel {
+    height: 50vh; /* Further reduce carousel height */
+  }
+
+  .photo-gallery .carousel-item img {
+    width: 100%; /* Ensure images are fully responsive */
+    height: auto;
+    border-radius: 5px; /* Slightly round borders for mobile */
+  }
+
+  .photo-gallery .gallery-header h2 {
+    font-size: 1.25rem; /* Reduce title font size further */
+  }
 }
