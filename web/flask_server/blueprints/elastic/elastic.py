@@ -347,7 +347,7 @@ def addPost():
             "location": "",
             "url": "",
             "disaster_type": "",
-            "source": "",
+            "source": "AapdaMitra App",
         }
 
         data = request.json
@@ -355,7 +355,6 @@ def addPost():
             template[key] = data[key]
 
         print(template)
-
 
         es.index(index=INDEX_NAME, document=dict(template))
         return {"onload": "Successful"}

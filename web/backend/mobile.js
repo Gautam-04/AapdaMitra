@@ -523,11 +523,12 @@ const AddIssue = async (req, res) => {
   }
 
       const date = newIssue.createdAt;
+      const formattedDate = date.toLocaleDateString("en-GB"); 
 
     const data = {
       post_title: newIssue.title || "",
       post_body: newIssue.description || "",
-      date: date || "",
+      date: formattedDate || "",
       likes: 0,
       retweets: 0,
       post_image_url: "",
