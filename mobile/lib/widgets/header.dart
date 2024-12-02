@@ -1,7 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Header extends StatelessWidget {
   const Header({Key? key}) : super(key: key);
+
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Remove all stored user data
+    await prefs.remove('userToken');
+    await prefs.remove('userName');
+    await prefs.remove('userEmail');
+    await prefs.remove('userPhoneNumber');
+    await prefs.remove('userAadharNumber');
+    await prefs.remove('userGender');
+    await prefs.remove('userState');
+    await prefs.setBool('isLoggedIn', false); // Set the login status to false
+
+    // Redirect to authentication screen
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/auth_screen', // Navigate to the Auth Screen
+      (route) => false, // Clear all previous routes
+    );
+  }
+
+  // Show a confirmation dialog for logging out
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Do you really want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Logout'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _logout(context); // Proceed with logout
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +96,15 @@ class Header extends StatelessWidget {
                   ),
                 ),
               ),
-              // Profile Image on the right
-              CircleAvatar(
-                backgroundImage: AssetImage('assets/images/Avatar.png'),
-                radius: 20,
+              // Profile Image on the right with logout confirmation
+              GestureDetector(
+                onTap: () {
+                  _showLogoutDialog(context); // Show logout confirmation dialog
+                },
+                child: CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/Avatar.png'),
+                  radius: 20,
+                ),
               ),
             ],
           ),

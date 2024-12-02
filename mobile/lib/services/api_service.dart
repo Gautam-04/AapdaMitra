@@ -5,83 +5,48 @@ class ApiService {
   // Base API URL
   static const String _baseUrl = 'http://10.0.2.2:8000/v1/mobile';
 
-  // Register Citizen API
-  static Future<Map<String, dynamic>> registerCitizen(String email) async {
-    final Uri url = Uri.parse('$_baseUrl/register-citizen');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email}),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to send OTP: ${response.body}');
-    }
-  }
-
-  // Verify Registered Citizen API
-  static Future<Map<String, dynamic>> verifyRegisteredCitizen({
-    required String email,
+    static Future<Map<String, dynamic>> registerWithAadhar({
     required String name,
-    required String otp,
-  }) async {
-    final Uri url = Uri.parse('$_baseUrl/verify-reg-citizen');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'email': email,
-        'name': name,
-        'otp': otp,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to verify OTP: ${response.body}');
-    }
-  }
-
-  // Citizen Login API
-  static Future<Map<String, dynamic>> loginCitizen(String email) async {
-    final Uri url = Uri.parse('$_baseUrl/login-mobile');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email}),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to send OTP for login: ${response.body}');
-    }
-  }
-
-  // Verify Logged-In Citizen API
-  static Future<Map<String, dynamic>> verifyLoginCitizen({
     required String email,
-    required String otp,
+    required String phoneNumber,
+    required String aadharNumber,
   }) async {
-    final Uri url = Uri.parse('$_baseUrl/verify-login-citizen');
+    final Uri url = Uri.parse('$_baseUrl/verify-aadhar');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
+        'name': name,
         'email': email,
-        'otp': otp,
+        'mobileNo': phoneNumber,
+        'aadharNo': aadharNumber,
       }),
     );
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to verify login OTP: ${response.body}');
+      throw Exception('Error: ${response.body}');
     }
   }
+
+  static Future<Map<String, dynamic>> loginWithAadhar({
+    required String phoneNumber,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl/login-with-aadhar');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'mobileNo': phoneNumber}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Error: ${response.body}');
+    }
+  }
+
 
   // Fetch Fundraisers API
   static Future<List<Map<String, dynamic>>> fetchFundraisers() async {
@@ -155,6 +120,27 @@ class ApiService {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to raise issue: ${response.body}');
+    }
+  }
+
+ // Fetch Verified Posts API
+  static Future<List<Map<String, dynamic>>> fetchVerifiedPosts() async {
+    final Uri url = Uri.parse('$_baseUrl/get-all-post');
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true && data['verified'] != null) {
+        return List<Map<String, dynamic>>.from(data['verified']);
+      } else {
+        throw Exception('Invalid response structure: ${response.body}');
+      }
+    } else {
+      throw Exception(
+          'Failed to fetch verified posts: ${response.statusCode} - ${response.body}');
     }
   }
 }
