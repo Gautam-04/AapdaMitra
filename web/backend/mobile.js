@@ -682,6 +682,13 @@ const perMonthSosCount = async (req, res) => {
 
 const verifySos = async (req, res) => {
   try {
+    const emergencyNumbers = {
+    "Natural Disaster": ["9321604801"],
+      "Medical": ["7045649922"],
+      "Fire": ["9137166421"],
+      "Infrastructure": ["9321604801"],
+      "Other": ["9321604801"]
+  };
     const { id } = req.body;
     if (!id) {
       return res.status(400).json({ message: "ID is required" });
@@ -694,6 +701,12 @@ const verifySos = async (req, res) => {
 
     sos.verified = !sos.verified;
     await sos.save();
+    const emergencyType = sos.emergencyType; 
+    const numberToSend = emergencyNumbers[emergencyType];
+    var message = `Alert!! There is an emergency at the location ${sos.location}`
+    console.log({numberToSend})
+
+    await sendSMS(message,numberToSend)
 
     res.status(200).json({
       message: "Verified status updated successfully",
@@ -749,7 +762,7 @@ const sendSMS = async (message, numbers) => {
     message: message,
     language: "english",
     route: "q", // Transactional route
-    numbers: numbers, // Comma-separated mobile numbers
+    numbers: numbers?.join(','), // Comma-separated mobile numbers
   };
 
   try {
@@ -769,20 +782,26 @@ const sendSMS = async (message, numbers) => {
 };
 
 const smsTesting = async (req, res) => {
-  const { title, description } = req.body;
-
-  if (!title || !description) {
-    return res
-      .status(400)
-      .json({ error: "Title and description are required" });
-  }
-
-  const message = `${title}: ${description}`;
-
   try {
+    const { title, description,state } = req.body;
+
+    if (!title || !description) {
+      return res
+        .status(400)
+        .json({ error: "Title and description are required" });
+    }
+
+    const message = `${title}: ${description}`;
+    let citizens;
     // Fetch all phone numbers from the Citizen database
-    const citizens = await Citizen.find({}, "phoneNumber");
-    const phoneNumbers = citizens.map((citizen) => citizen.phoneNumber);
+    if (!state || state.trim() === "") {
+      // No state provided, fetch all users
+      citizens = await AppUsers.find({});
+    } else {
+      // State provided, fetch users from that state
+      citizens = await AppUsers.find({ state });
+    }
+    const phoneNumbers = citizens.map((citizen) => citizen.mobileNo);
 
     if (phoneNumbers.length === 0) {
       return res
@@ -791,7 +810,7 @@ const smsTesting = async (req, res) => {
     }
 
     // Send SMS
-    const result = await sendSMS(message, 9321604801);
+    const result = await sendSMS(message, phoneNumbers);
     res.status(200).json({ message: "SMS sent successfully", result });
   } catch (error) {
     res
@@ -929,7 +948,7 @@ routes.route("/get-all-issue").get(getAllIssue);
 routes.route("/get-all-sos").get(getSos);
 routes.route("/per-hr-sos").get(perHrSosCount);
 routes.route("/per-month-sos").get(perMonthSosCount);
-routes.route("/verify-sos").get(verifySos);
+routes.route("/verify-sos").post(verifySos);
 routes.route("/send-notification").post(warningNotification);
 routes.route("/send-message").post(smsTesting);
 
