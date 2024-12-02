@@ -47,6 +47,18 @@ i18n
                     fundraiser_create_fund_file: "Logo File",
                     fundraiser_create_close: "Close",
                     fundraiser_create_create_button: "Create Fundraiser",
+                    //sos sidebar
+                    sos_sidebar_request: "SOS Requests",
+                    sos_sidebar_emeergencyType: "Emergency Type: ",
+                    sos_sidebar_location: "Location:",
+                    sos_sidebar_date: "",
+                    sos_sidebar_time: "",
+                    sos_sidebar_resolve_button: "Resolve",
+                    sos_modal_resolver: "SOS Resolver",
+                    sos_modal_name: "Name:",
+                    sos_sidebar_email: "Email:",
+                    sos_button_close: "Close",
+                    sos_button_save: "Save Changes",
                     //footer
                     footer_description: "\"AapdaMitra\" is a software designed to help government and private agencies by providing real-time data collection from sources like social media, news websites, and open platforms.",
                     footer_middle_div_1: "General",

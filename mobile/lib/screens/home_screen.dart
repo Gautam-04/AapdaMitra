@@ -18,8 +18,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  String _userName = ''; // Holds the user's name
-  String _location = 'Mumbai'; // Example static location
+  String _userName = '';
+  String _location = 'Mumbai';
 
   final List<Map<String, String>> verifiedPosts = [
     {"title": "Flash Floods Chennai", "date": "20 Sept, 2024"},
@@ -34,11 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadUserName();
   }
 
-  /// Load the user's name from SharedPreferences
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('userName') ?? 'User'; // Default to 'User'
+      _userName = prefs.getString('userName') ?? 'User';
     });
   }
 
@@ -97,11 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _IssuesRaisedButton(),  // Static button
+                  const _IssuesRaisedButton(),
                   const SizedBox(height: 20),
-                  _ActionButtons(),
+                  const _ActionButtons(),
                   const SizedBox(height: 10),
-                  _SOSAndDonationButtons(),
+                  const _SOSAndDonationButtons(),
                   const SizedBox(height: 20),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -115,14 +114,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  VerifiedPostsList(verifiedPosts: verifiedPosts),
+                  _VerifiedPostsSection(verifiedPosts: verifiedPosts),
                 ],
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: _ChatbotButton(),
+      floatingActionButton: const _ChatbotButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: Footer(
         currentIndex: _currentIndex,
@@ -133,14 +132,14 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _IssuesRaisedButton extends StatelessWidget {
+  const _IssuesRaisedButton();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ElevatedButton(
-        onPressed: () {
-          // No action for now
-        },
+        onPressed: () {},
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
           minimumSize: const Size(double.infinity, 50),
@@ -158,6 +157,8 @@ class _IssuesRaisedButton extends StatelessWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
+  const _ActionButtons();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -169,9 +170,7 @@ class _ActionButtons extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const ManualsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const ManualsScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -220,6 +219,8 @@ class _ActionButtons extends StatelessWidget {
 }
 
 class _SOSAndDonationButtons extends StatelessWidget {
+  const _SOSAndDonationButtons();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -231,9 +232,7 @@ class _SOSAndDonationButtons extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const DonationPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const DonationPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -256,9 +255,7 @@ class _SOSAndDonationButtons extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const SOSScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const SOSScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -280,34 +277,59 @@ class _SOSAndDonationButtons extends StatelessWidget {
   }
 }
 
-class VerifiedPostsList extends StatelessWidget {
+class _VerifiedPostsSection extends StatelessWidget {
   final List<Map<String, String>> verifiedPosts;
 
-  const VerifiedPostsList({required this.verifiedPosts});
+  const _VerifiedPostsSection({required this.verifiedPosts});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 220,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: verifiedPosts.length,
-        itemBuilder: (context, index) {
-          final post = verifiedPosts[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      VerifiedPostsScreen(posts: verifiedPosts),
-                ),
+    final isMoreThanThree = verifiedPosts.length > 3;
+    final visiblePosts = isMoreThanThree ? verifiedPosts.sublist(0, 3) : verifiedPosts;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: visiblePosts.length,
+            itemBuilder: (context, index) {
+              final post = visiblePosts[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VerifiedPostsScreen(posts: verifiedPosts),
+                    ),
+                  );
+                },
+                child: VerifiedPostCard(post: post),
               );
             },
-            child: VerifiedPostCard(post: post),
-          );
-        },
-      ),
+          ),
+        ),
+        if (isMoreThanThree)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VerifiedPostsScreen(posts: verifiedPosts),
+                  ),
+                );
+              },
+              child: const Text(
+                'View More',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -322,35 +344,39 @@ class VerifiedPostCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
       child: SizedBox(
-        width: 200,
+        width: 300,
         child: Card(
+          elevation: 5,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset(
-                'assets/images/Sample_Image.png',
-                height: 140,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   post['title']!,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
+                const SizedBox(height: 8),
+                Text(
                   post['date']!,
-                  style: const TextStyle(color: Colors.grey),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-              ),
-            ],
+                const Spacer(),
+                Row(
+                  children: [
+                    Icon(Icons.share, size: 18),
+                    const SizedBox(width: 8),
+                    Icon(Icons.bookmark_outline, size: 18),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -359,17 +385,19 @@ class VerifiedPostCard extends StatelessWidget {
 }
 
 class _ChatbotButton extends StatelessWidget {
+  const _ChatbotButton();
+
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      backgroundColor: Colors.blue,
+      child: const Icon(Icons.chat),
       onPressed: () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ChatbotPage()),
         );
       },
-      backgroundColor: Colors.blue,
-      child: const Icon(Icons.chat_bubble),
     );
   }
 }

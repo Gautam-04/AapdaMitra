@@ -7,6 +7,7 @@ import 'package:mobile/services/api_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile/widgets/header.dart';
 import 'package:mobile/widgets/footer.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class RaiseIssueScreen extends StatefulWidget {
   const RaiseIssueScreen({super.key});
@@ -49,7 +50,9 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${source == ImageSource.camera ? 'Camera' : 'Storage'} permission is required to select an image")),
+        SnackBar(
+            content: Text(
+                "${source == ImageSource.camera ? 'Camera' : 'Storage'} permission is required to select an image")),
       );
     }
   }
@@ -79,18 +82,22 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
 
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location permission is permanently denied")),
+        const SnackBar(
+            content: Text("Location permission is permanently denied")),
       );
       return;
     }
 
     try {
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _currentPosition = position;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Location fetched: ${position.latitude}, ${position.longitude}")),
+        SnackBar(
+            content: Text(
+                "Location fetched: ${position.latitude}, ${position.longitude}")),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -116,9 +123,19 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
     });
 
     try {
-      final bytes = await _selectedImage!.readAsBytes();
-      final String photoBase64 = base64Encode(bytes);
-      final String location = "${_currentPosition!.latitude},${_currentPosition!.longitude}";
+      // final bytes = await _selectedImage!.readAsBytes();
+      // final String photoBase64 = base64Encode(bytes);
+      final originalBytes = await _selectedImage!.readAsBytes();
+
+      final compressedBytes = await FlutterImageCompress.compressWithList(
+        originalBytes,
+        quality: 70,
+      );
+
+      // Encode the compressed image to Base64
+      final String photoBase64 = base64Encode(compressedBytes);
+      final String location =
+          "${_currentPosition!.latitude},${_currentPosition!.longitude}";
 
       final response = await ApiService.addIssue(
         photoBase64: photoBase64,
@@ -159,7 +176,9 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
         decoration: ShapeDecoration(
           color: isPrimary ? const Color(0xFF2B3674) : Colors.transparent,
           shape: RoundedRectangleBorder(
-            side: isPrimary ? BorderSide.none : const BorderSide(width: 1, color: Color(0xFF2B3674)),
+            side: isPrimary
+                ? BorderSide.none
+                : const BorderSide(width: 1, color: Color(0xFF2B3674)),
             borderRadius: BorderRadius.circular(10),
           ),
         ),
@@ -195,7 +214,9 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                   const SizedBox(height: 20),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Step 1: Upload Image', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    child: Text('Step 1: Upload Image',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 20),
                   Padding(
@@ -237,14 +258,16 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                           : const Center(
                               child: Text(
                                 'No image selected',
-                                style: TextStyle(fontSize: 16, color: Colors.blue),
+                                style:
+                                    TextStyle(fontSize: 16, color: Colors.blue),
                               ),
                             ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   Center(
-                    child: _styledButton("Next", true, () => _navigateToPage(1)),
+                    child:
+                        _styledButton("Next", true, () => _navigateToPage(1)),
                   ),
                 ],
               ),
@@ -258,24 +281,31 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                   children: [
                     const Header(),
                     const SizedBox(height: 20),
-                    const Text('Step 2: Details', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text('Step 2: Details',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     TextField(
-                      decoration: const InputDecoration(labelText: 'Title', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Title', border: OutlineInputBorder()),
                       onChanged: (value) => _title = value,
                     ),
                     const SizedBox(height: 20),
                     TextField(
-                      decoration: const InputDecoration(labelText: 'Description', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Description',
+                          border: OutlineInputBorder()),
                       onChanged: (value) => _description = value,
                       maxLines: 3,
                     ),
                     const SizedBox(height: 20),
                     DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(labelText: "Category", border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: "Category", border: OutlineInputBorder()),
                       value: _selectedCategory,
                       items: _categories
-                          .map((category) => DropdownMenuItem(value: category, child: Text(category)))
+                          .map((category) => DropdownMenuItem(
+                              value: category, child: Text(category)))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -288,7 +318,8 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _styledButton("Previous", false, () => _navigateToPage(0)),
+                        _styledButton(
+                            "Previous", false, () => _navigateToPage(0)),
                         _styledButton("Next", true, () => _navigateToPage(2)),
                       ],
                     ),
@@ -305,7 +336,9 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                   children: [
                     const Header(),
                     const SizedBox(height: 20),
-                    const Text('Step 3: Location & Submit', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text('Step 3: Location & Submit',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: _locateUser,
@@ -322,7 +355,8 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _styledButton("Previous", false, () => _navigateToPage(1)),
+                        _styledButton(
+                            "Previous", false, () => _navigateToPage(1)),
                         _styledButton(
                           "Submit",
                           true,

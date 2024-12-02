@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert'; // For encoding JSON
-import 'home_screen.dart';
 import 'package:mobile/services/api_service.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -13,86 +11,46 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _otpController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _aadharController = TextEditingController();
+
+  bool _isRegistrationMode = true;
   bool _isLoading = false;
-  bool _isOtpSent = false;
-  bool _isRegistrationMode = true; // Toggle between Registration and Login
 
   @override
   void initState() {
     super.initState();
-    _checkToken(); // Check token on startup
+    Future.delayed(Duration.zero, () async {
+      await _checkToken();
+    });
   }
 
-  /// Check if token exists and navigate to HomeScreen
   Future<void> _checkToken() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('userToken');
     if (token != null) {
-      // Token exists, navigate to HomeScreen
       Navigator.of(context).pushReplacementNamed('/home_screen');
     }
   }
 
-  /// Send OTP for Registration or Login
-  Future<void> _sendOtp() async {
+  Future<void> _registerWithAadhar() async {
+    if (!_validateInputs()) return;
     setState(() {
       _isLoading = true;
     });
-
     try {
-      final response = _isRegistrationMode
-          ? await ApiService.registerCitizen(_emailController.text)
-          : await ApiService.loginCitizen(_emailController.text);
-
-      if (response['message'] == 'OTP sent successfully') {
-        setState(() {
-          _isOtpSent = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Failed to send OTP')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred. Please try again later.')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  /// Verify OTP for Registration
-  Future<void> _verifyOtp() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final response = await ApiService.verifyRegisteredCitizen(
-        email: _emailController.text,
+      final response = await ApiService.registerWithAadhar(
         name: _nameController.text,
-        otp: _otpController.text,
+        email: _emailController.text,
+        phoneNumber: _phoneNumberController.text,
+        aadharNumber: _aadharController.text,
       );
-
-      if (response['message'] == 'User registered successfully') {
-        await _saveUserDataAndNavigate(response);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Invalid OTP')),
-        );
-      }
+      await _saveUserDataAndNavigate(response);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred. Please try again later.')),
+        SnackBar(content: Text('registration_failed'.tr(args: [e.toString()]))),
       );
     } finally {
       setState(() {
@@ -101,28 +59,19 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  /// Verify OTP for Login
-  Future<void> _verifyLoginOtp() async {
+  Future<void> _loginWithAadhar() async {
+    if (!_validateInputs(forLogin: true)) return;
     setState(() {
       _isLoading = true;
     });
-
     try {
-      final response = await ApiService.verifyLoginCitizen(
-        email: _emailController.text,
-        otp: _otpController.text,
+      final response = await ApiService.loginWithAadhar(
+        phoneNumber: _phoneNumberController.text,
       );
-
-      if (response['message'] == 'User logged in successfully') {
-        await _saveUserDataAndNavigate(response);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Invalid OTP')),
-        );
-      }
+      await _saveUserDataAndNavigate(response);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred. Please try again later.')),
+        SnackBar(content: Text('login_failed'.tr(args: [e.toString()]))),
       );
     } finally {
       setState(() {
@@ -131,128 +80,152 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  /// Save user data and navigate to HomeScreen
   Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
-    final prefs = await SharedPreferences.getInstance();
-    final userName = response['createdUser']['name']; // Extract username
-
-    await prefs.setString('userToken', response['accessToken']);
-    await prefs.setString('userEmail', response['createdUser']['email']);
-    await prefs.setString('userName', userName);
-    await prefs.setBool('isLoggedIn', true);
-
-    // Send username to another page via POST request
-    const endpointUrl = 'https://example.com/api/receive-username'; // Replace with actual URL
     try {
-      final postResponse = await http.post(
-        Uri.parse(endpointUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': userName}),
-      );
-
-      if (postResponse.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Username sent successfully')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to send username')),
-        );
+      final prefs = await SharedPreferences.getInstance();
+      final userData = response['createdUser'];
+      if (userData == null || response['accessToken'] == null) {
+        throw Exception('invalid_response'.tr());
       }
+      await prefs.setString('userToken', response['accessToken']);
+      await prefs.setString('userName', userData['name'] ?? '');
+      await prefs.setString('userEmail', userData['email'] ?? '');
+      await prefs.setString('userPhoneNumber', userData['mobileNo'] ?? '');
+      await prefs.setString('userAadharNumber', userData['aadharNo'] ?? '');
+      await prefs.setString('userGender', userData['gender'] ?? '');
+      await prefs.setString('userState', userData['state'] ?? '');
+      await prefs.setBool('isLoggedIn', true);
+
+      Navigator.of(context).pushReplacementNamed('/home_screen');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred while sending username')),
+        SnackBar(content: Text('save_user_data_failed'.tr(args: [e.toString()]))),
       );
     }
+  }
 
-    Navigator.of(context).pushReplacementNamed('/home_screen');
+  bool _validateInputs({bool forLogin = false}) {
+    if (_phoneNumberController.text.length != 10 ||
+        int.tryParse(_phoneNumberController.text) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('invalid_phone_number'.tr())),
+      );
+      return false;
+    }
+
+    if (!forLogin) {
+      if (_aadharController.text.length != 12 ||
+          int.tryParse(_aadharController.text) == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('invalid_aadhar_number'.tr())),
+        );
+        return false;
+      }
+
+      if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('all_fields_required'.tr())),
+        );
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Authentication')),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Welcome to Aapda Mitra',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownButton<bool>(
-                    value: _isRegistrationMode,
-                    items: const [
-                      DropdownMenuItem(
-                        value: true,
-                        child: Text('Registration'),
-                      ),
-                      DropdownMenuItem(
-                        value: false,
-                        child: Text('Login'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _isRegistrationMode = value ?? true;
-                        _isOtpSent = false;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  if (_isRegistrationMode)
+      appBar: AppBar(title: Text('authentication'.tr())),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text(
+                'welcome_text'.tr(),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              DropdownButton<bool>(
+                value: _isRegistrationMode,
+                items: [
+                  DropdownMenuItem(value: true, child: Text('register'.tr())),
+                  DropdownMenuItem(value: false, child: Text('login'.tr())),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _isRegistrationMode = value ?? true;
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
+              if (_isRegistrationMode)
+                Column(
+                  children: [
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
+                      decoration: InputDecoration(
+                        labelText: 'name'.tr(),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.person),
                       ),
                     ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (_isOtpSent)
+                    const SizedBox(height: 20),
                     TextField(
-                      controller: _otpController,
-                      decoration: const InputDecoration(
-                        labelText: 'OTP',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'email'.tr(),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.email),
                       ),
                     ),
-                  const SizedBox(height: 20),
-                  if (!_isOtpSent)
-                    ElevatedButton(
-                      onPressed: _sendOtp,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Send OTP'),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _aadharController,
+                      decoration: InputDecoration(
+                        labelText: 'aadhar_number'.tr(),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.credit_card),
+                      ),
                     ),
-                  if (_isOtpSent)
-                    ElevatedButton(
-                      onPressed: _isRegistrationMode ? _verifyOtp : _verifyLoginOtp,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Verify OTP'),
-                    ),
-                ],
+                  ],
+                ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _phoneNumberController,
+                decoration: InputDecoration(
+                  labelText: 'phone_number'.tr(),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.phone),
+                ),
               ),
-            ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isLoading
+                    ? null
+                    : (_isRegistrationMode ? _registerWithAadhar : _loginWithAadhar),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(_isRegistrationMode ? 'register'.tr() : 'login'.tr()),
+              ),
+              const SizedBox(height: 20),
+              DropdownButton<String>(
+                value: context.locale.languageCode,
+                items: [
+                  DropdownMenuItem(value: 'en', child: Text('English')),
+                  DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
+                  DropdownMenuItem(value: 'mr', child: Text('मराठी')),
+                ],
+                onChanged: (languageCode) {
+                  if (languageCode != null) {
+                    context.setLocale(Locale(languageCode));
+                  }
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

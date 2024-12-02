@@ -22,6 +22,10 @@ class _DonationPageState extends State<DonationPage> {
   late Razorpay _razorpay;
   final TextEditingController _amountController = TextEditingController();
   String _loggedInUserName = ""; // Hold the logged-in user's name.
+  String _selectfundRaiser = "";
+
+  String get fundraiserId => _selectfundRaiser;
+  String get userId => _loggedInUserName;
 
   @override
   void initState() {
@@ -45,7 +49,8 @@ class _DonationPageState extends State<DonationPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       setState(() {
-        _loggedInUserName = prefs.getString('userName') ?? 'Guest'; // Get username.
+        _loggedInUserName =
+            prefs.getString('userName') ?? 'Guest'; // Get username.
       });
     } catch (e) {
       print('Error fetching logged-in user: $e');
@@ -111,7 +116,9 @@ class _DonationPageState extends State<DonationPage> {
 
   Future<void> _createOrder(String fundraiserId) async {
     final amount = int.tryParse(_amountController.text.trim()) ?? 0;
-
+    setState(() {
+      _selectfundRaiser = fundraiserId;
+    });
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter a valid amount.")),
@@ -136,7 +143,8 @@ class _DonationPageState extends State<DonationPage> {
         _openRazorpayCheckout(order['id'], amount);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to create order. Please try again.")),
+          const SnackBar(
+              content: Text("Failed to create order. Please try again.")),
         );
       }
     } catch (e) {
@@ -149,10 +157,10 @@ class _DonationPageState extends State<DonationPage> {
 
   void _openRazorpayCheckout(String orderId, int amount) {
     var options = {
-      'key': 'rzp_test_IB0DFCqRT7jxeD',
+      'key': 'rzp_live_Gog8bh57PaPKoC',
       'amount': amount * 100,
       'order_id': orderId,
-      'name': 'Donation',
+      'name': 'Fund Relief',
       'description': 'Donation Payment',
       'prefill': {
         'contact': '9876543210',
@@ -170,11 +178,54 @@ class _DonationPageState extends State<DonationPage> {
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     print("Payment Successful: ${response.paymentId}");
+    final amount = int.tryParse(_amountController.text.trim()) ?? 0;
+    await _verifyPayment(
+      response.orderId!,
+      response.paymentId!,
+      response.signature!,
+      userId,
+      fundraiserId,
+      amount,
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Donation Successful! Thank you.")),
     );
+  }
+
+  Future<void> _verifyPayment(String orderId, String paymentId,
+    String signature,String userId, String fundraiserId, int amount) async {
+    final url = Uri.parse("http://10.0.2.2:8000/v1/donation/verify-payment");
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "razorpay_order_id": orderId,
+          "razorpay_payment_id": paymentId,
+          "razorpay_signature": signature,
+          "userId": userId,
+          "fundraiserId": fundraiserId,
+          "amount": amount,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Donation Successful! Thank you.")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Payment verification failed.")),
+        );
+      }
+    } catch (e) {
+      print("Error verifying payment: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error occurred during verification.")),
+      );
+    }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
