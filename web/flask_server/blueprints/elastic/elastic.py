@@ -332,3 +332,38 @@ def esautocomplete():
     print(baseQuery)
     res = es.search(index=INDEX_NAME, body=baseQuery)
     return dict(res)
+
+@search.post("/add-post")
+def addPost():
+    try:
+        template = {
+            "post_title": "",
+            "post_body": "",
+            "date": None,
+            "likes": 0,
+            "retweets": 0,
+            "post_image_url": "",
+            "post_image_b64": "",
+            "location": "",
+            "url": "",
+            "disaster_type": "",
+            "source": ""
+            "priority"
+        }
+
+        template['post_title'] = request.form.get('post_title', "")
+        template['post_body'] = request.form.get('post_body',  "")
+        template['date'] = request.form.get('date',  None)
+        if template['date']:
+            template['date'] = (dateparser.parse(template['date']).date())
+        template['post_image_b64'] = request.form.get('post_image_b64', "")
+        template['location'] = request.form.get('location', "")
+        template['disaster_type'] = request.form.get('disaster_type', "")
+        template['source'] = 'AapdaMitra App'
+
+        es.index(index=INDEX_NAME, document=dict(template))
+        return {"onload": "Successful"}
+    except Exception as e:
+        print(e)
+        return {"error": "something went wrong"}
+
