@@ -31,7 +31,7 @@ function App() {
   return (
     <>
       {/* <Header /> */}
-      <CornerMenu />
+      {/* <CornerMenu /> */}
       <Routes>
         <Route path="/" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
@@ -43,7 +43,7 @@ function App() {
         <Route path="/summarizeposts" element={<SummarizePosts />} />
         {/* <Route path="/fundraising" element={<Fundraiser />} /> */}
         <Route path="/donations/:fundraiserId" element={<Donation />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/:tab" element={<Dashboard />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer

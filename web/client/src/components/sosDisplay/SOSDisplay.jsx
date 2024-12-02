@@ -126,6 +126,7 @@ const SOSDisplay = () => {
                     <span>Location:</span>
                     <br />
                     {req.location}
+                    {() => stringToDate(req.createdAt)}
                   </Card.Text>
                 </Card.Body>
                 {emergencyIconMap[req.emergencyType]}

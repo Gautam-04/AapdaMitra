@@ -19,6 +19,8 @@ Chart.register(CategoryScale);
 
 const Analytics = () => {
   const [SOSTimelineData, setSOSTimelineData] = useState([]);
+  const [sosResolvedToday, setSOSResolvedToday] = useState("");
+  const [sosTurnaround, setSOSTurnaround] = useState("");
 
   const getPastSixHoursData = (data) => {
     var tempObj = [];
@@ -60,6 +62,30 @@ const Analytics = () => {
       geocode: [21.86, 69.48],
     },
   ];
+
+  const fetchSOSResolvedData = async () => {
+    try {
+      const response = await axios.get("/api/v1/mobile/sos-count");
+      if (response.status === 200) {
+        setSOSResolvedToday(response.data.resolvedCount);
+      }
+    } catch (error) {
+      toast.error("Error fetching SOS Timeline Data. Try again later.");
+      console.error(error);
+    }
+  };
+
+  const fetchSOSTurnaroundData = async () => {
+    // try {
+    //   const response = await axios.get("/api/v1/mobile/");
+    //   if (response.status === 200) {
+    //     setSOSResolvedToday(response.data.resolvedCount);
+    //   }
+    // } catch (error) {
+    //   toast.error("Error fetching SOS Timeline Data. Try again later.");
+    //   console.error(error);
+    // }
+  };
 
   const { t } = useTranslation();
 
@@ -177,13 +203,13 @@ const Analytics = () => {
     },
     {
       title: t("analytics_sos_raised"),
-      statistic: 20,
+      statistic: sosResolvedToday,
       color: "#FBFBDF",
       icon: <MdCrisisAlert className="analytics-card-icon" />,
     },
     {
       title: t("analytics_posts_scraped"),
-      statistic: 150,
+      statistic: sosTurnaround,
       color: "#FFDDAA",
       icon: <IoDownload className="analytics-card-icon" />,
     },
@@ -209,6 +235,8 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchSOSTimelineData();
+    fetchSOSTurnaroundData();
+    fetchSOSResolvedData();
     console.log(SOSTimelineData);
   }, []);
 
