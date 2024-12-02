@@ -9,6 +9,7 @@ import { Spinner } from "react-bootstrap";
 import NdrfLogo from "../../assets/ndrf_logo.svg"
 import AuthLogo from "../../assets/login_logo.svg"
 import Footer from "../../components/footer/Footer";
+import { useTranslation } from "react-i18next";
 
 function SignIn() {
     const [email, setEmail] = useState("");
@@ -22,6 +23,8 @@ function SignIn() {
     const [hasValidLength, setHasValidLength] = useState(false); 
     const navigate = useNavigate();
     const { setUser } = UserState();
+
+    const {t} = useTranslation()
 
     const handlePasswordChange = (e) => {
         const newPassword = e.target.value;
@@ -74,10 +77,10 @@ function SignIn() {
                     <img src={AuthLogo} alt="authlogo.svg" />
                 </div>
                 <div className="form-container">
-                    <h2>Sign In</h2>
+                    <h2>{t("sign_in")}</h2>
                         <input
                             type="text"
-                            placeholder="Enter Email"
+                            placeholder={t("enter_email")}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="input-field"
@@ -85,7 +88,7 @@ function SignIn() {
                         <div className="password-input-container">
                             <input
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Password"
+                                placeholder={t("password")}
                                 value={password}
                                 onChange={handlePasswordChange}
                                 className="input-field"
@@ -94,31 +97,31 @@ function SignIn() {
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
                         </div>
-                        <p className="forgot_password">Forgot Password?</p>
+                        <p className="forgot_password">{t("forgot_pass")}</p>
                         {password.length > 0 && (
                             <div className="password-conditions">
                                 <small className={hasValidLength ? 'valid-text' : 'invalid-text'}>
-                                    <FaCheckDouble /> At least 8 characters
+                                    <FaCheckDouble /> {t("char_8")}
                                 </small>
                                 <small className={hasUpperCase ? 'valid-text' : 'invalid-text'}>
-                                    <FaCheckDouble /> 1 uppercase letter
+                                    <FaCheckDouble /> {t("upper_1")}
                                 </small>
                                 <small className={hasLowerCase ? 'valid-text' : 'invalid-text'}>
-                                    <FaCheckDouble /> 1 lowercase letter
+                                    <FaCheckDouble /> {t("lower_1")}
                                 </small>
                                 <small className={hasNumber ? 'valid-text' : 'invalid-text'}>
-                                    <FaCheckDouble /> 1 number
+                                    <FaCheckDouble /> {t("num_1")}
                                 </small>
                                 <small className={hasSpecialChar ? 'valid-text' : 'invalid-text'}>
-                                    <FaCheckDouble /> 1 special character
+                                    <FaCheckDouble /> {t("special_1")}
                                 </small>
                             </div>
                         )}
                         <button onClick={handleLogin} disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)} className="submit-btn">
-                            {loading ? <Spinner animation="border" size="sm" /> : 'Sign In'}
+                            {loading ? <Spinner animation="border" size="sm" /> : t("sign_in")}
                         </button>
                         <button onClick={()=>navigate('/register')} className="auth_button">
-                            Register
+                            {t("register")}
                         </button>
                 </div>
             </div>

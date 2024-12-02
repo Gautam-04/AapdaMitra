@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const donationSchema = new mongoose.Schema({
   serialNumber: Number,
@@ -11,9 +11,20 @@ const donationSchema = new mongoose.Schema({
     blockNumber: Number,
     dataHash: String,
   },
-},{
-    timestamps: true
-})
+}, {
+  timestamps: true
+});
 
-export const Donation = mongoose.model('Donation',donationSchema)
+export const Donation = mongoose.model('Donation', donationSchema);
 
+const fundraiserSchema = new mongoose.Schema({
+  title: { type: String, required: true }, // Short form
+  fullForm: { type: String, required: true }, // Full form
+  description: { type: String, required: true },
+  logo: { type: String, required: true }, // Logo image in base64
+  donations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Donation' }] // Aggregated donations
+}, {
+  timestamps: true
+});
+
+export const Fundraiser = mongoose.model('Fundraiser', fundraiserSchema);

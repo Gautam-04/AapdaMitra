@@ -9,6 +9,7 @@ import NdrfLogo from "../../assets/ndrf_logo.svg"
 import AuthLogo from "../../assets/login_logo.svg"
 import { Spinner } from "react-bootstrap"; // Import Bootstrap components
 import Footer from "../../components/footer/Footer";
+import { useTranslation } from "react-i18next";
 
 function SignUp() {
     const [email, setEmail] = useState("");
@@ -24,6 +25,7 @@ function SignUp() {
     const [hasValidLength, setHasValidLength] = useState(false); // State for length check
     const navigate = useNavigate();
     const { setUser } = UserState();
+    const {t} = useTranslation()
 
     const handlePasswordChange = (e) => {
         const newPassword = e.target.value;
@@ -113,12 +115,12 @@ function SignUp() {
                     <img src={AuthLogo} alt="authlogo.svg" />
                 </div>
                 <div className="form-container">
-            <h2>Register</h2>
+            <h2>{t("register")}</h2>
             {!otpSent ? (
                 <>
                     <input
                         type="text"
-                        placeholder="Enter your Email"
+                        placeholder={t("enter_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="input-field"
@@ -126,7 +128,7 @@ function SignUp() {
                     <div className="password-input-container">
                         <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Password"
+                            placeholder={t("password")}
                             value={password}
                             onChange={handlePasswordChange}
                             className="input-field"
@@ -135,31 +137,31 @@ function SignUp() {
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
-                    <p className="forgot_password">Forgot Password?</p>
+                    <p className="forgot_password">{t("forgot_pass")}</p>
                     {password.length > 0 && (
                         <div className="password-conditions">
                             <small className={hasValidLength ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> At least 8 characters
+                                <FaCheckDouble /> {t("char_8")}
                             </small>
                             <small className={hasUpperCase ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 uppercase letter
+                                <FaCheckDouble /> {t("upper_1")}
                             </small>
                             <small className={hasLowerCase ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 lowercase letter
+                                <FaCheckDouble /> {t("lower_1")}
                             </small>
                             <small className={hasNumber ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 number
+                                <FaCheckDouble /> {t("num_1")}
                             </small>
                             <small className={hasSpecialChar ? 'valid-text' : 'invalid-text'}>
-                                <FaCheckDouble /> 1 special character
+                                <FaCheckDouble /> {t("special_1")}
                             </small>
                         </div>
                     )}
                     <button onClick={handleOtpSend} disabled={!(hasValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar)} className="register-btn">
-                            {loading ? <Spinner animation="border" size="sm" /> : 'Send Otp'}
+                            {loading ? <Spinner animation="border" size="sm" /> : t("send_otp")}
                         </button>
                         <button onClick={()=>navigate('/')} className="auth_button">
-                            Login
+                            {t("sign_in")}
                         </button>
                 </>
             ) : (
@@ -177,10 +179,10 @@ function SignUp() {
                         ))}
                     </div>
                     <button onClick={verifyOtp} className="register-btn">
-                        {loading ? <Spinner animation="border" size="sm" /> : 'Verify OTP'}
+                        {loading ? <Spinner animation="border" size="sm" /> : t("verify_otp")}
                     </button>
                     <div className="otp-note">
-                        <p>If you did not receive the OTP, please check your spam folder.</p>
+                        <p>{t("otp_note")}</p>
                     </div>
                 </div>
             )}
