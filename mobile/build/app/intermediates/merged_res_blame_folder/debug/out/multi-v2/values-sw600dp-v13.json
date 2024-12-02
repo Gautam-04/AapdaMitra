@@ -4,7 +4,7 @@
             "outputFile": "com.example.mobile.app-mergeDebugResources-30:/values-sw600dp-v13/values-sw600dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Gautam\\.gradle\\caches\\transforms-3\\728957219620aedb66235d819ee65bf5\\transformed\\jetified-standard-core-1.6.43\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
+                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\0b8342312a3e2032068207ea5f8ee708\\transformed\\jetified-standard-core-1.6.43\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
