@@ -1,4 +1,4 @@
-//import MainLogo from "../../assets/main_logo.svg";
+//import ndrf from "../../assets/ndrf_logo.svg";
 import "./Navbar.css"
 function Navbar() {
   return (
@@ -6,6 +6,7 @@ function Navbar() {
       <div className="nav">
         <div>
           <nav className="header-nav-container">
+            {/* <div className="nav-item ndrf_logo"><img src={ndrf} alt="ndrf" className=""/></div> */}
             <div className="nav-item">HOME</div>
             <div className="nav-item">EVENTS</div>
             <div className="nav-item">ANALYSIS</div>
