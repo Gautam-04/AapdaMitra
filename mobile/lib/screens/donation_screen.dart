@@ -25,6 +25,7 @@ class _DonationPageState extends State<DonationPage> {
   String _selectfundRaiser = "";
 
   String get fundraiserId => _selectfundRaiser;
+  String get userId => _loggedInUserName;
 
   @override
   void initState() {
@@ -184,6 +185,7 @@ class _DonationPageState extends State<DonationPage> {
       response.orderId!,
       response.paymentId!,
       response.signature!,
+      userId,
       fundraiserId,
       amount,
     );
@@ -193,7 +195,7 @@ class _DonationPageState extends State<DonationPage> {
   }
 
   Future<void> _verifyPayment(String orderId, String paymentId,
-      String signature, String fundraiserId, int amount) async {
+    String signature,String userId, String fundraiserId, int amount) async {
     final url = Uri.parse("http://10.0.2.2:8000/v1/donation/verify-payment");
     try {
       final response = await http.post(
@@ -203,7 +205,7 @@ class _DonationPageState extends State<DonationPage> {
           "razorpay_order_id": orderId,
           "razorpay_payment_id": paymentId,
           "razorpay_signature": signature,
-          "userId": "123",
+          "userId": userId,
           "fundraiserId": fundraiserId,
           "amount": amount,
         }),

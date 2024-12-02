@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile/screens/auth_screen.dart';
 import 'package:mobile/screens/home_screen.dart';
 import 'package:mobile/screens/donation_screen.dart';
 import 'package:mobile/screens/raiseIssue_screen.dart';
 import 'package:mobile/screens/manuals_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await EasyLocalization.ensureInitialized();
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('en'), 
+        Locale('hi'), 
+        Locale('mr')
+      ],
+      path: 'assets/translation', 
+      fallbackLocale: const Locale('en'),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -27,7 +41,6 @@ class _MyAppState extends State<MyApp> {
     _checkLoginStatus();
   }
 
-  /// Check if the user is logged in by verifying the token or login flag
   Future<void> _checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -40,6 +53,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Aapda Mitra | NDRF',
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        EasyLocalization.of(context)!.delegate,
+      ],
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Inter',

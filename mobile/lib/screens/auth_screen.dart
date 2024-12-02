@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/services/api_service.dart';
 
@@ -15,13 +16,15 @@ class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _aadharController = TextEditingController();
 
-  bool _isRegistrationMode = true; // Toggle between Registration and Login
+  bool _isRegistrationMode = true;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _checkToken(); // Check token on startup
+    Future.delayed(Duration.zero, () async {
+      await _checkToken();
+    });
   }
 
   Future<void> _checkToken() async {
@@ -34,11 +37,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _registerWithAadhar() async {
     if (!_validateInputs()) return;
-
     setState(() {
       _isLoading = true;
     });
-
     try {
       final response = await ApiService.registerWithAadhar(
         name: _nameController.text,
@@ -46,11 +47,10 @@ class _AuthScreenState extends State<AuthScreen> {
         phoneNumber: _phoneNumberController.text,
         aadharNumber: _aadharController.text,
       );
-
       await _saveUserDataAndNavigate(response);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: $e')),
+        SnackBar(content: Text('registration_failed'.tr(args: [e.toString()]))),
       );
     } finally {
       setState(() {
@@ -61,20 +61,17 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _loginWithAadhar() async {
     if (!_validateInputs(forLogin: true)) return;
-
     setState(() {
       _isLoading = true;
     });
-
     try {
       final response = await ApiService.loginWithAadhar(
         phoneNumber: _phoneNumberController.text,
       );
-
       await _saveUserDataAndNavigate(response);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
+        SnackBar(content: Text('login_failed'.tr(args: [e.toString()]))),
       );
     } finally {
       setState(() {
@@ -86,12 +83,10 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userData = response['createdUser']; // Updated key to use 'createdUser'
-
+      final userData = response['createdUser'];
       if (userData == null || response['accessToken'] == null) {
-        throw Exception('Invalid response from server');
+        throw Exception('invalid_response'.tr());
       }
-
       await prefs.setString('userToken', response['accessToken']);
       await prefs.setString('userName', userData['name'] ?? '');
       await prefs.setString('userEmail', userData['email'] ?? '');
@@ -104,7 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
       Navigator.of(context).pushReplacementNamed('/home_screen');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save user data: $e')),
+        SnackBar(content: Text('save_user_data_failed'.tr(args: [e.toString()]))),
       );
     }
   }
@@ -113,7 +108,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (_phoneNumberController.text.length != 10 ||
         int.tryParse(_phoneNumberController.text) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 10-digit phone number.')),
+        SnackBar(content: Text('invalid_phone_number'.tr())),
       );
       return false;
     }
@@ -122,14 +117,14 @@ class _AuthScreenState extends State<AuthScreen> {
       if (_aadharController.text.length != 12 ||
           int.tryParse(_aadharController.text) == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter a valid 12-digit Aadhaar number.')),
+          SnackBar(content: Text('invalid_aadhar_number'.tr())),
         );
         return false;
       }
 
       if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All fields are required for registration.')),
+          SnackBar(content: Text('all_fields_required'.tr())),
         );
         return false;
       }
@@ -141,22 +136,22 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Authentication')),
+      appBar: AppBar(title: Text('authentication'.tr())),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const Text(
-                'Welcome to Aapda Mitra',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Text(
+                'welcome_text'.tr(),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               DropdownButton<bool>(
                 value: _isRegistrationMode,
-                items: const [
-                  DropdownMenuItem(value: true, child: Text('Register')),
-                  DropdownMenuItem(value: false, child: Text('Login')),
+                items: [
+                  DropdownMenuItem(value: true, child: Text('register'.tr())),
+                  DropdownMenuItem(value: false, child: Text('login'.tr())),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -170,28 +165,28 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: [
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
+                      decoration: InputDecoration(
+                        labelText: 'name'.tr(),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.person),
                       ),
                     ),
                     const SizedBox(height: 20),
                     TextField(
                       controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
+                      decoration: InputDecoration(
+                        labelText: 'email'.tr(),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.email),
                       ),
                     ),
                     const SizedBox(height: 20),
                     TextField(
                       controller: _aadharController,
-                      decoration: const InputDecoration(
-                        labelText: 'Aadhaar Number',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.credit_card),
+                      decoration: InputDecoration(
+                        labelText: 'aadhar_number'.tr(),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.credit_card),
                       ),
                     ),
                   ],
@@ -199,10 +194,10 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 20),
               TextField(
                 controller: _phoneNumberController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                decoration: InputDecoration(
+                  labelText: 'phone_number'.tr(),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.phone),
                 ),
               ),
               const SizedBox(height: 20),
@@ -212,7 +207,21 @@ class _AuthScreenState extends State<AuthScreen> {
                     : (_isRegistrationMode ? _registerWithAadhar : _loginWithAadhar),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(_isRegistrationMode ? 'Register' : 'Login'),
+                    : Text(_isRegistrationMode ? 'register'.tr() : 'login'.tr()),
+              ),
+              const SizedBox(height: 20),
+              DropdownButton<String>(
+                value: context.locale.languageCode,
+                items: [
+                  DropdownMenuItem(value: 'en', child: Text('English')),
+                  DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
+                  DropdownMenuItem(value: 'mr', child: Text('मराठी')),
+                ],
+                onChanged: (languageCode) {
+                  if (languageCode != null) {
+                    context.setLocale(Locale(languageCode));
+                  }
+                },
               ),
             ],
           ),
