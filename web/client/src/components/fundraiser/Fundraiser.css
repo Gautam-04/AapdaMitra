@@ -1,0 +1,132 @@
+.fundraiser-container {
+  padding: 20px;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  background-color: whitesmoke;
+  height: 100%;
+}
+
+.fundraiser-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+}
+
+.fundraiser-cards .card {
+  max-width: 25% !important;
+  min-width: 297px !important;
+  max-height: 25% !important;
+  box-shadow: 2px 2px 4px var(--light-gray);
+  padding-bottom: 1rem;
+  /* margin: 10px; */
+}
+
+.fundraiser-cards .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  text-align: left;
+  align-items: left;
+  margin: 0;
+}
+
+.card-body-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.fundraiser-cards .card-text {
+  font-size: 1.25rem !important;
+  color: #242424;
+}
+
+.fundraiser-cards .card-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+.fundraiser-title-button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.2rem;
+  padding-inline: 0.5rem;
+}
+
+.fundraiser-title {
+  width: 50%;
+  font-size: 2rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.create-new-fund {
+  color: white !important;
+  text-decoration: none;
+  font-weight: 700 !important;
+  letter-spacing: 1px;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  align-items: center;
+  /* margin-block: 1rem; */
+}
+
+.create-new-fund:hover {
+  background-color: var(--primary-color-light);
+}
+
+.create-new-fund:active {
+  background-color: var(--primary-color-light) !important;
+  transform: scale(0.98);
+}
+
+.card-body-bottom-button {
+  display: flex;
+}
+
+.fundraiser-view {
+  width: 3rem;
+  height: 3rem;
+  background: var(--primary-color);
+}
+
+.fundraiser-view:hover,
+.fundraiser-view:active {
+  background-color: var(--primary-color-light) !important;
+}
+
+.fundraiser-delete {
+  width: 3rem;
+  height: 3rem;
+  background: white;
+  border: 1px solid var(--warning-red);
+}
+
+.fundraiser-delete svg {
+  color: var(--warning-red);
+  transition: color 0.2s ease-in-out;
+}
+
+.fundraiser-delete:hover,
+.fundraiser-delete:active {
+  background-color: var(--warning-red) !important;
+}
+
+.fundraiser-delete:hover svg {
+  color: white;
+}
+
+.fundraiser-delete svg,
+.fundraiser-view svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}

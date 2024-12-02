@@ -4,20 +4,34 @@ import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/Auth/SignUp";
 import SignIn from "./pages/Auth/SignIn";
 import Home from "./pages/Home/Home";
+import "leaflet/dist/leaflet.css";
 import Footer from "./components/footer/Footer";
 import Header from "./components/header/header";
-import Search from "./pages/Search/Search";
 import CardContainer from "./components/cardContainer/cardContainer";
 import Searchbar from "./components/searchbar/searchbar";
 import MultiTabContainer from "./components/multitabContainer/multiTabContainer";
 import ElasticSearch from "./pages/ElasticSearch/ElasticSearch";
 import VerifyPosts from "./pages/VerifyPosts/VerifyPosts";
 import Donation from "./pages/Donation/Donation";
+import SummarizePosts from "./pages/SummarizePosts/SummarizePosts";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Search from "./components/Search/Search";
+// import Fundraiser from "./pages/Fundraiser/Fundraiser";
+import { io } from "socket.io-client";
+import { useEffect } from "react";
+import CornerMenu from "./components/cornerMenu/CornerMenu";
 
 function App() {
+  const socket = io();
+  useEffect(() => {
+    socket.on("newSos", (x) => {
+      console.log(x);
+    });
+  });
   return (
     <>
       {/* <Header /> */}
+      <CornerMenu />
       <Routes>
         <Route path="/" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
@@ -26,7 +40,10 @@ function App() {
         <Route path="/elastic" element={<ElasticSearch />} />
         <Route path="/event" element={<CardContainer />} />
         <Route path="/verifyposts" element={<VerifyPosts />} />
-        <Route path="/track-donation" element={<Donation />} />
+        <Route path="/summarizeposts" element={<SummarizePosts />} />
+        {/* <Route path="/fundraising" element={<Fundraiser />} /> */}
+        <Route path="/donations/:fundraiserId" element={<Donation />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer

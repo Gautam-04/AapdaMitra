@@ -9,7 +9,7 @@ import json
 es = Elasticsearch('http://mongo.chinmaydesai.site:9200')
 print("Connected to ElasticSearch\t", es.ping())
 
-INDEX_NAME = "disasters"
+INDEX_NAME = "scraped_tweets"
 
 search = Blueprint("search", __name__)
 
@@ -110,13 +110,8 @@ def detect_disasters(doc):
     return None
 
 
-def preprocess_query(query):
-    entities = {
-        "disaster_type": None,
-        "location": None,
-        "date": None,
-        "priority": None
-    }
+def preprocess_query(query, entities):
+    
     
     doc = nlp(query.lower())
     entities['disaster_type'] = detect_disasters(doc)
@@ -135,7 +130,7 @@ def preprocess_query(query):
                 entities["date"] = parsed_date
 
     if "recent" in query.lower():
-        entities["date"] = datetime.now()
+        entities["date"] = (datetime.now(), None)
 
     return entities
 
@@ -205,14 +200,18 @@ def parse_date_range(phrase):
         start_date = six_months_ago.replace(day=1)
         end_date = today
     else:
-        start_date = dateparser.parse(phrase)
-        end_date = None if not start_date or start_date > today else start_date
+        # start_date = dateparser.parse(phrase)
+        # end_date = None if not start_date or start_date > today else start_date
+        start_date, end_date = None, None
 
     return start_date, end_date
 
 
 def build_es_query(entities):
     query = {"bool": {"must": [], "filter": []}}
+
+    if entities['query']:
+        query["bool"]["must"].append({"match": {"post_body": entities['query']}})
 
     if entities['disaster_type']:
         query["bool"]["must"].append({"match": {"disaster_type": entities['disaster_type']}})
@@ -224,7 +223,7 @@ def build_es_query(entities):
         query["bool"]["must"].append({"match_phrase": {"priority": entities['priority']}})
 
     if entities['date']:
-        start_date, end_date = entities['date']
+        start_date, end_date= entities['date']
         query["bool"]["filter"].append({
             "range": {
                 "date": {
@@ -242,32 +241,59 @@ def search_elastic_db(es, index, query):
     return response["hits"]["hits"]
 
 
-@search.route("/search")
+@search.route("/")
 def index():
     return "Elastic search pipeline"
 
-@search.post("/search/elastic")
+@search.post("/elastic")
 def elasticSearch():
+    entities = {
+        "query": None,
+        "disaster_type": None,
+        "location": None,
+        "date": None,
+        "priority": None
+    }
     print(request.form)
     query_string = request.form.get('query')
-    # doc_type = request.args.get('doctype')
-    # location = request.args.get('location')
-    # date_range = request.args.get('dater')
-    # priority = request.args.get('priority')
+    print(True if request.form.get('nlp') else False)
+    print(request.form.get('nlp'))
+    if request.form.get('nlp', False) == 'false':
+        disaster_type = request.form.get('disaster_type')
+        location = request.form.get('location')
+        date = request.form.get('date')
+        try:
+            date = dateparser.parse(date)
+        except:
+            date = None
+        print(date, type(date))
+        priority = request.form.get('priority')
+        entities = {
+            "query": query_string,
+            "disaster_type": disaster_type,
+            "location": location,
+            "date": date,
+            "priority": priority
+        }
+        print("Manuel: ", entities)
+    else:
+        entities = preprocess_query(query_string, entities)
+        print(entities)
 
-    entities = preprocess_query(query_string)
-    print(entities)
     es_query = build_es_query(entities)
     print(es_query)
 
     results = search_elastic_db(es, INDEX_NAME, es_query)
 
-    return [result['_source'] for result in results]
+    entities_formatted = entities
+    entities_formatted['date'] = " to ".join(date.strftime("%d-%m-%Y") for date in entities_formatted['date'] if date) if entities_formatted['date'] else None
+
+    return {"parameters" : entities, "results": [result['_source'] for result in results]}
 
     # print(query_string, doc_type, location, date_range, priority)
     # return {'output': [query_string, location, doc_type, date_range, priority]} 
 
-@search.get("/search/autocomplete")
+@search.get("/autocomplete")
 def esautocomplete():
     query = request.args.get('query')
     baseQuery ={
