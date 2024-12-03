@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.mobile.app-mergeDebugResources-30:/values-as/values-as.xml",
+            "outputFile": "com.example.mobile.app-mergeDebugResources-34:/values-as/values-as.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\956f8d1a0f0e3e1ace1ca82263497398\\transformed\\core-1.13.1\\res\\values-as\\values-as.xml",
+                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\e1991a66dc47391cc028bea36980a82d\\transformed\\core-1.13.1\\res\\values-as\\values-as.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\3f5e4a3940b271317189a5bb5aa6d837\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-as\\values.xml",
+                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\c1c801bdb6116c5b07657e00ed3128df\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-as\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\76a747daf6ad1b0bbd6dea9e80dc93a0\\transformed\\jetified-play-services-base-18.3.0\\res\\values-as\\values.xml",
+                    "source": "C:\\Users\\shaan\\.gradle\\caches\\transforms-3\\bc22ac82cd35148e94d17091a563a35f\\transformed\\jetified-play-services-base-18.3.0\\res\\values-as\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
