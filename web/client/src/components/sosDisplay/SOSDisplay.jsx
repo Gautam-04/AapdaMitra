@@ -125,12 +125,7 @@ const SOSDisplay = () => {
                 <Card.Text>
                   {/* <span>Time:</span>
                   <br /> */}
-                  {
-                    new Date(req.createdAt)
-                      .toISOString()
-                      .split("T")[1]
-                      .split(".")[0]
-                  }
+                  {req.createdAt.split("T")[1].split(".")[0]}
                 </Card.Text>
               </div>
               <div className="sos-body-icon-wrapper">

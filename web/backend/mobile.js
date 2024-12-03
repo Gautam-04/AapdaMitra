@@ -5,6 +5,7 @@ import { Router } from "express";
 import admin from "firebase-admin";
 import axios from "axios";
 import Twilio from "twilio";
+import moment from "moment-timezone";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -616,15 +617,23 @@ const sendSos = async (req, res) => {
 };
 
 const getSos = async (req, res) => {
-  const allSos = await Sos.find({});
+  try {
+    const allSos = await Sos.find({}).lean();
 
-  if (allSos.length === 0) {
-    return res.status(404).json({ message: "There are no issues to retrieve" });
+    if (allSos.length === 0) {
+      return res.status(404).json({ message: "There are no issues to retrieve" });
+    }
+
+    const sosWithISTTime = allSos.map((sos) => ({
+      ...sos,
+      createdAt: moment(sos.createdAt).tz("Asia/Kolkata").format("YYYY-MM-DDTHH:mm:ss"),
+    }));
+
+    return res.status(200).json(sosWithISTTime);
+  } catch (err) {
+    return res.status(500).json({ message: "Server Error", error: err.message });
   }
-
-  return res.status(200).json(allSos);
 };
-
 const perHrSosCount = async (req, res) => {
   try {
     const startOfDay = new Date();
