@@ -77,7 +77,7 @@ const SummarizePosts = () => {
           )} */}
         </div>
       </div>
-      <button onClick={() => handlePrint()}>Print article</button>
+      {/* <button onClick={() => handlePrint()}>Print article</button> */}
       <Footer />
     </>
   );

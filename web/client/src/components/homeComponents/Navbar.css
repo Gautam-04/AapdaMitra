@@ -1,7 +1,7 @@
 /* Navigation Bar */
 .nav {
   display: flex;
-  flex-direction:row;
+  flex-direction: row;
   align-items: center;
   background-color: #ff653c;
   padding: 0 20px; /* Reduced horizontal padding */
@@ -20,10 +20,15 @@
   box-sizing: border-box; /* Prevent padding from causing overflow */
 }
 
-.ndrf_logo{
+.ndrf_logo {
   padding: 1.5px;
-  border-radius:50%;
-  background-color:#fff;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Login Button */
@@ -43,8 +48,7 @@
   letter-spacing: 2px;
   white-space: nowrap; /* Prevent text from wrapping */
   transition: background-color 0.3s ease; /* Optional: smooth hover effect */
-  margin-right:5rem;
-  padding
+  margin-right: 5rem;
 }
 
 .login-btn:hover {

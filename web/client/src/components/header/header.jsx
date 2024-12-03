@@ -43,7 +43,7 @@ function Header() {
         </div>
         <div className="header-nav-item">
           <Link
-            to={"/donations/:0"}
+            to={"/dashboard/donations"}
             style={{ textDecoration: "None", color: "black" }}
           >
             DONATIONS

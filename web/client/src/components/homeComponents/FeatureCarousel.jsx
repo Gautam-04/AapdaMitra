@@ -60,11 +60,11 @@ function FeatureCarousel() {
         <Carousel.Item key={idx}>
           <div className="content">
             <div className="left">
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <div>
-                  <h2>Learn More</h2>
-                </div>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+              <div>
+                <h2>Learn More</h2>
+              </div>
             </div>
             <div className="right">
               <img src={item.image} alt={item.title} />

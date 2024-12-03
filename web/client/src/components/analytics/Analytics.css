@@ -45,6 +45,7 @@
   font-size: clamp(2rem, 2.5vw, 2.5rem) !important;
   font-weight: 800;
   margin-bottom: 0.5rem;
+  text-wrap: nowrap;
 }
 
 .card-title {

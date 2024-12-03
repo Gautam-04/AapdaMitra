@@ -7,14 +7,22 @@ function Navbar() {
       <div className="nav">
         <div>
           <nav className="header-nav-container">
-            <div className="nav-item">FEATURES</div>
-            <div className="nav-item">APP</div>
-            <div className="nav-item">GALLERY</div>
-            <div className="nav-item">NDRF</div>
+            <div className="nav-item">
+              <a href="#features">FEATURES</a>
+            </div>
+            <div className="nav-item">
+              <a href="#appad">APP</a>
+            </div>
+            <div className="nav-item">
+              <a href="#gallery">GALLERY</a>
+            </div>
+            <div className="nav-item">
+              <a href="https://ndrf.gov.in">NDRF</a>
+            </div>
           </nav>
         </div>
         <div>
-          <Link to={"/"}>
+          <Link to={"/login"}>
             <button className="login-btn">LOGIN</button>
           </Link>
         </div>

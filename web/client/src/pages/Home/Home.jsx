@@ -13,8 +13,14 @@ const Home = () => {
     <div className="home-page">
       <Navbar />
       <HeroSection />
-      <div className="latest-news-section">
-        <h2>Latest News</h2>
+      <div className="latest-news-section" id="features">
+        {/* <h2 style={{ fontFamily: "'Inter', sans-serif" }}>Latest News</h2> */}
+        <marquee>
+          <span>Saving Lives & Beyond “आपदा सेवा सदैव सर्वत्र”</span>
+          <span>NDRF Helpline Number : +91-9711077372</span>
+          <span>Saving Lives & Beyond “आपदा सेवा सदैव सर्वत्र”</span>
+          <span>NDRF Helpline Number : +91-9711077372</span>
+        </marquee>
       </div>
       <FeatureSection />
       <FeatureCarousel />

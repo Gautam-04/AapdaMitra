@@ -12,6 +12,7 @@ import { FaHourglassHalf } from "react-icons/fa";
 import { IoDownload } from "react-icons/io5";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
+import L from "leaflet";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -216,23 +217,57 @@ const Analytics = () => {
     },
   ];
 
-  const floodIcon = new Icon({
-    iconUrl:
-      "https://assets.publishing.service.gov.uk/media/653915a7e6c9680014aa9ab1/flood-alert-icon-960.png",
-    iconSize: [100, 66],
-  });
+  // const floodIcon = new Icon({
+  //   iconUrl:
+  //     "https://assets.publishing.service.gov.uk/media/653915a7e6c9680014aa9ab1/flood-alert-icon-960.png",
+  //   iconSize: [100, 66],
+  // });
 
-  const earquakeIcon = new Icon({
-    iconUrl:
-      "https://png.pngtree.com/png-clipart/20230825/original/pngtree-traffic-sign-with-earthquake-picture-image_8517813.png",
-    iconSize: [72, 60],
-  });
+  // const earquakeIcon = new Icon({
+  //   iconUrl:
+  //     "https://png.pngtree.com/png-clipart/20230825/original/pngtree-traffic-sign-with-earthquake-picture-image_8517813.png",
+  //   iconSize: [72, 60],
+  // });
 
   const cycloneIcon = new Icon({
     iconUrl:
       "https://png.pngtree.com/png-vector/20240611/ourmid/pngtree-unveiling-nature-s-fury-satellite-views-of-hurricane-png-image_12634675.png",
     iconSize: [80, 80],
   });
+
+  const icons = {
+    earthquake: L.icon({
+      iconUrl: "https://www.svgrepo.com/show/346804/earthquake.svg",
+      iconSize: [45, 45],
+    }),
+    flood: L.icon({
+      iconUrl: "https://www.svgrepo.com/show/467723/flood.svg",
+      iconSize: [45, 45],
+    }),
+    cyclone: L.icon({
+      iconUrl: "https://www.svgrepo.com/show/335815/whirlwind.svg",
+      iconSize: [45, 45],
+    }),
+    wildfire: L.icon({
+      iconUrl: "https://www.svgrepo.com/show/289319/forest-fire.svg",
+      iconSize: [32, 32],
+    }),
+    drought: L.icon({
+      iconUrl: "https://www.svgrepo.com/show/90502/plant-on-drought.svg",
+      iconSize: [32, 32],
+    }),
+  };
+
+  const disasters = [
+    { id: 1, position: [29, 77], type: "Earthquake", icon: icons.earthquake },
+    { id: 2, position: [19, 74], type: "Flood", icon: icons.flood },
+    { id: 3, position: [21, 87], type: "Cyclone", icon: icons.cyclone },
+    { id: 4, position: [31, 76], type: "Wildfire", icon: icons.wildfire },
+    { id: 5, position: [24, 72], type: "Drought", icon: icons.drought },
+    { id: 6, position: [25, 85], type: "Flood", icon: icons.flood },
+    { id: 7, position: [16, 73], type: "Cyclone", icon: icons.cyclone },
+    { id: 8, position: [10, 76], type: "Wildfire", icon: icons.wildfire },
+  ];
 
   useEffect(() => {
     fetchSOSTimelineData();
@@ -295,7 +330,7 @@ const Analytics = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors&ensp;'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Marker position={[29, 77]} icon={earquakeIcon}>
+          {/* <Marker position={[29, 77]} icon={earquakeIcon}>
             <Popup>Earthquake</Popup>
           </Marker>
           <Marker position={[19, 74]} icon={floodIcon}>
@@ -303,7 +338,20 @@ const Analytics = () => {
           </Marker>
           <Marker position={[21, 87]} icon={cycloneIcon}>
             <Popup>Cyclone</Popup>
-          </Marker>
+          </Marker> */}
+          {disasters.map((disaster) => (
+            <Marker
+              key={disaster.id}
+              position={disaster.position}
+              icon={disaster.icon}
+            >
+              <Popup>
+                <strong>{disaster.type}</strong>
+                <br />
+                Location: {disaster.position[0]}, {disaster.position[1]}
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
       </div>
     </div>

@@ -35,17 +35,17 @@ function App() {
       {/* <Header /> */}
       {/* <CornerMenu /> */}
       <Routes>
-        <Route path="/" element={<SignIn />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/dashboard/:tab" element={<Dashboard />} />
+        <Route path="/donations/:fundraiserId" element={<Donation />} />
         <Route path="/elastic" element={<ElasticSearch />} />
-        <Route path="/event" element={<CardContainer />} />
+        {/* <Route path="/search" element={<Search />} /> */}
+        {/* <Route path="/event" element={<CardContainer />} /> */}
         <Route path="/verifyposts" element={<VerifyPosts />} />
         <Route path="/summarizeposts" element={<SummarizePosts />} />
         {/* <Route path="/fundraising" element={<Fundraiser />} /> */}
-        <Route path="/donations/:fundraiserId" element={<Donation />} />
-        <Route path="/dashboard/:tab" element={<Dashboard />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer

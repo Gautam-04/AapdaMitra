@@ -236,7 +236,7 @@ const CornerMenu = () => {
         return;
       }
       const response = await axios.post(
-        `http://localhost:8000/v1/mobile/${mode}`,
+        `/api/v1/mobile/${mode}`,
         newBroadcast,
         {
           headers: { "Content-Type": "application/json" },
@@ -384,7 +384,7 @@ const CornerMenu = () => {
             <Form.Group className="mb-3">
               <Form.Label>Message Description</Form.Label>
               <Form.Select
-                value={newBroadcast.description}
+                value={newBroadcast.mode}
                 onChange={(e) =>
                   setNewBroadcast({
                     ...newBroadcast,
