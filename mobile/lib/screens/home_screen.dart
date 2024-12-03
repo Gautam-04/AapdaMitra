@@ -9,6 +9,7 @@ import 'package:mobile/screens/verifiedPost_screen.dart';
 import 'package:mobile/screens/sos_screen.dart';
 import 'package:mobile/screens/manuals_screen.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -121,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: const _ChatbotButton(),
+      //floatingActionButton: const _ChatbotButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: Footer(
         currentIndex: _currentIndex,
@@ -384,20 +385,20 @@ class VerifiedPostCard extends StatelessWidget {
   }
 }
 
-class _ChatbotButton extends StatelessWidget {
-  const _ChatbotButton();
+// class _ChatbotButton extends StatelessWidget {
+//   const _ChatbotButton();
 
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      backgroundColor: Colors.blue,
-      child: const Icon(Icons.chat),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ChatbotPage()),
-        );
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return FloatingActionButton(
+//       backgroundColor: Colors.blue,
+//       child: const Icon(Icons.chat),
+//       onPressed: () {
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(builder: (context) => ChatbotPage()),
+//         );
+//       },
+//     );
+//   }
+// }

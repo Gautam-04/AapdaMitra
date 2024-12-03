@@ -7,9 +7,14 @@ import 'package:mobile/screens/home_screen.dart';
 import 'package:mobile/screens/donation_screen.dart';
 import 'package:mobile/screens/raiseIssue_screen.dart';
 import 'package:mobile/screens/manuals_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   await EasyLocalization.ensureInitialized();
   runApp(
     EasyLocalization(
