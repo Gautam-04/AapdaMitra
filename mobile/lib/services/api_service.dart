@@ -5,11 +5,13 @@ class ApiService {
   // Base API URL
   static const String _baseUrl = 'http://10.0.2.2:8000/v1/mobile';
 
-    static Future<Map<String, dynamic>> registerWithAadhar({
+  // Register with Aadhar API
+  static Future<Map<String, dynamic>> registerWithAadhar({
     required String name,
     required String email,
     required String phoneNumber,
     required String aadharNumber,
+    required String fcmToken, // Added FCM token
   }) async {
     final Uri url = Uri.parse('$_baseUrl/verify-aadhar');
     final response = await http.post(
@@ -20,6 +22,7 @@ class ApiService {
         'email': email,
         'mobileNo': phoneNumber,
         'aadharNo': aadharNumber,
+        'fcmToken': fcmToken, // Send FCM token
       }),
     );
 
@@ -30,14 +33,19 @@ class ApiService {
     }
   }
 
+  // Login with Aadhar API
   static Future<Map<String, dynamic>> loginWithAadhar({
     required String phoneNumber,
+    required String fcmToken, // Added FCM token
   }) async {
     final Uri url = Uri.parse('$_baseUrl/login-with-aadhar');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'mobileNo': phoneNumber}),
+      body: json.encode({
+        'mobileNo': phoneNumber,
+        'fcmToken': fcmToken, // Send FCM token
+      }),
     );
 
     if (response.statusCode == 200) {
@@ -46,7 +54,6 @@ class ApiService {
       throw Exception('Error: ${response.body}');
     }
   }
-
 
   // Fetch Fundraisers API
   static Future<List<Map<String, dynamic>>> fetchFundraisers() async {
@@ -123,7 +130,7 @@ class ApiService {
     }
   }
 
- // Fetch Verified Posts API
+  // Fetch Verified Posts API
   static Future<List<Map<String, dynamic>>> fetchVerifiedPosts() async {
     final Uri url = Uri.parse('$_baseUrl/get-all-post');
     final response = await http.get(
