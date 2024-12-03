@@ -112,29 +112,34 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final userData = response['createdUser'];
-      if (userData == null || response['accessToken'] == null) {
-        throw Exception('invalid_response'.tr());
-      }
-      await prefs.setString('userToken', response['accessToken']);
-      await prefs.setString('userName', userData['name'] ?? '');
-      await prefs.setString('userEmail', userData['email'] ?? '');
-      await prefs.setString('userPhoneNumber', userData['mobileNo'] ?? '');
-      await prefs.setString('userAadharNumber', userData['aadharNo'] ?? '');
-      await prefs.setString('userGender', userData['gender'] ?? '');
-      await prefs.setString('userState', userData['state'] ?? '');
-      await prefs.setBool('isLoggedIn', true);
-
-      Navigator.of(context).pushReplacementNamed('/home_screen');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('save_user_data_failed'.tr(args: [e.toString()]))),
-      );
+Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = response['createdUser'] ?? response['user']; // Handle both cases
+    if (userData == null || response['accessToken'] == null) {
+      throw Exception('invalid_response'.tr());
     }
+
+    // Save user data
+    await prefs.setString('userToken', response['accessToken']);
+    await prefs.setString('userId', userData['_id'] ?? ''); // Save userId
+    await prefs.setString('userName', userData['name'] ?? '');
+    await prefs.setString('userEmail', userData['email'] ?? '');
+    await prefs.setString('userPhoneNumber', userData['mobileNo'] ?? '');
+    await prefs.setString('userAadharNumber', userData['aadharNo'] ?? '');
+    await prefs.setString('userGender', userData['gender'] ?? '');
+    await prefs.setString('userState', userData['state'] ?? '');
+    await prefs.setBool('isLoggedIn', true);
+
+    // Navigate to home screen
+    Navigator.of(context).pushReplacementNamed('/home_screen');
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('save_user_data_failed'.tr(args: [e.toString()]))),
+    );
   }
+}
+
 
   bool _validateInputs({bool forLogin = false}) {
     if (_phoneNumberController.text.length != 10 ||
