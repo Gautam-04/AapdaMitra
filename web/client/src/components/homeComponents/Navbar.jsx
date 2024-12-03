@@ -1,20 +1,22 @@
 //import ndrf from "../../assets/ndrf_logo.svg";
-import "./Navbar.css"
+import { Link, useNavigate } from "react-router-dom";
+import "./Navbar.css";
 function Navbar() {
   return (
     <>
       <div className="nav">
         <div>
           <nav className="header-nav-container">
-            <div className="nav-item">HOME</div>
-            <div className="nav-item">EVENTS</div>
-            <div className="nav-item">ANALYSIS</div>
+            <div className="nav-item">FEATURES</div>
+            <div className="nav-item">APP</div>
+            <div className="nav-item">GALLERY</div>
             <div className="nav-item">NDRF</div>
-            <div className="nav-item">CAMPAIGNS</div>
           </nav>
         </div>
         <div>
-          <button className="login-btn">LOGIN</button>
+          <Link to={"/"}>
+            <button className="login-btn">LOGIN</button>
+          </Link>
         </div>
       </div>
     </>

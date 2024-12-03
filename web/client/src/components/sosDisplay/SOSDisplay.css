@@ -29,7 +29,7 @@
 .sos-display-card {
   width: 100%;
   margin: 0;
-  padding: 1rem;
+  padding: 1.5rem 1rem 1rem 1rem;
   background-color: rgb(255, 223, 220);
   box-shadow: 2px 2px 4px var(--light-gray);
   min-height: 0;
@@ -44,17 +44,23 @@
 .sos-type-icon {
   width: 3rem;
   height: 3rem;
+  margin-right: 1rem;
+}
+
+.sos-display-card .card-body {
+  padding-block: 0.5rem;
+  max-width: 70%;
 }
 
 .sos-display-card .card-body .card-title {
-  font-size: 1.2rem !important;
+  font-size: 1.1rem !important;
   line-height: 1.5rem !important;
   text-wrap: wrap;
   font-weight: 700;
 }
 
-.sos-display-card .card-body .card-text {
-  font-size: 1.2rem !important;
+.sos-display-card .card-text {
+  font-size: 1.1rem !important;
   line-height: 1.5rem !important;
   text-wrap: wrap;
   font-weight: 700;
@@ -67,11 +73,28 @@
   font-weight: 500;
 }
 
+.sos-date-time-wrapper {
+  display: flex;
+  justify-content: space-between;
+  padding: 0rem 1rem 0.5rem 1rem;
+  align-items: center;
+  margin: 0;
+}
+
+.sos-date-time-wrapper .card-text {
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  margin: 0;
+  font-size: 1rem;
+}
+
 .sos-resolve {
   background: white;
   border: 1px solid var(--warning-red);
   color: var(--warning-red);
   font-weight: 600;
+  margin-inline: 1rem !important;
+  margin-top: 0.5rem;
 }
 
 .sos-resolve:active,

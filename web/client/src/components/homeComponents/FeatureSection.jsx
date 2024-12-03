@@ -34,12 +34,12 @@ const features = [
 
 const FeatureSection = () => {
   return (
-    <div className="features-section">
+    <div className="features-section" id="features">
       <h2>Features</h2>
       <div className="features-grid">
         {features.map((feature, index) => (
           <div key={index} className="feature-card">
-            <img src={feature.source} alt={feature.source} className="icons"/>
+            <img src={feature.source} alt={feature.source} className="icons" />
             <h3>{feature.title}</h3>
             {/* <button className="learn-more-btn">Learn more</button> */}
           </div>
