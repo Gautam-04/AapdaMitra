@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/services/api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -18,13 +19,26 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool _isRegistrationMode = true;
   bool _isLoading = false;
+  String? _fcmToken; // Store FCM token
 
   @override
   void initState() {
     super.initState();
+    setupPushNotification();
     Future.delayed(Duration.zero, () async {
       await _checkToken();
     });
+  }
+
+  Future<void> setupPushNotification() async {
+    final fcm = FirebaseMessaging.instance;
+
+    // Request permission and fetch FCM token
+    await fcm.requestPermission();
+    _fcmToken = await fcm.getToken();
+    if (_fcmToken != null) {
+      print('FCM Token: $_fcmToken');
+    }
   }
 
   Future<void> _checkToken() async {
@@ -37,15 +51,24 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _registerWithAadhar() async {
     if (!_validateInputs()) return;
+    if (_fcmToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('fcm_token_not_found'.tr())),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       final response = await ApiService.registerWithAadhar(
         name: _nameController.text,
         email: _emailController.text,
         phoneNumber: _phoneNumberController.text,
         aadharNumber: _aadharController.text,
+        fcmToken: _fcmToken!, // Pass FCM token
       );
       await _saveUserDataAndNavigate(response);
     } catch (e) {
@@ -61,12 +84,21 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _loginWithAadhar() async {
     if (!_validateInputs(forLogin: true)) return;
+    if (_fcmToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('fcm_token_not_found'.tr())),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       final response = await ApiService.loginWithAadhar(
         phoneNumber: _phoneNumberController.text,
+        fcmToken: _fcmToken!, // Pass FCM token
       );
       await _saveUserDataAndNavigate(response);
     } catch (e) {
