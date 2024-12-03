@@ -70,6 +70,9 @@ const Issue = mongoose.model(
         default: "Other",
       },
       location: { type: String, trim: true },
+      userId: { type: String, required: true },
+      currentStatus: {type: String, enum: ["Pending", "Resolved"], default: "Pending"},
+      comment: {type: String, default: ""},
     },
     {
       timestamps: true,
@@ -522,7 +525,7 @@ const loginAadhar = async (req, res) => {
 // }
 
 const AddIssue = async (req, res) => {
-  const { photo, title, description, emergencyType, location } = req.body;
+  const { photo, title, description, emergencyType, location, userId } = req.body;
 
   const newIssue = await Issue.create({
     photo,
@@ -530,14 +533,15 @@ const AddIssue = async (req, res) => {
     description,
     emergencyType,
     location,
+    userId
   });
 
   if (!newIssue) {
     return res.status(400).json({ message: "New Issue not raised" });
   }
 
-      const date = newIssue.createdAt;
-      const formattedDate = date.toLocaleDateString("en-GB"); 
+    const date = newIssue.createdAt;
+    const formattedDate = date.toLocaleDateString("en-GB"); 
 
     const data = {
       post_title: newIssue.title || "",
@@ -569,8 +573,24 @@ const AddIssue = async (req, res) => {
       return res.status(500).json({ message: "Failed to sync data with Elasticsearch." });
     }
 
-  return res.status(200).json({ message: "Issue raised successfully" });
+  return res.status(200).json({ message: "Issue raised successfully",newIssue });
 };
+
+const getPersonalIssue = async(req,res) => {
+try {
+  const {userId} = req.body;
+  const personalIssues  = await Issue.findOne({userId});
+
+  if(!personalIssues){
+    return res.status(404).json({message: 'No issues found'})
+  }
+
+  return res.status(200).json({message: 'Your Issues Fetched',personalIssues})
+} catch (error) {
+  console.log('Error in getting personal issue', error);
+  return res.status(200).json({message: 'Error in loading data'})
+}
+}
 
 const getAllIssue = async (req, res) => {
   const allIssue = await Issue.find({});
@@ -1151,6 +1171,7 @@ routes.route("/login-with-aadhar").post(loginAadhar);
 routes.route("/get-fundraisers").get(getFundraiser);
 routes.route("/add-issue").post(AddIssue);
 routes.route("/send-sos").post(sendSos);
+routes.route('/get-personal-issue').post(getPersonalIssue)
 //verified posts
 routes.route("/add-post").post(addVerifiedPost);
 routes.route("/get-all-post").get(getVerifiedPost);
