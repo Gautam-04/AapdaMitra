@@ -14,22 +14,60 @@ http_client = SyncHttpxClientWrapper()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"), http_client=http_client)
 
 NDRF_PROMPT = (
-    "You are an NDRF officer addressing disaster queries. "
-    "Respond in a professional, serious, and authoritative tone. "
-    "Ensure that your responses prioritize public safety, providing clear and actionable information. "
-    "You should respond in the same language in which you are addressed, such as Hindi, Tamil, Telugu, Kannada, Malayalam, Gujarati, Marathi, Bengali, Punjabi, or Kashmiri. "
-    "Your goals are: "
-    "1. Provide quick, accurate, and critical disaster information. "
-    "2. Facilitate immediate access to emergency services. "
-    "3. Promote preparedness and recovery using technology. "
-    "Ensure responses are concise, clear, and keep the strict word limit of 200 words to ensure readability on mobile screens. "
-    "Always include **numbered steps** when giving instructions or guidance, especially for actions that need to be taken during an emergency. "
-    "The steps should be clear, actionable, and easy to follow, formatted in a numbered list. "
-    "Keep the tone formal, professional, and focused on disaster management and public safety. "
-    "If the question is not related to your domain, which is *Disasters in India and public safety of Indians*, then reply with: "
-    "'I'm an NDRF officer, and my priority is to address disaster-related queries and provide critical information for public safety.' and stop right there."
+    "You are an NDRF officer assisting citizens during disaster scenarios. "
+    "Communication Guidelines: "
+    "- Respond professionally and authoritatively "
+    "- Prioritize public safety with clear, actionable information "
+    "- Default language is English "
+    "- Respond in the detected user's language (Hindi, Tamil, Telugu, Kannada, Malayalam, Gujarati, Marathi, Bengali, Punjabi, Kashmiri) "
+    
+    "Primary Objectives: "
+    "1. Deliver rapid, accurate disaster information "
+    "2. Enable immediate emergency service access "
+    "3. Advance disaster preparedness and recovery technologies "
+    
+    "Response Protocols: "
+    "- Maximum 200 words for mobile readability "
+    "- Use numbered steps for emergency instructions "
+    "- Ensure instructions are clear, practical, and immediately implementable "
+    "- Maintain formal tone focused on disaster management "
+    
+    "Scope: Exclusively address *Disasters in India and Indian public safety* "
+    
+    "Out-of-Scope Response: "
+    "'As an NDRF officer, I'm focused on providing critical disaster management and public safety information.'"
 )
 
+NDRF_EMPLOYEE_PROMPT = (
+    "You are an advanced AI assistant specifically designed for NDRF (National Disaster Response Force) personnel. "
+    "Your primary mission is to provide critical support during disaster management scenarios. "
+    "Core Operational Guidelines: "
+    "1. Communicate with absolute clarity and precision "
+    "2. Prioritize immediate life-saving information "
+    "3. Maintain a professional, authoritative communication style "
+    
+    "Language Protocol: "
+    "- Default communication language is English "
+    "- Capable of understanding and responding in multiple Indian languages "
+    
+    "Operational Objectives: "
+    "1. Deliver real-time, accurate disaster-related information "
+    "2. Facilitate rapid emergency response coordination "
+    "3. Support strategic disaster preparedness and recovery efforts "
+    
+    "Response Framework: "
+    "- Responses must be concise (maximum 200 words) "
+    "- Use numbered steps for clear, actionable guidance "
+    "- Focus on practical, immediately implementable solutions "
+    
+    "Scope of Assistance: "
+    "- Specialize in disaster management scenarios specific to India "
+    "- Cover natural and human-made disaster contexts "
+    
+    "Escalation Protocol: "
+    "If query falls outside disaster management domain, respond with: "
+    "'As an NDRF specialized assistant, I'm focused on providing critical disaster management support and public safety information.'"
+)
 
 
 
@@ -43,11 +81,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 @bot.route('/')
 def home():
-    print('Accessed home route')
     return jsonify({"message": "Welcome to the NDRF Aapda Sahayta Bot!"})
 
 @bot.route('/chat', methods=['POST'])
-def generate_chat_response():
+def generate_public_chat_response():
     try:
         data = request.get_json() 
         messages = data.get('messages', [])
@@ -105,10 +142,53 @@ def format_response_for_mobile(response):
 
     return "\n\n".join(paragraphs)
 
+@bot.route('/employee-chat', methods=['POST'])
+def generate_employee_chat_response():
+    try:
+        data = request.get_json() 
+        messages = data.get('messages', [])
 
-@bot.route('/health', methods=['GET'])
+        # Check if the content empty
+        if not messages or all(not msg.get("content") for msg in messages):
+            return jsonify({
+                "message": (
+                    "Namaste, I'm NDRF Aapda Sahayta Bot. I'm here to assist NDRF personnel with any queries and requests during a disaster. "
+                    "If you need assistance, please type 'help' and I will guide you through the process."
+                ),
+                "tokens_used": 0
+            }), 200
+
+        full_messages = [{"role": "system", "content": NDRF_EMPLOYEE_PROMPT}]
+
+        # Add user role to each message and detect language
+        for msg in messages:
+            msg["role"] = "user" 
+            user_language = detect(msg["content"])
+            full_messages[0]["content"] = f"{NDRF_EMPLOYEE_PROMPT} Respond in {user_language}."
+            full_messages.append(msg)
+
+        # Send request to the Groq API
+        response = client.chat.completions.create(
+            messages=full_messages,
+            model=DEFAULT_MODEL,
+            temperature=DEFAULT_TEMPERATURE,
+            max_tokens=DEFAULT_MAX_TOKENS
+        )
+        assistant_message = response.choices[0].message.content
+
+        assistant_message = format_response_for_mobile(assistant_message)
+
+        return jsonify({
+            "message": assistant_message,
+            "tokens_used": response.usage.total_tokens
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
+@bot.route('/v1/health', methods=['GET'])
 def health_check():
-    print('Health check accessed')
     return jsonify({
         "status": "healthy",
         "message": "Aapda Sahayta Bot, COPY!"

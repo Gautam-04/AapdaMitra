@@ -8,6 +8,7 @@ import { Card } from "react-bootstrap";
 import { FaClipboardCheck } from "react-icons/fa";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { MdCrisisAlert } from "react-icons/md";
+import { FaHourglassHalf } from "react-icons/fa";
 import { IoDownload } from "react-icons/io5";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
@@ -19,6 +20,8 @@ Chart.register(CategoryScale);
 
 const Analytics = () => {
   const [SOSTimelineData, setSOSTimelineData] = useState([]);
+  const [sosResolvedToday, setSOSResolvedToday] = useState("");
+  const [sosTurnaround, setSOSTurnaround] = useState("");
 
   const getPastSixHoursData = (data) => {
     var tempObj = [];
@@ -60,6 +63,30 @@ const Analytics = () => {
       geocode: [21.86, 69.48],
     },
   ];
+
+  const fetchSOSResolvedData = async () => {
+    try {
+      const response = await axios.get("/api/v1/mobile/sos-count");
+      if (response.status === 200) {
+        setSOSResolvedToday(response.data.resolvedCount);
+      }
+    } catch (error) {
+      toast.error("Error fetching SOS Count Data. Try again later.");
+      console.error(error);
+    }
+  };
+
+  const fetchSOSTurnaroundData = async () => {
+    try {
+      const response = await axios.get("/api/v1/mobile/sos-average-time");
+      if (response.status === 200) {
+        setSOSTurnaround(response.data.averageTimeFormatted);
+      }
+    } catch (error) {
+      toast.error("Error fetching SOS Turnaround Data. Try again later.");
+      console.error(error);
+    }
+  };
 
   const { t } = useTranslation();
 
@@ -177,15 +204,15 @@ const Analytics = () => {
     },
     {
       title: t("analytics_sos_raised"),
-      statistic: 20,
+      statistic: sosResolvedToday,
       color: "#FBFBDF",
       icon: <MdCrisisAlert className="analytics-card-icon" />,
     },
     {
       title: t("analytics_posts_scraped"),
-      statistic: 150,
+      statistic: sosTurnaround,
       color: "#FFDDAA",
-      icon: <IoDownload className="analytics-card-icon" />,
+      icon: <FaHourglassHalf className="analytics-card-icon" />,
     },
   ];
 
@@ -209,6 +236,8 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchSOSTimelineData();
+    fetchSOSTurnaroundData();
+    fetchSOSResolvedData();
     console.log(SOSTimelineData);
   }, []);
 
