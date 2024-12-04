@@ -337,6 +337,7 @@ def esautocomplete():
 def addPost():
     try:
         template = {
+            "postID": "",
             "post_title": "",
             "post_body": "",
             "date": None,

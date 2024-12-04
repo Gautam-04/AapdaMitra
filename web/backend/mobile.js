@@ -557,6 +557,7 @@ const AddIssue = async (req, res) => {
     };
 
     const elasticResponse = await axios.post("http://localhost:5000/search/add-post", {
+      postID: newIssue._id || "",
       post_title: newIssue.title || "",
       post_body: newIssue.description || "",
       date: date || "",
@@ -1079,6 +1080,12 @@ const addVerifiedPost = async (req, res) => {
       postId,
       priority,
     });
+    const response = await Issue.findByIdAndUpdate(postId, {currentStatus: "Resolved"}, {new: true});
+
+    if(!response){
+      return res.status(404).json({message: 'No issue found'});
+    }
+
     await verified.save();
     res.status(201).json({ success: true, verified });
   } catch (error) {
@@ -1156,6 +1163,25 @@ const updatePost = async (req, res) => {
   }
 };
 
+const getTotalCountVerifiedPosts = async(req,res) => {
+try {
+  const verifiedPostCount = await VerifiedPosts.countDocuments({_id: {$exists: true}});
+
+  const sources = ["Twitter", "RSS", "AapdaMitra App", "Others"];
+  const sourceCount = await Promise.all(
+      sources.map(async (source) => {
+        const count = await VerifiedPosts.countDocuments({ source });
+        return { source, count };
+      })
+    );
+  return res.status(200).json({message: 'Total count fetched and source differene', verifiedPostCount,sourceCount})
+} catch (error) {
+  console.log("Error in getting total counts", error);
+  return res.status(500).json({message: 'Error in getting total count'})
+}
+}
+
+
 //raise a req controller
 
 //routes
@@ -1189,5 +1215,6 @@ routes.route("/per-month-sos").get(perMonthSosCount);
 routes.route("/verify-sos").post(verifySos);
 routes.route("/send-notification").post(warningNotification);
 routes.route("/send-message").post(smsTesting);
+routes.route("/get-total-count").get(getTotalCountVerifiedPosts)
 
 export default routes;
