@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import axios from "axios";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import { Spinner } from "react-bootstrap";
 
 const SummarizePosts = () => {
   const printRef = useRef(null);
@@ -26,7 +27,7 @@ const SummarizePosts = () => {
     }`,
   });
 
-  const [Report, setReport] = useState("Please wait... Report is loading.");
+  const [Report, setReport] = useState("");
 
   const [g, setG] = useState(null);
   useEffect(() => {
@@ -60,11 +61,24 @@ const SummarizePosts = () => {
         <div className="summary-container">
           <div className="title">Post Summary</div>
           {/* {Role === "superAdmin" ? <>SuperAdmin</> : <> Admin</>} */}
-          <ReactMarkdown
-            children={Report}
-            class="md-format"
-            urlTransform={(value) => value}
-          />
+          {Report === "" ? (
+            <>
+              <ReactMarkdown
+                children={"Summary is Loading. Please wait..."}
+                className={"md-format"}
+              />
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </>
+          ) : (
+            <ReactMarkdown
+              children={Report}
+              class="md-format"
+              urlTransform={(value) => value}
+            />
+          )}
+
           {/* {g && (
             <div className="graphs">
               <div className="title">Supporting Graphs</div>

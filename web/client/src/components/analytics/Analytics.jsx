@@ -24,34 +24,21 @@ const Analytics = () => {
   const [sosResolvedToday, setSOSResolvedToday] = useState("");
   const [sosTurnaround, setSOSTurnaround] = useState("");
 
-  const getPastSixHoursData = (data) => {
-    var tempObj = [];
-    const d = new Date();
-    var currHour = d.getHours();
-    if (currHour < 10) {
-      currHour = "0" + currHour + ":00-0" + (currHour + 1) + ":00";
-    } else {
-      currHour = currHour + ":00-" + (currHour + 1) + ":00";
-    }
-    for (var i = 0; i < data.length; i++) {
-      if (data[i]["hour"] === currHour) {
-        if (i - 5 <= 0) {
-          tempObj = data.splice(24 + i - 5, 25);
-        }
-        tempObj = tempObj.concat(data.splice(Math.max(0, i - 5), i + 1));
-      }
-    }
-    for (var i = 0; i < tempObj.length; i++) {
-      tempObj[i]["id"] = i;
-    }
-    return tempObj;
+  const getPastSixHoursData = (inputData) => {
+    const currentHour = new Date().getHours();
+
+    const filteredData = inputData.filter((data, index) => {
+      return index >= currentHour - 5 && index <= currentHour;
+    });
+    return filteredData;
   };
 
   const fetchSOSTimelineData = async () => {
     try {
       const response = await axios.get("/api/v1/mobile/per-hr-sos");
       if (response.status === 200) {
-        setSOSTimelineData(response.data);
+        setSOSTimelineData(getPastSixHoursData(response.data));
+        console.log(response.data);
       }
     } catch (error) {
       toast.error("Error fetching SOS Timeline Data. Try again later.");
@@ -283,15 +270,17 @@ const Analytics = () => {
         {
           label: t("analytics_sos_request"),
           data: SOSTimelineData.map((data) => data["count"]),
-          backgroundColor: [
-            "rgba(75,192,192,1)",
-            "#ecf0f1",
-            "#50AF95",
-            "#f3ba2f",
-            "#2a71d0",
-          ],
-          borderColor: "black",
+          // backgroundColor: [
+          //   "rgba(75,192,192,1)",
+          //   "#ecf0f1",
+          //   "#50AF95",
+          //   "#f3ba2f",
+          //   "#2a71d0",
+          // ],
+          fill: false,
+          borderColor: "#2b3674",
           borderWidth: 1,
+          tension: 0.3,
         },
       ],
     });

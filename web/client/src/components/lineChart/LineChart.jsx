@@ -15,6 +15,14 @@ function LineChart({ chartData }) {
               display: false,
             },
           },
+          scales: {
+            y: {
+              ticks: {
+                stepSize: 1,
+              },
+              beginAtZero: true,
+            },
+          },
         }}
       />
     </div>

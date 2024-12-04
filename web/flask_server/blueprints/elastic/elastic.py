@@ -256,8 +256,8 @@ def elasticSearch():
     }
     print(request.form)
     query_string = request.form.get('query')
-    print(True if request.form.get('nlp') else False)
-    print(request.form.get('nlp'))
+    # print(True if request.form.get('nlp') else False)
+    # print(request.form.get('nlp'))
     if request.form.get('nlp', False) == 'false':
         disaster_type = request.form.get('disaster_type')
         location = request.form.get('location')
@@ -266,7 +266,7 @@ def elasticSearch():
             date = dateparser.parse(date)
         except:
             date = None
-        print(date, type(date))
+        # print(date, type(date))
         priority = request.form.get('priority')
         entities = {
             "query": query_string,
@@ -288,6 +288,8 @@ def elasticSearch():
     entities_formatted = entities
     entities_formatted['date'] = " to ".join(date.strftime("%d-%m-%Y") for date in entities_formatted['date'] if date) if entities_formatted['date'] else None
 
+    for result in results:
+        result['_source']['objId'] = result['_id']
     return {"parameters" : entities, "results": [result['_source'] for result in results]}
 
     # print(query_string, doc_type, location, date_range, priority)
@@ -362,3 +364,15 @@ def addPost():
         print(e)
         return {"error": "something went wrong"}
 
+@search.post("/remove-post")
+def removePost():
+    try:
+        objId = request.form.get("objId", "")
+        if objId:
+            response = es.delete(index=INDEX_NAME, id=objId)
+        else:
+            response = {"error": "No objId in form"}
+        return response
+    except Exception as e:
+        print(e)
+        return {"error": "something went wrong"}

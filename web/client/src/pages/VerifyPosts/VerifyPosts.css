@@ -1,23 +1,40 @@
 .verify-cards-wrapper {
   width: 100%;
+  min-height: 75vh;
+  height: fit-content;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-block: 2rem;
 }
 
 .verify-cards-container {
-  width: 80%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.carousel-inner {
+  width: 75% !important;
+  min-height: 90%;
+  /* margin-block: 1rem; */
+  /* padding: 2rem; */
+  /* display: flex; */
+  justify-content: center;
+  /* flex-direction: column; */
+  align-items: center;
+  border-radius: 25px;
 }
 
 .verify-card-container {
-  margin-block: 1rem;
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
   background: #f4f7fe;
-  border-radius: 25px;
+  padding: 2rem;
 }
 
 .verify-card-bottom {
