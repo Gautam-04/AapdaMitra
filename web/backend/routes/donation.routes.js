@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createOrder, verifyPayment, getDonations, createFundraiser, deleteFundraiser, } from "../controllers/donation.controller.js";
+import { createOrder, verifyPayment, getDonations, createFundraiser, deleteFundraiser, getLast30DaysDonations} from "../controllers/donation.controller.js";
 
 const routes = Router();
 
@@ -10,5 +10,6 @@ routes.route('/verify-payment').post(verifyPayment)
 routes.route('/get-donations').get(getDonations)
 routes.route("/create-fundraiser").post(createFundraiser);
 routes.route("/delete/:id").delete(deleteFundraiser);
+routes.route("/get-fundraiser").get(getLast30DaysDonations);
 
 export default routes
