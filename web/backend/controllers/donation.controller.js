@@ -198,7 +198,7 @@ const getLast30DaysDonations = async (req, res) => {
   const { fundraiserId } = req.query;
 
   try {
-    const fundraiser = await Fundraiser.findById(fundraiserId).select('donations');
+    const fundraiser = await Fundraiser.findById(fundraiserId).select('donations amountCollected goal');
     if (!fundraiser) {
       return res.status(404).json({ success: false, message: 'Fundraiser not found' });
     }
@@ -234,6 +234,10 @@ const getLast30DaysDonations = async (req, res) => {
       success: true,
       message: 'Daily donations for the last 30 days',
       data: dailyDonationArray,
+      fundraiser: {
+        amountCollected: fundraiser.amountCollected,
+        goal: fundraiser.goal
+      }
     });
   } catch (error) {
     console.error('Error in getting last 30 days donations', error);
