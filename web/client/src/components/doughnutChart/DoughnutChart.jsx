@@ -1,7 +1,7 @@
 import React from "react";
 import { Doughnut } from "react-chartjs-2";
 
-function DoughnutChart({ chartData }) {
+function DoughnutChart({ chartData, title }) {
   return (
     <div className="chart-container">
       <Doughnut
@@ -10,7 +10,7 @@ function DoughnutChart({ chartData }) {
           plugins: {
             title: {
               display: true,
-              text: "Disaster Distribution",
+              text: title,
             },
           },
         }}

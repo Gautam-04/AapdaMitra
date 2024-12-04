@@ -44,6 +44,7 @@ i18n
           fundraiser_create_fund_title: "Title",
           fundraiser_create_fund_ff: "Full Form",
           fundraiser_create_fund_desc: "Description",
+          fundraiser_create_fund_goal: "Goal Amount",
           fundraiser_create_fund_file: "Logo File",
           fundraiser_create_close: "Close",
           fundraiser_create_create_button: "Create Fundraiser",

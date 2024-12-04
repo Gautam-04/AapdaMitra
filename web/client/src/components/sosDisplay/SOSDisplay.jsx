@@ -120,6 +120,7 @@ const SOSDisplay = () => {
                 <Card.Text>
                   {/* <span>Date:</span>
                   <br /> */}
+                  {req.createdAt}
                   {new Date(req.createdAt).toISOString().split("T")[0]}
                 </Card.Text>
                 <Card.Text>

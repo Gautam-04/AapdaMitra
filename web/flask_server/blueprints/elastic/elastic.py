@@ -233,7 +233,7 @@ def build_es_query(entities):
             }
         })
     
-    return {"query": query}
+    return {"query": query, "size": 1000}
 
 
 def search_elastic_db(es, index, query):
@@ -376,4 +376,13 @@ def removePost():
         return response
     except Exception as e:
         print(e)
-        return {"error": "something went wrong"}
+        return {"error": "Something went wrong"}
+    
+@search.get("/get-unverified-count")
+def unverifiedCount():
+    try:
+        print(es.count(index=INDEX_NAME).get('count'))
+        return {"count": es.count(index=INDEX_NAME).get('count')}
+    except Exception as e:
+        print(e)
+        return {"error": "Couldn't get count"}
