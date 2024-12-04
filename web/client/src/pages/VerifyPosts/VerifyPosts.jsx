@@ -48,7 +48,7 @@ const VerifyPosts = (props) => {
           priority: "",
         };
 
-        const response = await axios.post("/api/v1/mobile/add-post", post, {
+        const response = await axios.post("/api/v1/mobile/add-post", toSend, {
           headers: { "Content-Type": "application/json" },
         });
         if (response.status === 201) {
