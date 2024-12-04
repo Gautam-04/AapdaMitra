@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/services/api_service.dart';
+import 'package:mobile/screens/issuesRaised_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Header extends StatelessWidget {
@@ -6,26 +8,111 @@ class Header extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Remove all stored user data
-    await prefs.remove('userToken');
-    await prefs.remove('userName');
-    await prefs.remove('userEmail');
-    await prefs.remove('userPhoneNumber');
-    await prefs.remove('userAadharNumber');
-    await prefs.remove('userGender');
-    await prefs.remove('userState');
-    await prefs.setBool('isLoggedIn', false); // Set the login status to false
-
-    // Redirect to authentication screen
+    await prefs.clear();
+    await prefs.setBool('isLoggedIn', false);
     Navigator.pushNamedAndRemoveUntil(
       context,
-      '/auth_screen', // Navigate to the Auth Screen
-      (route) => false, // Clear all previous routes
+      '/auth_screen',
+      (route) => false,
     );
   }
 
-  // Show a confirmation dialog for logging out
+  void _openUserSidebar(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Column(
+            children: [
+              _buildSidebarOption(
+                context,
+                icon: Icons.person,
+                text: 'Profile',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/profile_screen');
+                },
+              ),
+              const SizedBox(height: 15),
+              _buildSidebarOption(
+                context,
+                icon: Icons.report_problem,
+                text: 'Issues Raised by You',
+                onTap: () async {
+                  Navigator.pop(context);
+                  try {
+                    final issues = await ApiService.fetchPersonalIssues();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => IssuesRaisedScreen(issues: issues),
+                      ),
+                    );
+                  } catch (error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error fetching issues: $error'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 15),
+              _buildSidebarOption(
+                context,
+                icon: Icons.logout,
+                text: 'Logout',
+                onTap: () {
+                  Navigator.pop(context);
+                  _showLogoutDialog(context);
+                },
+                isLogout: true,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSidebarOption(
+    BuildContext context, {
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+    bool isLogout = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isLogout ? Colors.red.shade50 : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: isLogout ? Colors.red : Colors.black87),
+            const SizedBox(width: 15),
+            Text(
+              text,
+              style: TextStyle(
+                color: isLogout ? Colors.red : Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _showLogoutDialog(BuildContext context) async {
     showDialog(
       context: context,
@@ -33,18 +120,16 @@ class Header extends StatelessWidget {
         return AlertDialog(
           title: const Text('Logout'),
           content: const Text('Do you really want to logout?'),
-          actions: <Widget>[
+          actions: [
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
               child: const Text('Logout'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                _logout(context); // Proceed with logout
+                Navigator.of(context).pop();
+                _logout(context);
               },
             ),
           ],
@@ -56,18 +141,18 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 30.0), // Adjust this value to lower the header
+      padding: const EdgeInsets.only(top: 30.0),
       child: Container(
-        width: MediaQuery.of(context).size.width, // Full width of the screen
+        width: MediaQuery.of(context).size.width,
         height: 55,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2), // Reduced opacity for a softer shadow
-              spreadRadius: 1, // Less spread to make the shadow less outward
-              blurRadius: 3, // Lower blur for a subtle effect
-              offset: const Offset(0, 2), // Slightly smaller offset for a gentler shadow
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -76,18 +161,16 @@ class Header extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Back Button
               IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
-                    '/home_screen', // Navigate to the home screen
-                    (route) => false, // Clear all previous routes
+                    '/home_screen',
+                    (route) => false,
                   );
                 },
               ),
-              // Centered Logo
               Expanded(
                 child: Center(
                   child: Image.asset(
@@ -96,11 +179,8 @@ class Header extends StatelessWidget {
                   ),
                 ),
               ),
-              // Profile Image on the right with logout confirmation
               GestureDetector(
-                onTap: () {
-                  _showLogoutDialog(context); // Show logout confirmation dialog
-                },
+                onTap: () => _openUserSidebar(context),
                 child: CircleAvatar(
                   backgroundImage: AssetImage('assets/images/Avatar.png'),
                   radius: 20,

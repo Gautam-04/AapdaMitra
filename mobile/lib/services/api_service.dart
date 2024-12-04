@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   // Base API URL
@@ -150,4 +151,51 @@ class ApiService {
           'Failed to fetch verified posts: ${response.statusCode} - ${response.body}');
     }
   }
+
+// Fetch Personal Issues API
+  static Future<List<Map<String, dynamic>>> fetchPersonalIssues() async {
+  final Uri url = Uri.parse('$_baseUrl/get-personal-issue');
+
+  // Fetch userId from SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userId') ?? '';
+  print('Fetched userId: $userId'); // Debugging userId
+
+  if (userId.isEmpty) {
+    throw Exception('User ID not found in local storage');
+  }
+
+  // Send POST request
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({'userId': userId}),
+  );
+
+  print('API Response: ${response.body}'); // Debugging response body
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    // Ensure the 'personalIssues' key exists
+    if (data['personalIssues'] != null) {
+      final issues = data['personalIssues'];
+
+      // Handle cases where 'personalIssues' is a list or a single object
+      if (issues is List) {
+        return List<Map<String, dynamic>>.from(issues);
+      } else if (issues is Map<String, dynamic>) {
+        return [issues]; // Wrap single issue in a list
+      } else {
+        throw Exception('Unexpected format for personal issues');
+      }
+    } else {
+      throw Exception('No issues found for the user');
+    }
+  } else {
+    throw Exception(
+        'Failed to fetch personal issues: ${response.statusCode} - ${response.body}');
+  }
+}
+
 }
