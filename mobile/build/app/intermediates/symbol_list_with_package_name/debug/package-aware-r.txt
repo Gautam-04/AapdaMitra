@@ -362,6 +362,7 @@ layout single_item
 layout toast_custom
 layout wallet_test_layout
 mipmap ic_launcher
+raw firebase_common_keep
 raw otpelf
 raw rzp_config
 string androidx_startup
@@ -390,6 +391,14 @@ string common_google_play_services_wear_update_text
 string common_open_on_phone
 string common_signin_button_text
 string common_signin_button_text_long
+string fcm_fallback_notification_channel_label
+string firebase_database_url
+string gcm_defaultSenderId
+string google_api_key
+string google_app_id
+string google_crash_reporting_api_key
+string google_storage_bucket
+string project_id
 string status_bar_notification_info_overflow
 string wallet_buy_button_place_holder
 style CheckoutTheme

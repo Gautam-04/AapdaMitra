@@ -9,7 +9,7 @@ function LineChart({ chartData }) {
           plugins: {
             title: {
               display: true,
-              text: "SOS Timeline",
+              text: "SOS Timeline (Past 6 Hours)",
             },
             legend: {
               display: false,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/services/api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -18,13 +19,26 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool _isRegistrationMode = true;
   bool _isLoading = false;
+  String? _fcmToken; // Store FCM token
 
   @override
   void initState() {
     super.initState();
+    setupPushNotification();
     Future.delayed(Duration.zero, () async {
       await _checkToken();
     });
+  }
+
+  Future<void> setupPushNotification() async {
+    final fcm = FirebaseMessaging.instance;
+
+    // Request permission and fetch FCM token
+    await fcm.requestPermission();
+    _fcmToken = await fcm.getToken();
+    if (_fcmToken != null) {
+      print('FCM Token: $_fcmToken');
+    }
   }
 
   Future<void> _checkToken() async {
@@ -37,15 +51,24 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _registerWithAadhar() async {
     if (!_validateInputs()) return;
+    if (_fcmToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('fcm_token_not_found'.tr())),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       final response = await ApiService.registerWithAadhar(
         name: _nameController.text,
         email: _emailController.text,
         phoneNumber: _phoneNumberController.text,
         aadharNumber: _aadharController.text,
+        fcmToken: _fcmToken!, // Pass FCM token
       );
       await _saveUserDataAndNavigate(response);
     } catch (e) {
@@ -61,12 +84,21 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _loginWithAadhar() async {
     if (!_validateInputs(forLogin: true)) return;
+    if (_fcmToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('fcm_token_not_found'.tr())),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       final response = await ApiService.loginWithAadhar(
         phoneNumber: _phoneNumberController.text,
+        fcmToken: _fcmToken!, // Pass FCM token
       );
       await _saveUserDataAndNavigate(response);
     } catch (e) {
@@ -80,29 +112,34 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final userData = response['createdUser'];
-      if (userData == null || response['accessToken'] == null) {
-        throw Exception('invalid_response'.tr());
-      }
-      await prefs.setString('userToken', response['accessToken']);
-      await prefs.setString('userName', userData['name'] ?? '');
-      await prefs.setString('userEmail', userData['email'] ?? '');
-      await prefs.setString('userPhoneNumber', userData['mobileNo'] ?? '');
-      await prefs.setString('userAadharNumber', userData['aadharNo'] ?? '');
-      await prefs.setString('userGender', userData['gender'] ?? '');
-      await prefs.setString('userState', userData['state'] ?? '');
-      await prefs.setBool('isLoggedIn', true);
-
-      Navigator.of(context).pushReplacementNamed('/home_screen');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('save_user_data_failed'.tr(args: [e.toString()]))),
-      );
+Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = response['createdUser'] ?? response['user']; // Handle both cases
+    if (userData == null || response['accessToken'] == null) {
+      throw Exception('invalid_response'.tr());
     }
+
+    // Save user data
+    await prefs.setString('userToken', response['accessToken']);
+    await prefs.setString('userId', userData['_id'] ?? ''); // Save userId
+    await prefs.setString('userName', userData['name'] ?? '');
+    await prefs.setString('userEmail', userData['email'] ?? '');
+    await prefs.setString('userPhoneNumber', userData['mobileNo'] ?? '');
+    await prefs.setString('userAadharNumber', userData['aadharNo'] ?? '');
+    await prefs.setString('userGender', userData['gender'] ?? '');
+    await prefs.setString('userState', userData['state'] ?? '');
+    await prefs.setBool('isLoggedIn', true);
+
+    // Navigate to home screen
+    Navigator.of(context).pushReplacementNamed('/home_screen');
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('save_user_data_failed'.tr(args: [e.toString()]))),
+    );
   }
+}
+
 
   bool _validateInputs({bool forLogin = false}) {
     if (_phoneNumberController.text.length != 10 ||

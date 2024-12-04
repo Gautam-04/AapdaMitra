@@ -9,7 +9,7 @@ import json
 es = Elasticsearch('http://mongo.chinmaydesai.site:9200')
 print("Connected to ElasticSearch\t", es.ping())
 
-INDEX_NAME = "scraped_tweets"
+INDEX_NAME = "unverified_posts"
 
 search = Blueprint("search", __name__)
 
@@ -332,3 +332,33 @@ def esautocomplete():
     print(baseQuery)
     res = es.search(index=INDEX_NAME, body=baseQuery)
     return dict(res)
+
+@search.post("/add-post")
+def addPost():
+    try:
+        template = {
+            "post_title": "",
+            "post_body": "",
+            "date": None,
+            "likes": 0,
+            "retweets": 0,
+            "post_image_url": "",
+            "post_image_b64": "",
+            "location": "",
+            "url": "",
+            "disaster_type": "",
+            "source": "AapdaMitra App",
+        }
+
+        data = request.json
+        for key in data.keys():
+            template[key] = data[key]
+
+        print(template)
+
+        es.index(index=INDEX_NAME, document=dict(template))
+        return {"onload": "Successful"}
+    except Exception as e:
+        print(e)
+        return {"error": "something went wrong"}
+

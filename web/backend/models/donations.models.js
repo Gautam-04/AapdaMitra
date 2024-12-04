@@ -22,6 +22,8 @@ const fundraiserSchema = new mongoose.Schema({
   fullForm: { type: String, required: true }, // Full form
   description: { type: String, required: true },
   logo: { type: String, required: true }, // Logo image in base64
+  goal: {type: Number, required: true},
+  amountCollected: {type: Number, default: 0},
   donations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Donation' }] // Aggregated donations
 }, {
   timestamps: true

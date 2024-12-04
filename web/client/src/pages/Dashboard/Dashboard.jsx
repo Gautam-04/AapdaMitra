@@ -5,6 +5,7 @@ import Header from "../../components/header/header";
 import Footer from "../../components/footer/Footer";
 import Analytics from "../../components/analytics/Analytics";
 import Searchbar from "../../components/searchbar/searchbar";
+import CornerMenu from "../../components/cornerMenu/CornerMenu";
 import Search from "../../components/Search/Search";
 import { MdCrisisAlert, MdOutlineAnalytics } from "react-icons/md";
 import { RiRefund2Fill } from "react-icons/ri";
@@ -14,41 +15,51 @@ import { icon } from "leaflet";
 import Fundraiser from "../../components/Fundraiser/Fundraiser";
 import { useTranslation } from "react-i18next";
 import SOSDisplay from "../../components/sosDisplay/SOSDisplay";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Dashboard = () => {
-  const [dashboardPage, setDashboardPage] = useState("Analytics");
-  const [SOSToggle, setSOSToggle] = useState(true);
+  const [SOSToggle, setSOSToggle] = useState(false);
   const { t } = useTranslation();
+  const { tab } = useParams();
+  const [dashboardPage, setDashboardPage] = useState(tab);
+  let navigateContent = useNavigate();
+
+  const changeSidebarContent = (path) => {
+    navigateContent(`/dashboard/${path}`);
+    setDashboardPage(path);
+  };
+
   const sidebarContent = [
     {
       name: t("dashboard_analytics"),
       icon: <MdOutlineAnalytics className="sidebar-icon" />,
-      to: "Analytics",
+      to: "analytics",
       color: "white",
     },
     {
       name: t("dashboard_search"),
       icon: <IoSearch className="sidebar-icon" />,
-      to: "Search",
+      to: "search",
       color: "white",
     },
     {
       name: t("dashboard_donations"),
       icon: <RiRefund2Fill className="sidebar-icon" />,
-      to: "Donations",
+      to: "donations",
       color: "white",
     },
   ];
   return (
     <>
       <Header />
+      <CornerMenu />
       <div className="dashboard-wrapper">
         <div className="dashboard-sidebar">
           {sidebarContent.map((sidebarItem, idx) => {
             return (
               <div
                 className="sidebar-item"
-                onClick={() => setDashboardPage(sidebarItem.to)}
+                onClick={() => changeSidebarContent(sidebarItem.to)}
                 key={idx}
                 style={{
                   backgroundColor: `${
@@ -103,9 +114,9 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="dashboard-content">
-          {dashboardPage === "Analytics" && <Analytics />}
-          {dashboardPage === "Search" && <Search />}
-          {dashboardPage === "Donations" && <Fundraiser />}
+          {dashboardPage === "analytics" && <Analytics />}
+          {dashboardPage === "search" && <Search />}
+          {dashboardPage === "donations" && <Fundraiser />}
         </div>
         {SOSToggle && (
           <div className="dashboard-sos">

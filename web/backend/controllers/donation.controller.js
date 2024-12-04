@@ -1,4 +1,3 @@
-import { response } from "express";
 import { Donation,Fundraiser } from "../models/donations.models.js";
 import {createHmac } from 'node:crypto'
 import Razorpay from 'razorpay'
@@ -120,7 +119,9 @@ const verifyPayment  = async(req,res) => {
 
         if (fundraiserId) {
       const fundraiser = await Fundraiser.findById(fundraiserId);
-      if (!fundraiser) {
+      const updatedAmount = fundraiser.amountCollected + amount;
+      const newResponse = await Fundraiser.findByIdAndUpdate(fundraiserId, { amountCollected: updatedAmount }, { new: true });
+      if (!fundraiser && !newResponse) {
         return res.status(404).json({ success: false, message: "Fundraiser not found" });
       }
       fundraiser.donations.push(donation._id);
@@ -156,9 +157,9 @@ const getDonations = async(req,res) => {
 }
 
 const createFundraiser = async (req, res) => {
-  const { title, fullForm, description, logo } = req.body;
+  const { title, fullForm, description, logo,goal } = req.body;
   try {
-    const fundraiser = new Fundraiser({ title, fullForm, description, logo });
+    const fundraiser = new Fundraiser({ title, fullForm, description, logo, goal });
     await fundraiser.save();
     res.status(201).json({ success: true, fundraiser });
   } catch (error) {
@@ -193,4 +194,51 @@ const getFundraiser = async(req,res) => {
   }
 }
 
-export {createOrder,verifyPayment,getDonations,createFundraiser,deleteFundraiser,getFundraiser}
+const getLast30DaysDonations = async (req, res) => {
+  const { fundraiserId } = req.query;
+
+  try {
+    const fundraiser = await Fundraiser.findById(fundraiserId).select('donations');
+    if (!fundraiser) {
+      return res.status(404).json({ success: false, message: 'Fundraiser not found' });
+    }
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+
+    const donations = await Donation.find({
+      _id: { $in: fundraiser.donations },
+      paymentDate: { $gte: thirtyDaysAgo },
+    }).select('amount paymentDate');
+
+    if (!donations.length) {
+      return res.status(404).json({ success: false, message: 'No donations found in the last 30 days' });
+    }
+
+    const dailyAmounts = donations.reduce((acc, donation) => {
+      const date = donation.paymentDate.toISOString().split('T')[0]; 
+      if (!acc[date]) {
+        acc[date] = 0;
+      }
+      acc[date] += donation.amount;
+      return acc;
+    }, {});
+
+    const dailyDonationArray = Object.entries(dailyAmounts).map(([date, amount]) => ({
+      date,
+      amount,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      message: 'Daily donations for the last 30 days',
+      data: dailyDonationArray,
+    });
+  } catch (error) {
+    console.error('Error in getting last 30 days donations', error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+export {createOrder,verifyPayment,getDonations,createFundraiser,deleteFundraiser,getFundraiser,getLast30DaysDonations}
