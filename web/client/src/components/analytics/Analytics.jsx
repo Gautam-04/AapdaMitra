@@ -9,7 +9,9 @@ import { FaClipboardCheck } from "react-icons/fa";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { MdCrisisAlert } from "react-icons/md";
 import { FaHourglassHalf } from "react-icons/fa";
-import { IoDownload } from "react-icons/io5";
+import { AiOutlineIssuesClose } from "react-icons/ai";
+import { MdOutlineSos } from "react-icons/md";
+import { GiSiren } from "react-icons/gi";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
 import L from "leaflet";
@@ -24,6 +26,9 @@ const Analytics = () => {
   const [verifiedPostData, setVerifiedPostData] = useState({
     sourceCount: [],
     verifiedPostCount: 0,
+  });
+  const [allAnalyticsData, setAllAnalyticsData] = useState({
+    regional: [],
   });
   const [unverifiedPostCount, setUnverifiedPostCount] = useState("0");
   const [sosResolvedToday, setSOSResolvedToday] = useState("0");
@@ -64,6 +69,19 @@ const Analytics = () => {
     }
   };
 
+  const fetchAnalyticsData = async () => {
+    try {
+      const response = await axios.get("/api/v1/mobile/get-analytics");
+      if (response.status === 200) {
+        setAllAnalyticsData(response.data);
+        console.log(response.data);
+      }
+    } catch (error) {
+      toast.error("Error fetching All Analytics Data. Try again later.");
+      console.error(error);
+    }
+  };
+
   const fetchUnverifiedPostCount = async () => {
     try {
       const response = await axios.get(
@@ -74,7 +92,7 @@ const Analytics = () => {
         setUnverifiedPostCount(response.data.count);
       }
     } catch (error) {
-      toast.error("Error fetching Verified Posts Data. Try again later.");
+      toast.error("Error fetching Unverified Posts Data. Try again later.");
       console.error(error);
     }
   };
@@ -237,11 +255,10 @@ const Analytics = () => {
     },
   ];
 
-  // const floodIcon = new Icon({
-  //   iconUrl:
-  //     "https://assets.publishing.service.gov.uk/media/653915a7e6c9680014aa9ab1/flood-alert-icon-960.png",
-  //   iconSize: [100, 66],
-  // });
+  const regionIcon = new Icon({
+    iconUrl: "https://www.svgrepo.com/show/505452/pin-1.svg",
+    iconSize: [50, 50],
+  });
 
   // const earquakeIcon = new Icon({
   //   iconUrl:
@@ -295,6 +312,7 @@ const Analytics = () => {
     fetchSOSTurnaroundData();
     fetchSOSResolvedData();
     fetchVerifiedPostData();
+    fetchAnalyticsData();
     // console.log(SOSTimelineData);
   }, []);
 
@@ -390,7 +408,7 @@ const Analytics = () => {
           <Marker position={[21, 87]} icon={cycloneIcon}>
             <Popup>Cyclone</Popup>
           </Marker> */}
-          {disasters.map((disaster) => (
+          {/* {disasters.map((disaster) => (
             <Marker
               key={disaster.id}
               position={disaster.position}
@@ -402,7 +420,56 @@ const Analytics = () => {
                 Location: {disaster.position[0]}, {disaster.position[1]}
               </Popup>
             </Marker>
-          ))}
+          ))} */}
+          {allAnalyticsData.regional.map((region, idx) => {
+            return (
+              <Marker
+                key={idx}
+                position={[
+                  region.location.split(", ")[0],
+                  region.location.split(", ")[1],
+                ]}
+                icon={regionIcon}
+              >
+                <Popup>
+                  <div className="map-popup-cards">
+                    <div
+                      className="map-popup-card"
+                      style={{ backgroundColor: "#C6E7FF" }}
+                    >
+                      <AiOutlineIssuesClose size={"35px"} />
+                      <span>Issues Last 7 Days</span>
+                      {region.issues.last7Days}
+                    </div>
+                    <div
+                      className="map-popup-card"
+                      style={{ backgroundColor: "#D4F6FF" }}
+                    >
+                      <MdOutlinePendingActions size={"35px"} />
+                      <span>Issues Unresolved</span>
+                      {region.sos.unresolved}
+                    </div>
+                    <div
+                      className="map-popup-card"
+                      style={{ backgroundColor: "#FBFBDF" }}
+                    >
+                      <GiSiren size={"35px"} />
+                      <span>SOS Last 7 Days</span>
+                      {region.sos.last7Days}
+                    </div>
+                    <div
+                      className="map-popup-card"
+                      style={{ backgroundColor: "#FFDDAA" }}
+                    >
+                      <MdOutlineSos size={"35px"} />
+                      <span>SOS Unresolved</span>
+                      {region.sos.unresolved}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>

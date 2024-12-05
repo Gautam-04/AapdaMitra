@@ -78,7 +78,7 @@ function Donation() {
         // console.log(response.data.donations[0].donations);
       }
     } catch (error) {
-      toast.error("Error fetching donations. Try again later.");
+      // toast.error("Error fetching donations. Try again later.");
       console.error(error);
     }
   };
@@ -100,7 +100,7 @@ function Donation() {
         setFundraiserInfo(response.data);
       }
     } catch (error) {
-      toast.error("Error fetching donation info. Try again later.");
+      // toast.error("Error fetching donation info. Try again later.");
       console.error(error);
     }
   };
@@ -128,7 +128,7 @@ function Donation() {
         // console.log(response.data);
       }
     } catch (error) {
-      toast.error("Error fetching donation statistics. Try again later.");
+      // toast.error("Error fetching donation statistics. Try again later.");
       console.error(error);
     }
   };

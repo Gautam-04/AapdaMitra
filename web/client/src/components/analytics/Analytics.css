@@ -135,3 +135,48 @@
   background: white;
   border-radius: 25px;
 }
+
+.map-popup-cards {
+  display: flex;
+  gap: 1rem;
+  width: fit-content;
+  height: fit-content;
+  padding: 1rem;
+}
+
+.leaflet-popup {
+  width: fit-content;
+  max-width: fit-content;
+}
+
+.leaflet-popup-content-wrapper {
+  width: fit-content !important;
+  max-width: fit-content;
+}
+
+.leaflet-popup-content {
+  width: fit-content !important;
+}
+
+.map-popup-card {
+  background-color: var(--light-gray);
+  min-width: 150px;
+  aspect-ratio: 1/1;
+  border-radius: 25px;
+  font-family: "Inter", sans;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-popup-card span {
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding-top: 1rem;
+}
+
+.map-popup-card {
+  font-size: 2rem;
+}
