@@ -65,12 +65,28 @@
   text-wrap: wrap;
   font-weight: 700;
 }
-.sos-display-card .card-body .card-title span,
-.sos-display-card .card-body .card-text span {
+.sos-display-card .card-body .card-title .sos-label,
+.sos-display-card .card-body .card-text .sos-label {
   font-size: 1rem !important;
   /* line-height: 1.5rem !important; */
   text-wrap: wrap;
   font-weight: 500;
+}
+
+.sos-code {
+  color: var(--primary-color) !important;
+  padding-inline: 0.6rem;
+  background-color: white !important;
+  /* -webkit-text-stroke: 1px var(--primary-color); */
+  font-weight: 800 !important;
+  font-size: 1.3rem !important;
+  border-radius: 25px;
+  width: fit-content;
+}
+
+.sos-code.red {
+  background-color: var(--warning-red) !important;
+  color: white !important;
 }
 
 .sos-date-time-wrapper {
@@ -145,10 +161,18 @@
   color: var(--primary-color);
 }
 
+.sos-resolver-code {
+  display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .sos-resolver-name span,
 .sos-resolver-email span,
 .sos-resolver-location span,
-.sos-resolver-type span {
+.sos-resolver-type span,
+.sos-resolver-code span {
   font-size: 1rem;
   color: black;
   font-weight: 400;
