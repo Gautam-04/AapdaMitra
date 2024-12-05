@@ -8,8 +8,8 @@ import { FaFire } from "react-icons/fa6";
 import { FaBuilding } from "react-icons/fa";
 import { PiEmptyBold } from "react-icons/pi";
 import { PiPlant } from "react-icons/pi";
+import emergencyLocations from "./emergencyLocations.json";
 
-// import
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 const provider = new OpenStreetMapProvider();
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
@@ -22,9 +22,24 @@ const SOSDisplay = () => {
   const [show, setShow] = useState(false);
 
   const sosIcon = new Icon({
+    iconUrl: "https://www.svgrepo.com/show/272074/siren-siren.svg",
+    iconSize: [40, 40],
+  });
+
+  const medicIcon = new Icon({
     iconUrl:
-      "https://www.freeiconspng.com/thumbs/alert-icon/alert-icon-red-11.png",
-    iconSize: [58, 50],
+      "https://www.svgrepo.com/show/385155/health-healthcare-hospital-medic-medical-medicine.svg",
+    iconSize: [28, 28],
+  });
+
+  const fireIcon = new Icon({
+    iconUrl: "https://www.svgrepo.com/show/500065/fire-hydrant.svg",
+    iconSize: [28, 28],
+  });
+
+  const policeIcon = new Icon({
+    iconUrl: "https://www.svgrepo.com/show/407224/police-car.svg",
+    iconSize: [28, 28],
   });
 
   const handleOpenResolver = (sos) => {
@@ -90,6 +105,7 @@ const SOSDisplay = () => {
 
   useEffect(() => {
     fetchSOS();
+    console.log(emergencyLocations);
   }, []);
 
   const fetchGeoFromLocation = async (location) => {
@@ -101,7 +117,7 @@ const SOSDisplay = () => {
   function SetViewOnClick(location) {
     const map = useMap();
     if (location) {
-      map.panTo([location["location"][0], location["location"][1]]);
+      map.setView([location["location"][0], location["location"][1]], 12);
     }
 
     return null;
@@ -120,7 +136,6 @@ const SOSDisplay = () => {
                 <Card.Text>
                   {/* <span>Date:</span>
                   <br /> */}
-                  {req.createdAt}
                   {new Date(req.createdAt).toISOString().split("T")[0]}
                 </Card.Text>
                 <Card.Text>
@@ -132,14 +147,22 @@ const SOSDisplay = () => {
               <div className="sos-body-icon-wrapper">
                 <Card.Body>
                   <Card.Title>
-                    <span>Emergency Type: </span>
+                    <span className="sos-label">Emergency Type: </span>
                     <br />
                     {req.emergencyType}
                   </Card.Title>
                   <Card.Text>
-                    <span>Location:</span>
+                    <span className="sos-label">Location:</span>
                     <br />
                     {req.location}
+                  </Card.Text>
+                  <Card.Text>
+                    <span className="sos-label">Code: </span>
+                    {req.code === "red" ? (
+                      <span className="sos-code red">RED</span>
+                    ) : (
+                      <span className="sos-code">NORMAL</span>
+                    )}
                   </Card.Text>
                 </Card.Body>
                 {emergencyIconMap[req.emergencyType]}
@@ -184,6 +207,14 @@ const SOSDisplay = () => {
                   <span>Type:</span>
                   {currentSOS.emergencyType}
                 </div>
+                <div className="sos-resolver-code">
+                  <span>Code:</span>
+                  {currentSOS.code === "red" ? (
+                    <span className="sos-code red">RED</span>
+                  ) : (
+                    <span className="sos-code">NORMAL</span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="map-wrapper">
@@ -192,9 +223,47 @@ const SOSDisplay = () => {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors&ensp;'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                {emergencyLocations.hospitals.map((location, idx) => {
+                  return (
+                    <Marker
+                      key={idx}
+                      position={[location.latitude, location.longitude]}
+                      icon={medicIcon}
+                    >
+                      <Popup>{location.hospital_name}</Popup>
+                    </Marker>
+                  );
+                })}
+                {emergencyLocations.fireStations.map((location, idx) => {
+                  return (
+                    <Marker
+                      key={idx}
+                      position={[
+                        location.gpsCoordinates.latitude,
+                        location.gpsCoordinates.longitude,
+                      ]}
+                      icon={fireIcon}
+                    >
+                      <Popup>{location.title}</Popup>
+                    </Marker>
+                  );
+                })}
+                {emergencyLocations.police_stations.map((location, idx) => {
+                  return (
+                    <Marker
+                      key={idx}
+                      position={[location.latitude, location.longitude]}
+                      icon={policeIcon}
+                    >
+                      <Popup>{location.station_name}</Popup>
+                    </Marker>
+                  );
+                })}
+
                 <Marker position={currentSOSLocation} icon={sosIcon}>
                   <Popup>{currentSOS.emergencyType}</Popup>
                 </Marker>
+
                 <SetViewOnClick location={currentSOSLocation} />
               </MapContainer>
             </div>

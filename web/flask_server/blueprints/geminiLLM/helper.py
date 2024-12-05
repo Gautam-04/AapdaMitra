@@ -44,6 +44,7 @@ class DisasterAnalysis:
                                             The report should provide actionable insights in context to the data.
                                             Do not add any Limitations and Conclusion section. Only return the report.
                                             Do not give summary property by property. Only include information that would help mitigate the event.
+                                            Add appropriate colors to Authenticity only in the markdown.
                                             {self.data}''').text)
     
     def generateGraphPhrases(self):
