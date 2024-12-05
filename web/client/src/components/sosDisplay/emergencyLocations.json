@@ -1,0 +1,240 @@
+{
+    "hospitals": [
+      {
+        "hospital_name": "Pandit Madan Mohan Malviya Shatabdi Municipal General Hospital",
+        "address": "Centenary Building, WTP Marg, near Pepsi Company, Deonar, Govandi East, Mumbai, Maharashtra 400088",
+        "contact": "022 2556 4070",
+        "latitude": 19.048538,
+        "longitude": 72.918731
+      },
+      {
+        "hospital_name": "BARC Hospital",
+        "address": "Anushakti Colony, Anushakti Nagar, Mumbai, Maharashtra 400094",
+        "contact": "022 2559 8000",
+        "latitude": 19.0156,
+        "longitude": 72.8611
+      },
+      {
+        "hospital_name": "Sant Muktabai General Hospital",
+        "address": "3WX3+9MF, SG Barve Marg, near Muktabai Hospital, Siddharth Nagar, Barve Nagar, Ghatkopar West, Mumbai, Maharashtra 400084",
+        "contact": null,
+        "latitude": 19.1020,
+        "longitude": 72.9090
+      },
+      {
+        "hospital_name": "Brihanmumbai Municipal Hospital",
+        "address": "Universal Majestic, Ghatkopar - Mankhurd Link Rd, ACC Nagar, Govandi East, Mumbai, Maharashtra 400043",
+        "contact": null,
+        "latitude": 19.0524,
+        "longitude": 72.9216
+      },
+      {
+        "hospital_name": "Dadasaheb Gaikwad BMC Hospital",
+        "address": "69, Eastern Express Hwy, Ramabai Ambedkar Nagar, Mumbai, Maharashtra 400075",
+        "contact": null,
+        "latitude": 19.0806,
+        "longitude": 72.9175
+      },
+      {
+        "hospital_name": "Municipal Hospital",
+        "address": "3R7X+FRP, JL Shirshekar Marg, Government Colony, Bandra East, Mumbai, Maharashtra 400051",
+        "contact": null,
+        "latitude": 19.0554,
+        "longitude": 72.8408
+      },
+      {
+        "hospital_name": "Holy Family Multispeciality Hospital Bandra",
+        "address": "St Andrews Rd, Bandra West, Mumbai, Maharashtra 400050",
+        "contact": "022 6267 0555",
+        "latitude": 19.0581,
+        "longitude": 72.8289
+      },
+      {
+        "hospital_name": "Government Hospital",
+        "address": "JN1-13, Sant Tukaram Marg, Juhu Chowpatty Marg, Juhu Nagar, Sector 10A, Vashi, Navi Mumbai, Maharashtra 400703",
+        "contact": null,
+        "latitude": 19.0774,
+        "longitude": 72.9975
+      },
+      {
+        "hospital_name": "MGM Hospital",
+        "address": "Plot No.35, Atmashanti Society, Sector 3, Vashi, Navi Mumbai, Maharashtra 400703",
+        "contact": "022 5066 6777",
+        "latitude": 19.0854,
+        "longitude": 72.9982
+      },
+      {
+        "hospital_name": "ESIC Hospital",
+        "address": "6X34+HG3, Road No. 33, Wagle Estate, Chaitraban Society, Gangadhar Nagar, Thane West, Thane, Maharashtra 400604",
+        "contact": "1800 11 2526",
+        "latitude": 19.1827,
+        "longitude": 72.9874
+      },
+      {
+        "hospital_name": "Govt. Hospital",
+        "address": "541, Indradhanu Market Rd, Indradhanu Market, Block N5, IRC Village, Nayapalli, Bhubaneswar, Odisha 751015",
+        "contact": null,
+        "latitude": 20.2894,
+        "longitude": 85.8181
+      },
+      {
+        "hospital_name": "PGIMER & Capital Hospital Bhubaneswar",
+        "address": "Unit 6, Ganga Nagar, Bhubaneswar, Odisha 751025",
+        "contact": "0674 239 1983",
+        "latitude": 20.2960,
+        "longitude": 85.8180
+      },
+      {
+        "hospital_name": "CGHS Hospital",
+        "address": "Near Durga Mandap, Old Ag Colony, AG Colony, Unit 4, Bhouma Nagar, Bhubaneswar, Odisha 751001",
+        "contact": "0674 239 3612",
+        "latitude": 20.2850,
+        "longitude": 85.8300
+      },
+      {
+        "hospital_name": "Govt. Hospital",
+        "address": "8R5C+P7X, Nilamadhab Vihar, Gajapati Nagar, Bhubaneswar, Odisha 751013",
+        "contact": null,
+        "latitude": 20.2594,
+        "longitude": 85.8328
+      },
+      {
+        "hospital_name": "Central Hospital East Coast Railway",
+        "address": "8RCP+F64, Mancheswar Station Rd, Mancheswar, Bhubaneswar, Odisha 751017",
+        "contact": "0674 274 8895",
+        "latitude": 20.321239210792033, 
+        "longitude": 85.83561398658563
+      }
+    ],
+    "police_stations": [
+      {
+        "station_name": "Khardev Nagar Police Station",
+        "address": "3W45+9F3, Khardev Nagar Rd, Ashtavinayak Society, Sambhaji Nagar, Chembur, Mumbai, Maharashtra 400071",
+        "contact": null,
+        "latitude": 19.0548,
+        "longitude": 72.9271
+      },
+      {
+        "station_name": "Police Station-Govandi",
+        "address": "3W56+RP9, Limboni Baug Rd, near Municipal Office, Limboni Baug, Budha Nagar, Chedda Nagar, Mumbai, Maharashtra 400043",
+        "contact": "077381 33133",
+        "latitude": 19.0591,
+        "longitude": 72.9202
+      },
+      {
+        "station_name": "Chembur Police Station",
+        "address": "Police Station, Aarey Centre, Z-1436, near Basant Park, Building No. 8, opp. Chembur, शिवसाई को हा सोसायटी, Sindhi Society, Chembur, Mumbai, Maharashtra 400071",
+        "contact": "022 2529 5677",
+        "latitude": 19.0512,
+        "longitude": 72.9226
+      },
+      {
+        "station_name": "Deonar Police Station",
+        "address": "3W59+826, Deonar, Govandi East, Mumbai, Maharashtra 400043",
+        "contact": null,
+        "latitude": 19.0485,
+        "longitude": 72.9130
+      }
+    ],
+    "fireStations": [
+   {
+        "title": "Baramunda Fire Station",
+        "address": "7QHX+JP6, IRC Village, Baramunda, Bhubaneswar, Odisha 751003",
+        "contact": "null",
+        "gpsCoordinates": {
+        "latitude": 20.279200502184946,
+        "longitude":  85.79924363811124
+        }
+      },
+      {
+        "title": "Mumbai Fire Brigade Headquarters",
+        "phone": "+91 22 2307 6111",
+        "address": "XRCJ+QR9, Opposite Y Bridge, Byculla, Mumbai, Sir Jamshedji Jeejeebhoy Rd, Agripada, Mumbai, Maharashtra 400027, India",
+        "gpsCoordinates": {
+          "latitude": 18.9719167,
+          "longitude": 72.83211
+        }
+      },
+      {
+        "title": "Borivali Fire Station",
+        "phone": "+91 22 2860 2847",
+        "address": "6RHR+V77, Lokmanya Tilak Rd, Ashtavinayak Nagar, Borivali, Mumbai, Maharashtra 400092, India",
+        "gpsCoordinates": {
+          "latitude": 19.2296608,
+          "longitude": 72.8406847
+        }
+      },
+      {
+        "title": "Chembur Fire Brigade",
+        "phone": "+91 22 2522 4824",
+        "address": "3V3V+RCG, Near Chembur Naka Bus Stop, Ganesh Nagar, Postal Colony, Kurla, Mumbai, Maharashtra 400024, India",
+        "gpsCoordinates": {
+          "latitude": 19.0545687,
+          "longitude": 72.89359
+        }
+      },
+      {
+        "title": "Dadar Fire Station",
+        "phone": "+91 22 2430 6486",
+        "address": "4R35+JW6, Senapati Bapat Marg, Opp. Railway Station, Dadar West, Mumbai, Maharashtra 400028, India",
+        "gpsCoordinates": {
+          "latitude": 19.0176143,
+          "longitude": 72.8381622
+        }
+      },
+      {
+        "title": "Marol Fire Station",
+        "phone": "+91 22 2925 2431",
+        "address": "9WXV+78J, Opp. Takshila Society, Marol Maroshi Rd, Andheri East, Mumbai, Maharashtra 400059, India",
+        "gpsCoordinates": {
+          "latitude": 19.1112212,
+          "longitude": 72.8683221
+        }
+      },
+      {
+        "title": "Malad Fire Station",
+        "phone": "+91 22 2880 3150",
+        "address": "6RWP+XVH, Govindji Shroff Rd, Malad West, Mumbai, Maharashtra 400064, India",
+        "gpsCoordinates": {
+          "latitude": 19.1864583,
+          "longitude": 72.8342927
+        }
+      },
+      {
+        "title": "Vikhroli Fire Station",
+        "phone": "+91 22 2577 1933",
+        "address": "4VCM+QVX, Tagore Nagar, Vikhroli East, Mumbai, Maharashtra 400083, India",
+        "gpsCoordinates": {
+          "latitude": 19.0978057,
+          "longitude": 72.9258352
+        }
+      },
+      {
+        "title": "Mulund Fire Station",
+        "phone": "+91 22 2561 4499",
+        "address": "2XH3+F6F, Opposite Sriram Talkies, NS Rd, Mulund West, Mumbai, Maharashtra 400080, India",
+        "gpsCoordinates": {
+          "latitude": 19.1713873,
+          "longitude": 72.9392727
+        }
+      },
+      {
+        "title": "Santacruz Fire Station",
+        "phone": "+91 22 2611 3331",
+        "address": "7V3M+54X, Near Vakola Church, Nehru Rd, Santacruz East, Mumbai, Maharashtra 400055, India",
+        "gpsCoordinates": {
+          "latitude": 19.0919443,
+          "longitude": 72.853016
+        }
+      },
+      {
+        "title": "Tardeo Fire Station",
+        "phone": "+91 22 2351 1934",
+        "address": "5W54+5PQ, Mumbai Central, Tardeo Rd, Tardeo, Mumbai, Maharashtra 400034, India",
+        "gpsCoordinates": {
+          "latitude": 18.9686273,
+          "longitude": 72.8112267
+        }
+      }
+    ]
+  } 

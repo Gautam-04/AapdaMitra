@@ -8,6 +8,7 @@ import axios from "axios";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Spinner } from "react-bootstrap";
+import rehypeRaw from "rehype-raw";
 
 const SummarizePosts = () => {
   const printRef = useRef(null);
@@ -76,6 +77,7 @@ const SummarizePosts = () => {
               children={Report}
               class="md-format"
               urlTransform={(value) => value}
+              rehypePlugins={[rehypeRaw]}
             />
           )}
 
