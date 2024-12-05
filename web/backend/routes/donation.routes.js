@@ -7,6 +7,7 @@ import {
   deleteFundraiser,
   getLast30DaysDonations,
   getFundraiserfromId,
+  getFundraiserAnalytics
 } from "../controllers/donation.controller.js";
 
 const routes = Router();
@@ -20,5 +21,6 @@ routes.route("/create-fundraiser").post(createFundraiser);
 routes.route("/delete/:id").delete(deleteFundraiser);
 routes.route("/get-fundraiser").get(getLast30DaysDonations);
 routes.route("/get-fundraiser-from-id").get(getFundraiserfromId);
+routes.route("/get-fundraiser-analytics").get(getFundraiserAnalytics);
 
 export default routes;
