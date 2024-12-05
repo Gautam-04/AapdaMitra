@@ -96,6 +96,7 @@ const verifyPayment = async (req, res) => {
     )
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
+      console.log(generated_signature, razorpay_signature);
 
     if (generated_signature !== razorpay_signature) {
       return res

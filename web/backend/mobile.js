@@ -6,6 +6,7 @@ import admin from "firebase-admin";
 import axios from "axios";
 import Twilio from "twilio";
 import moment from "moment-timezone";
+import haversine from "haversine-distance"
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -73,7 +74,7 @@ const Issue = mongoose.model(
       userId: { type: String, required: true },
       currentStatus: {
         type: String,
-        enum: ["Pending", "Resolved"],
+        enum: ["Rejected","Pending", "Resolved"],
         default: "Pending",
       },
       comment: { type: String, default: "" },
@@ -90,6 +91,7 @@ const Sos = mongoose.model(
     {
       name: { type: String, required: true, default: "" },
       email: { type: String, required: true, default: "" },
+      mobileNo: {type: String, required: true, default: ""},
       location: { type: String, trim: true, required: true, default: "" },
       verified: { type: Boolean, default: false },
       emergencyType: {
@@ -103,6 +105,7 @@ const Sos = mongoose.model(
         ],
         default: "Other",
       },
+      code: {type: String,enum:["none","red"],default: "none"}
     },
     {
       timestamps: true,
@@ -617,8 +620,11 @@ const getAllIssue = async (req, res) => {
   return res.status(200).json(allIssue);
 };
 
+const Radius = 2000;
+const SosThreshold = 10;
+let activeLocation = { location: null, count: 0 };;
 const sendSos = async (req, res) => {
-  const { name, email, location, emergencyType } = req.body;
+  const { name, email, location, emergencyType,mobileNo } = req.body;
 
   if (!name || !email) {
     return res.status(400).json({ message: "Login again" });
@@ -631,13 +637,44 @@ const sendSos = async (req, res) => {
   const newSos = await Sos.create({
     name,
     email,
+    mobileNo,
     location,
     emergencyType,
+    code: "none"
   });
 
   if (!newSos) {
     return res.status(400).json({ message: "Sos not raised" });
   }
+
+
+  const [lat, long] = location.split(",").map(Number);
+ if (activeLocation.location) {
+    // Calculate distance between active location and current location
+    const activeLatLong = activeLocation.location.split(" ").map(Number);
+    const activeLatLongObj = { lat: activeLatLong[0], lng: activeLatLong[1] };
+    const currentLatLongObj = { lat, lng: long };
+    const distance = haversine(activeLatLongObj, currentLatLongObj);
+    console.log(distance)
+
+    if (distance <= Radius) {
+      activeLocation.count += 1;
+
+      if (activeLocation.count > SosThreshold) {
+        await Sos.findByIdAndUpdate(
+          newSos._id,
+          { code: "red" },
+          { new: true }
+        );
+      }
+    } else {
+      activeLocation = { location: `${lat} ${long}`, count: 1 };
+    }
+  } else {
+    activeLocation = { location: `${lat} ${long}`, count: 1 };
+  }
+
+  console.log({ activeLocation });
 
   const io = req.app.get("io");
   io.emit("newSos", {
@@ -646,9 +683,12 @@ const sendSos = async (req, res) => {
     location: newSos.location,
     emergencyType: newSos.emergencyType,
     createdAt: newSos.createdAt,
+    code: newSos.code
   });
 
-  return res.status(200).json({ message: "Sos sent" });
+  const createdSos = await Sos.findById(newSos._id)
+  
+  return res.status(200).json({ message: "Sos sent",createdSos });
 };
 
 const getSos = async (req, res) => {
@@ -1212,6 +1252,188 @@ const getTotalCountVerifiedPosts = async (req, res) => {
   }
 };
 
+const RejectedVerifiedPosts = async(req,res) =>{
+  const {
+    title,
+    body,
+    location,
+    date,
+    type,
+    source,
+    imageUrl,
+    postId,
+    comment,
+    priority,
+  } = req.body;
+  try {
+    const response = await Issue.findByIdAndUpdate(
+      postId,
+      { currentStatus: "Rejected", comment: comment },
+      { new: true }
+    );
+
+    if (!response) {
+      return res.status(404).json({ message: "No issue found" });
+    }
+
+    res.status(201).json({ message: 'Issue rejected successfully', response });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+}
+
+//Heavy analytics dashabord
+const getAnalytics = async (req, res) => {
+  try {
+    const today = new Date();
+    const last7Days = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const last30Days = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    //trends
+    const getTrends = async (Model, matchQuery, dateField = "createdAt") => {
+      return await Model.aggregate([
+        { $match: matchQuery },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: `$${dateField}` } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]);
+    };
+
+    const overallSosLast7Days = await Sos.countDocuments({
+      createdAt: { $gte: last7Days },
+    });
+    const overallSosLast30Days = await Sos.countDocuments({
+      createdAt: { $gte: last30Days },
+    });
+    const unresolvedSosCount = await Sos.countDocuments({ resolved: false });
+
+    const overallIssuesLast7Days = await Issue.countDocuments({
+      createdAt: { $gte: last7Days },
+    });
+    const overallIssuesLast30Days = await Issue.countDocuments({
+      createdAt: { $gte: last30Days },
+    });
+    const unresolvedIssuesCount = await Issue.countDocuments({
+      resolved: false,
+    });
+
+    const sosTrendsLast30Days = await getTrends(Sos, { createdAt: { $gte: last30Days } });
+    const issueTrendsLast30Days = await getTrends(Issue, { createdAt: { $gte: last30Days } });
+
+    const avgSosResolutionTime = await Sos.aggregate([
+      { $match: { resolved: true } },
+      { $project: { resolutionTime: { $subtract: ["$updatedAt", "$createdAt"] } } },
+      { $group: { _id: null, avgResolutionTime: { $avg: "$resolutionTime" } } },
+    ]);
+
+    // Regional Analytics
+    const sosByRegion = await Sos.aggregate([
+      {
+        $group: {
+          _id: "$location",
+          totalSos: { $sum: 1 },
+          unresolvedSos: { $sum: { $cond: [{ $eq: ["$resolved", false] }, 1, 0] } },
+          last7Days: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", last7Days] }, 1, 0],
+            },
+          },
+          last30Days: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", last30Days] }, 1, 0],
+            },
+          },
+          emergencyTypeDistribution: { $push: "$emergencyType" },
+        },
+      },
+    ]);
+
+    const issuesByRegion = await Issue.aggregate([
+      {
+        $group: {
+          _id: "$location",
+          totalIssues: { $sum: 1 },
+          unresolvedIssues: { $sum: { $cond: [{ $eq: ["$resolved", false] }, 1, 0] } },
+          last7Days: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", last7Days] }, 1, 0],
+            },
+          },
+          last30Days: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", last30Days] }, 1, 0],
+            },
+          },
+          issueTypeDistribution: { $push: "$issueType" },
+        },
+      },
+    ]);
+
+    const regionalAnalytics = sosByRegion.map((sosData) => {
+      const location = sosData._id;
+      const issueData = issuesByRegion.find((issue) => issue._id === location) || {
+        totalIssues: 0,
+        unresolvedIssues: 0,
+        last7Days: 0,
+        last30Days: 0,
+        issueTypeDistribution: [],
+      };
+
+      return {
+        location,
+        sos: {
+          total: sosData.totalSos,
+          unresolved: sosData.unresolvedSos,
+          last7Days: sosData.last7Days,
+          last30Days: sosData.last30Days,
+          emergencyTypeDistribution: sosData.emergencyTypeDistribution.reduce((acc, type) => {
+            acc[type] = (acc[type] || 0) + 1;
+            return acc;
+          }, {}),
+        },
+        issues: {
+          total: issueData.totalIssues,
+          unresolved: issueData.unresolvedIssues,
+          last7Days: issueData.last7Days,
+          last30Days: issueData.last30Days,
+          issueTypeDistribution: issueData.issueTypeDistribution.reduce((acc, type) => {
+            acc[type] = (acc[type] || 0) + 1;
+            return acc;
+          }, {}),
+        },
+      };
+    });
+
+    return res.status(200).json({
+      overall: {
+        sos: {
+          totalLast7Days: overallSosLast7Days,
+          totalLast30Days: overallSosLast30Days,
+          unresolved: unresolvedSosCount,
+          trendsLast30Days: sosTrendsLast30Days,
+          avgResolutionTime: avgSosResolutionTime[0]?.avgResolutionTime || 0,
+        },
+        issues: {
+          totalLast7Days: overallIssuesLast7Days,
+          totalLast30Days: overallIssuesLast30Days,
+          unresolved: unresolvedIssuesCount,
+          trendsLast30Days: issueTrendsLast30Days,
+        },
+      },
+      regional: regionalAnalytics,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ message: "Error in getting analytics" });
+  }
+};
+
+
 //raise a req controller
 
 //routes
@@ -1247,5 +1469,7 @@ routes.route("/verify-sos").post(verifySos);
 routes.route("/send-notification").post(warningNotification);
 routes.route("/send-message").post(smsTesting);
 routes.route("/get-verified-data").get(getTotalCountVerifiedPosts);
+routes.route("/get-analytics").get(getAnalytics);
+routes.route("/reject-issue").post(RejectedVerifiedPosts);
 
 export default routes;
