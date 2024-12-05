@@ -567,7 +567,7 @@ const AddIssue = async (req, res) => {
   const elasticResponse = await axios.post(
     "http://localhost:5000/search/add-post",
     {
-      postID: newIssue._id || "",
+      post_id: newIssue._id || "",
       post_title: newIssue.title || "",
       post_body: newIssue.description || "",
       date: date || "",
