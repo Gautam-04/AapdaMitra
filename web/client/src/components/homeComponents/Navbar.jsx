@@ -1,36 +1,42 @@
 //import ndrf from "../../assets/ndrf_logo.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { Dropdown } from "react-bootstrap";
 import i18next from "i18next";
+import { useTranslation } from "react-i18next";
 function Navbar() {
   const languages = [
     { code: "en", Lang: "English" },
-    { code: "hi", Lang: "Hindi" },
+    { code: "hi", Lang: "हिन्दी" },
+    { code: "mr", Lang: "मराठी" },
+    { code: "odia", Lang: "ଓଡ଼ିଆ" },
+    { code: "bangla", Lang: "বাংলা" },
   ];
+
+  const {t} = useTranslation();
   return (
     <>
       <div className="nav">
         <div>
           <nav className="header-nav-container">
             <div className="nav-item">
-              <a href="#features">FEATURES</a>
+              <a href="#features">{t("header_nav_features")}</a>
             </div>
             <div className="nav-item">
-              <a href="#appad">APP</a>
+              <a href="#appad">{t("header_nav_app")}</a>
             </div>
             <div className="nav-item">
-              <a href="#gallery">GALLERY</a>
+              <a href="#gallery">{t("header_nav_gallery")}</a>
             </div>
             <div className="nav-item">
-              <a href="https://ndrf.gov.in">NDRF</a>
+              <a href="https://ndrf.gov.in">{t("header_nav_ndrf")}</a>
             </div>
           </nav>
         </div>
         <div className="home-nav-right">
           <Dropdown className="change-language">
             <Dropdown.Toggle id="dropdown-basic">
-              Change Language
+              {t("header_nav_changeLang")}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
@@ -45,7 +51,7 @@ function Navbar() {
             </Dropdown.Menu>
           </Dropdown>
           <Link to={"/login"}>
-            <button className="login-btn">LOGIN</button>
+            <button className="login-btn">{t("header_nav_login")}</button>
           </Link>
         </div>
       </div>

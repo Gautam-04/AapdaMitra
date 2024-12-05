@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import Hero from "../../assets/Untitled-1 1.svg";
 import MainLogo from "../../assets/main_logo.svg";
 import "./Style.css";
+import { useTranslation } from "react-i18next";
 
 const HeroSection = () => {
+  const {t} = useTranslation();
   return (
     <section className="hero-section">
       <div className="hero-content">
@@ -14,24 +16,21 @@ const HeroSection = () => {
           <h1 className="hero-title"></h1>
           <p className="hero-description">
             <br />
-            <span> {/* <h4>{"AapdaMitra"}</h4> */}</span>An integrated solution
-            designed to aid National Disaster Response Force efforts by
-            providing real-time data collection from sources like social media,
-            news websites, and crowdsourcing and actionable insights.
+            <span> {/* <h4>{"AapdaMitra"}</h4> */}</span>{t("header_hero_description")}
           </p>
           <Link to={"/login"}>
-            <button className="get-started-btn">Get Started</button>
+            <button className="get-started-btn">{t("header_home_getStarted")}</button>
           </Link>
         </div>
         <div className="hero-image-container">
-          SIH1687
+          {t("header_sih_title")}
           <img
             src={Hero}
             alt="AapdaMitra Illustration"
             className="hero-image"
             loading="lazy"
           />
-          Real-Time Disaster Information Aggregation System
+          {t("header_sih_description")}
         </div>
       </div>
     </section>

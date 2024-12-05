@@ -10,7 +10,10 @@ function Header() {
 
   const languages = [
     { code: "en", Lang: "English" },
-    { code: "hi", Lang: "Hindi" },
+    { code: "hi", Lang: "हिन्दी" },
+    { code: "mr", Lang: "मराठी" },
+    { code: "odia", Lang: "ଓଡ଼ିଆ" },
+    { code: "bangla", Lang: "বাংলা" },
   ];
 
   return (

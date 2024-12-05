@@ -7,6 +7,7 @@ import pig from "../../assets/16482627_5764323 1.png";
 import verf from "../../assets/1988196_256429-P4R90V-522 1.png";
 import dis from "../../assets/21118602_6428509 1.png";
 import "./Style.css";
+import { useTranslation } from "react-i18next";
 
 const carouselItems = [
   {
@@ -54,6 +55,8 @@ function FeatureCarousel() {
     setIndex(selectedIndex);
   };
 
+  const {t} = useTranslation();
+
   return (
     <Carousel activeIndex={index} onSelect={handleSelect} className="car">
       {carouselItems.map((item, idx) => (
@@ -63,7 +66,7 @@ function FeatureCarousel() {
               <h3>{item.title}</h3>
               <p>{item.description}</p>
               <div>
-                <h2>Learn More</h2>
+                <h2>{t("home_learn_more")}</h2>
               </div>
             </div>
             <div className="right">

@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import Mob from "../../assets/rb_3865 1.svg";
 import "./Style.css";
 const AppAd = () => {
+  const {t} = useTranslation();
   return (
     <div className="mobile-app-section" id="appad">
       <div className="app-content">
@@ -8,13 +10,12 @@ const AppAd = () => {
           <img src={Mob} alt="Mob" />
         </div>
         <div className="app-text">
-          <h2>Download our Mobile App</h2>
+          <h2>{t("home_app_title")}</h2>
           <p>
-            Disaster Preparedness at Your Fingertips Stay connected and informed
-            wherever you are with the Aapda Mitra mobile app
+            {t("home_app_desc")}
           </p>
           <button className="download-btn">
-            Download
+            {t("home_app_download")}
             <span className="download-icon">↓</span>
           </button>
         </div>
