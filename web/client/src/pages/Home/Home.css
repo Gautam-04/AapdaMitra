@@ -1,5 +1,6 @@
 .latest-news-section {
   display: flex;
+  font-family: "Inter", sans-serif;
   /* justify-content: center; */
   align-items: center;
   background-color: #ff653c;
@@ -10,7 +11,18 @@
   font-size: 14px;
 }
 
-.home-page{
-  padding:0;
-  margin:0;
+.latest-news-section marquee {
+  width: 95%;
+  display: flex;
+  gap: 2rem;
+  font-size: 1.1rem;
+  font-weight: 300 !important;
+}
+.latest-news-section marquee span {
+  margin-inline: 2rem;
+}
+
+.home-page {
+  padding: 0;
+  margin: 0;
 }

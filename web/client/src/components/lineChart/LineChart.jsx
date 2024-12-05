@@ -1,6 +1,6 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-function LineChart({ chartData }) {
+function LineChart({ chartData, title }) {
   return (
     <div className="chart-container">
       <Line
@@ -9,10 +9,18 @@ function LineChart({ chartData }) {
           plugins: {
             title: {
               display: true,
-              text: "SOS Timeline (Past 6 Hours)",
+              text: title,
             },
             legend: {
               display: false,
+            },
+          },
+          scales: {
+            y: {
+              ticks: {
+                stepSize: 1,
+              },
+              beginAtZero: true,
             },
           },
         }}

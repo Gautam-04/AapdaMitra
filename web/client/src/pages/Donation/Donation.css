@@ -1,4 +1,130 @@
 .donation-container {
-    padding: 2rem 1rem;
-    box-shadow: none !important;
+  padding: 1rem 0rem;
+  box-shadow: none !important;
+  width: 80%;
+}
+
+.fundraiser-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 1rem;
+}
+
+.fundraiser-info-container {
+  background-color: #2b3674ef;
+  width: 80%;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: "Inter", sans-serif;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-radius: 25px;
+  /* padding: 1rem; */
+}
+
+.fundraiser-info {
+  padding-left: 1rem;
+  max-width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 2rem;
+  /* justify-content: center; */
+}
+
+.fundraiser-name {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: white;
+  padding-bottom: 0.5rem;
+}
+
+.fundraiser-description,
+.fundraiser-date,
+.fundraiser-goal {
+  max-width: 700px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+}
+
+.fundraiser-description span,
+.fundraiser-date span {
+  font-weight: 300;
+  color: whitesmoke;
+}
+
+.fundraiser-goal {
+  padding-top: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.fundraiser-goal span {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: whitesmoke;
+}
+
+.fundraiser-image img {
+  width: 350px;
+  margin-right: 1.5rem;
+  border-radius: 25px;
+  border: 2px solid whitesmoke;
+}
+
+.donation-charts {
+  width: 80%;
+  height: fit-content;
+  /* min-height: 40vh; */
+  flex-wrap: wrap;
+  padding-block: 1.2rem;
+  /* background-color: salmon; */
+  display: flex;
+  gap: 1rem;
+  padding-block: 1rem;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.charts-donation-timeline {
+  position: relative;
+  background-color: white;
+  /* min-height: ; */
+  max-width: 90%;
+  max-height: 60%;
+  /* height: 100% !important; */
+  box-shadow: 2px 2px 4px var(--light-gray);
+  aspect-ratio: 16 / 9.25;
+  /* padding: 2rem; */
+  border-radius: 25px;
+  width: 55%;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid whitesmoke;
+}
+
+.charts-donation-progress {
+  background-color: white;
+  box-shadow: 2px 2px 4px var(--light-gray);
+  /* padding: 2rem; */
+  border-radius: 25px;
+  width: 40% !important;
+  min-width: 390px;
+  aspect-ratio: 5 / 4;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  max-width: 90%;
+  border: 1px solid whitesmoke;
 }

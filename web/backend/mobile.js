@@ -41,7 +41,7 @@ const AppUsers = mongoose.model(
       state: { type: String, required: true },
       gender: { type: String, required: true },
       aadharNo: { type: String, required: true },
-      fcmToken: { type: String }
+      fcmToken: { type: String },
     },
     { timestamps: true }
   )
@@ -54,7 +54,7 @@ const Issue = mongoose.model(
       photo: { type: String, default: "" },
       title: { type: String, trim: true, default: "Untitled Issue" },
       description: {
-        type: String, 
+        type: String,
         trim: true,
         default: "No description provided.",
       },
@@ -71,8 +71,12 @@ const Issue = mongoose.model(
       },
       location: { type: String, trim: true },
       userId: { type: String, required: true },
-      currentStatus: {type: String, enum: ["Pending", "Resolved"], default: "Pending"},
-      comment: {type: String, default: ""},
+      currentStatus: {
+        type: String,
+        enum: ["Pending", "Resolved"],
+        default: "Pending",
+      },
+      comment: { type: String, default: "" },
     },
     {
       timestamps: true,
@@ -317,7 +321,7 @@ async function verifyMobile(NAME, mobileNo) {
 //controllers
 //aadhar based auth controllers
 const registerAadhar = async (req, res) => {
-  const { email, name, mobileNo, aadharNo, fcmToken} = req.body;
+  const { email, name, mobileNo, aadharNo, fcmToken } = req.body;
   try {
     const isNameMatched = await verifyMobile(name, mobileNo);
     if (!isNameMatched) {
@@ -332,8 +336,8 @@ const registerAadhar = async (req, res) => {
       verified: result.verified,
     });
 
-    if(result.verified === false){
-      return res.status(400).json({message: 'Aadhar No is incorrect'})
+    if (result.verified === false) {
+      return res.status(400).json({ message: "Aadhar No is incorrect" });
     }
 
     const user = await AppUsers.create({
@@ -343,7 +347,7 @@ const registerAadhar = async (req, res) => {
       state: result?.details?.state || " ",
       gender: result?.details?.gender || " ",
       aadharNo,
-      fcmToken
+      fcmToken,
     });
 
     if (!user) {
@@ -365,7 +369,7 @@ const registerAadhar = async (req, res) => {
 };
 
 const loginAadhar = async (req, res) => {
-  const { mobileNo, fcmToken} = req.body;
+  const { mobileNo, fcmToken } = req.body;
 
   try {
     if (!mobileNo) {
@@ -525,7 +529,8 @@ const loginAadhar = async (req, res) => {
 // }
 
 const AddIssue = async (req, res) => {
-  const { photo, title, description, emergencyType, location, userId } = req.body;
+  const { photo, title, description, emergencyType, location, userId } =
+    req.body;
 
   const newIssue = await Issue.create({
     photo,
@@ -533,30 +538,32 @@ const AddIssue = async (req, res) => {
     description,
     emergencyType,
     location,
-    userId
+    userId,
   });
 
   if (!newIssue) {
     return res.status(400).json({ message: "New Issue not raised" });
   }
 
-    const date = newIssue.createdAt;
-    const formattedDate = date.toLocaleDateString("en-GB"); 
+  const date = newIssue.createdAt;
+  const formattedDate = date.toLocaleDateString("en-GB");
 
-    const data = {
-      post_title: newIssue.title || "",
-      post_body: newIssue.description || "",
-      date: formattedDate || "",
-      likes: 0,
-      retweets: 0,
-      post_image_url: "",
-      post_image_b64: newIssue.photo || "",
-      location: newIssue.location || "",
-      url: "",
-      disaster_type: newIssue.emergencyType || "",
-    };
+  const data = {
+    post_title: newIssue.title || "",
+    post_body: newIssue.description || "",
+    date: formattedDate || "",
+    likes: 0,
+    retweets: 0,
+    post_image_url: "",
+    post_image_b64: newIssue.photo || "",
+    location: newIssue.location || "",
+    url: "",
+    disaster_type: newIssue.emergencyType || "",
+  };
 
-    const elasticResponse = await axios.post("http://localhost:5000/search/add-post", {
+  const elasticResponse = await axios.post(
+    "http://localhost:5000/search/add-post",
+    {
       postID: newIssue._id || "",
       post_title: newIssue.title || "",
       post_body: newIssue.description || "",
@@ -568,30 +575,37 @@ const AddIssue = async (req, res) => {
       location: newIssue.location || "",
       url: "",
       disaster_type: newIssue.emergencyType || "",
-    });
-
-    if (!elasticResponse || elasticResponse.status !== 200) {
-      return res.status(500).json({ message: "Failed to sync data with Elasticsearch." });
     }
+  );
 
-  return res.status(200).json({ message: "Issue raised successfully",newIssue });
-};
-
-const getPersonalIssue = async(req,res) => {
-try {
-  const {userId} = req.body;
-  const personalIssues  = await Issue.findOne({userId});
-
-  if(!personalIssues){
-    return res.status(404).json({message: 'No issues found'})
+  if (!elasticResponse || elasticResponse.status !== 200) {
+    return res
+      .status(500)
+      .json({ message: "Failed to sync data with Elasticsearch." });
   }
 
-  return res.status(200).json({message: 'Your Issues Fetched',personalIssues})
-} catch (error) {
-  console.log('Error in getting personal issue', error);
-  return res.status(200).json({message: 'Error in loading data'})
-}
-}
+  return res
+    .status(200)
+    .json({ message: "Issue raised successfully", newIssue });
+};
+
+const getPersonalIssue = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const personalIssues = await Issue.find({ userId });
+
+    if (!personalIssues) {
+      return res.status(404).json({ message: "No issues found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Your Issues Fetched", personalIssues });
+  } catch (error) {
+    console.log("Error in getting personal issue", error);
+    return res.status(200).json({ message: "Error in loading data" });
+  }
+};
 
 const getAllIssue = async (req, res) => {
   const allIssue = await Issue.find({});
@@ -642,17 +656,23 @@ const getSos = async (req, res) => {
     const allSos = await Sos.find({}).lean();
 
     if (allSos.length === 0) {
-      return res.status(404).json({ message: "There are no issues to retrieve" });
+      return res
+        .status(404)
+        .json({ message: "There are no issues to retrieve" });
     }
 
     const sosWithISTTime = allSos.map((sos) => ({
       ...sos,
-      createdAt: moment(sos.createdAt).tz("Asia/Kolkata").format("YYYY-MM-DDTHH:mm:ss"),
+      createdAt: moment(sos.createdAt)
+        .tz("Asia/Kolkata")
+        .format("YYYY-MM-DDTHH:mm:ss"),
     }));
 
     return res.status(200).json(sosWithISTTime);
   } catch (err) {
-    return res.status(500).json({ message: "Server Error", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: err.message });
   }
 };
 const perHrSosCount = async (req, res) => {
@@ -832,7 +852,10 @@ const warningNotification = async (req, res) => {
         results.push({ token, status: "success", messageId: response });
       } catch (error) {
         results.push({ token, status: "failure", error: error.message });
-        console.error(`Failed to send notification to ${token}:`, error.message);
+        console.error(
+          `Failed to send notification to ${token}:`,
+          error.message
+        );
       }
     }
 
@@ -959,8 +982,6 @@ const sosAverageTurnaroundTime = async (req, res) => {
   }
 };
 
-
-
 const FAST2SMS_API_KEY = process.env.FAST2SMS_API;
 //sms function
 const sendSMS = async (message, numbers) => {
@@ -1080,10 +1101,14 @@ const addVerifiedPost = async (req, res) => {
       postId,
       priority,
     });
-    const response = await Issue.findByIdAndUpdate(postId, {currentStatus: "Resolved"}, {new: true});
+    const response = await Issue.findByIdAndUpdate(
+      postId,
+      { currentStatus: "Resolved" },
+      { new: true }
+    );
 
-    if(!response){
-      return res.status(404).json({message: 'No issue found'});
+    if (!response) {
+      return res.status(404).json({ message: "No issue found" });
     }
 
     await verified.save();
@@ -1163,24 +1188,29 @@ const updatePost = async (req, res) => {
   }
 };
 
-const getTotalCountVerifiedPosts = async(req,res) => {
-try {
-  const verifiedPostCount = await VerifiedPosts.countDocuments({_id: {$exists: true}});
+const getTotalCountVerifiedPosts = async (req, res) => {
+  try {
+    const verifiedPostCount = await VerifiedPosts.countDocuments({
+      _id: { $exists: true },
+    });
 
-  const sources = ["Twitter", "RSS", "AapdaMitra App", "Others"];
-  const sourceCount = await Promise.all(
+    const sources = ["Twitter", "RSS", "AapdaMitra App", "Others"];
+    const sourceCount = await Promise.all(
       sources.map(async (source) => {
         const count = await VerifiedPosts.countDocuments({ source });
         return { source, count };
       })
     );
-  return res.status(200).json({message: 'Total count fetched and source differene', verifiedPostCount,sourceCount})
-} catch (error) {
-  console.log("Error in getting total counts", error);
-  return res.status(500).json({message: 'Error in getting total count'})
-}
-}
-
+    return res.status(200).json({
+      message: "Total count fetched and source differene",
+      verifiedPostCount,
+      sourceCount,
+    });
+  } catch (error) {
+    console.log("Error in getting total counts", error);
+    return res.status(500).json({ message: "Error in getting total count" });
+  }
+};
 
 //raise a req controller
 
@@ -1197,7 +1227,8 @@ routes.route("/login-with-aadhar").post(loginAadhar);
 routes.route("/get-fundraisers").get(getFundraiser);
 routes.route("/add-issue").post(AddIssue);
 routes.route("/send-sos").post(sendSos);
-routes.route('/get-personal-issue').post(getPersonalIssue)
+routes.route("/get-personal-issue").post(getPersonalIssue);
+
 //verified posts
 routes.route("/add-post").post(addVerifiedPost);
 routes.route("/get-all-post").get(getVerifiedPost);
@@ -1207,7 +1238,7 @@ routes.route("/update-post").post(updatePost);
 
 //for admin routes
 routes.route("/sos-count").get(sosCounter);
-routes.route("/sos-average-time").get(sosAverageTurnaroundTime)
+routes.route("/sos-average-time").get(sosAverageTurnaroundTime);
 routes.route("/get-all-issue").get(getAllIssue);
 routes.route("/get-all-sos").get(getSos);
 routes.route("/per-hr-sos").get(perHrSosCount);
@@ -1215,6 +1246,6 @@ routes.route("/per-month-sos").get(perMonthSosCount);
 routes.route("/verify-sos").post(verifySos);
 routes.route("/send-notification").post(warningNotification);
 routes.route("/send-message").post(smsTesting);
-routes.route("/get-total-count").get(getTotalCountVerifiedPosts)
+routes.route("/get-verified-data").get(getTotalCountVerifiedPosts);
 
 export default routes;

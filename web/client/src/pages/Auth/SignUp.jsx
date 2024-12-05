@@ -57,10 +57,9 @@ function SignUp() {
     }
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/user/register",
-        { email }
-      );
+      const response = await axios.post("/api/v1/user/register", {
+        email,
+      });
       if (response.status === 200) {
         toast.success(response.data.message);
         setOtpSent(true);
@@ -93,7 +92,7 @@ function SignUp() {
         withCredentials: true,
       };
       const response = await axios.post(
-        "http://localhost:8000/api/v1/user/verifyotp",
+        "/api/v1/user/verifyotp",
         userData,
         config
       );
@@ -200,7 +199,10 @@ function SignUp() {
                   t("send_otp")
                 )}
               </button>
-              <button onClick={() => navigate("/")} className="auth_button">
+              <button
+                onClick={() => navigate("/login")}
+                className="auth_button"
+              >
                 {t("sign_in")}
               </button>
             </>

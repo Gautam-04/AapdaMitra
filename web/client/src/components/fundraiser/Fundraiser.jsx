@@ -22,6 +22,7 @@ function Fundraiser() {
     title: "",
     fullForm: "",
     description: "",
+    goal: "",
     logo: "",
   });
 
@@ -201,6 +202,20 @@ function Fundraiser() {
                   setNewFundraiser({
                     ...newFundraiser,
                     description: e.target.value,
+                  })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>{t("fundraiser_create_fund_goal")}</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter fundraiser Goal in Rs."
+                value={newFundraiser.goal}
+                onChange={(e) =>
+                  setNewFundraiser({
+                    ...newFundraiser,
+                    goal: e.target.value,
                   })
                 }
               />

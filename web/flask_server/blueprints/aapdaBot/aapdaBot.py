@@ -70,7 +70,6 @@ NDRF_EMPLOYEE_PROMPT = (
 )
 
 
-
 # GROQ's parameters
 DEFAULT_MODEL = "llama-3.1-70b-versatile"
 DEFAULT_TEMPERATURE = 0.7

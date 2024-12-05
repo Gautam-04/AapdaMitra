@@ -6,13 +6,23 @@ import pig from "../../assets/1988196_256429-P4R90V-522 1.png";
 import "./Navigator.css";
 import { Link } from "react-router-dom";
 const images = [
-  { src: verf, alt: "Search Posts", label: "Search Posts", link: "/search" },
-  { src: dashboard, alt: "Dashboard", label: "Dashboard", link: "/dashboard" },
+  {
+    src: verf,
+    alt: "Search Posts",
+    label: "Search Posts",
+    link: "/dashboard/search",
+  },
+  {
+    src: dashboard,
+    alt: "Dashboard",
+    label: "Dashboard",
+    link: "/dashboard/analytics",
+  },
   {
     src: pig,
     alt: "Donations",
     label: "Donations",
-    link: "/donations/:0",
+    link: "/dashboard/donations",
   },
 ];
 

@@ -4,9 +4,12 @@ import Header from "../../components/header/header";
 import Footer from "../../components/footer/Footer";
 import "./VerifyPosts.css";
 import EventCard from "../../components/eventCard/EventCard";
-import { Button } from "react-bootstrap";
+import { Button, Carousel } from "react-bootstrap";
 import { MdDelete } from "react-icons/md";
 import { CiLink } from "react-icons/ci";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 
 const VerifyPosts = (props) => {
   const incomingPosts = useLocation();
@@ -15,20 +18,48 @@ const VerifyPosts = (props) => {
   const [postComments, setPostComments] = useState([]);
 
   const handlePostVerify = async (post, idx) => {
-    console.log(idx, postComments[idx]);
-    if (postComments[idx]) {
-      var content = postComments[idx];
-    } else {
-      content = "This post is Verified by NDRF. \n\n AapdaMitra | NDRF Team";
-    }
-    const formData = new FormData();
-    formData.append("content", content);
-    formData.append("tweet_id", post.post_id);
+    try {
+      console.log(idx, postComments[idx]);
+      if (postComments[idx]) {
+        var content = postComments[idx];
+      } else {
+        content = "This post is Verified by NDRF. \n\n AapdaMitra | NDRF Team";
+      }
+      if (post.source === "Twitter") {
+        const formData = new FormData();
+        formData.append("content", content);
+        formData.append("tweet_id", post.post_id);
 
-    const response = await fetch("http://localhost:5000/twitter/reply", {
-      method: "POST",
-      body: formData,
-    });
+        const response = await fetch("http://localhost:5000/twitter/reply", {
+          method: "POST",
+          body: formData,
+        });
+        if (response.status === 201) {
+          toast.success("Post Verified successfully!");
+        }
+      } else if (post.source === "AapdaMitra App") {
+        const toSend = {
+          title: post.post_title,
+          body: post.post_body,
+          location: post.location,
+          date: post.date,
+          type: post.disaster_type,
+          source: post.source,
+          postId: post._id,
+          priority: "",
+        };
+
+        const response = await axios.post("/api/v1/mobile/add-post", toSend, {
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.status === 201) {
+          toast.success("Post Verified successfully!");
+        }
+      }
+    } catch (error) {
+      toast.error("Error verifying post. Try again later.");
+      console.error(error);
+    }
   };
 
   const handleTextAreaChange = (e, idx) => {
@@ -55,10 +86,20 @@ const VerifyPosts = (props) => {
     <div>
       <Header />
       <div className="verify-cards-wrapper">
-        <div className="verify-cards-container">
+        <Carousel
+          interval={null}
+          prevIcon={
+            <GrFormPreviousLink size={"50px"} color="var(--primary-color)" />
+          }
+          nextIcon={
+            <GrFormNextLink size={"50px"} color="var(--primary-color)" />
+          }
+          wrap={false}
+          className="verify-cards-container"
+        >
           {Object.values(posts).map((post, idx) => {
             return (
-              <div key={idx} className="verify-card-container">
+              <Carousel.Item key={idx} className="verify-card-container">
                 <EventCard data={post} />
                 <div className="verify-card-bottom">
                   <textarea
@@ -115,10 +156,10 @@ const VerifyPosts = (props) => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </Carousel.Item>
             );
           })}
-        </div>
+        </Carousel>
       </div>
 
       <Footer />

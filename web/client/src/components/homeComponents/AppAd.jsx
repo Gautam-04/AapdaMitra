@@ -2,7 +2,7 @@ import Mob from "../../assets/rb_3865 1.svg";
 import "./Style.css";
 const AppAd = () => {
   return (
-    <div className="mobile-app-section">
+    <div className="mobile-app-section" id="appad">
       <div className="app-content">
         <div className="app-img">
           <img src={Mob} alt="Mob" />

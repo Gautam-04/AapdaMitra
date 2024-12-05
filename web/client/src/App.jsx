@@ -16,6 +16,7 @@ import Donation from "./pages/Donation/Donation";
 import SummarizePosts from "./pages/SummarizePosts/SummarizePosts";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Search from "./components/Search/Search";
+import Navigator from "./pages/Navigator/Navigator";
 // import Fundraiser from "./pages/Fundraiser/Fundraiser";
 import { io } from "socket.io-client";
 import { useEffect } from "react";
@@ -35,17 +36,20 @@ function App() {
       {/* <Header /> */}
       {/* <CornerMenu /> */}
       <Routes>
-        <Route path="/" element={<SignIn />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/dashboard/:tab" element={<Dashboard />} />
+        <Route path="/donations/:fundraiserId" element={<Donation />} />
         <Route path="/elastic" element={<ElasticSearch />} />
-        <Route path="/event" element={<CardContainer />} />
+        {/* <Route path="/search" element={<Search />} /> */}
+        {/* <Route path="/event" element={<CardContainer />} /> */}
         <Route path="/verifyposts" element={<VerifyPosts />} />
         <Route path="/summarizeposts" element={<SummarizePosts />} />
         {/* <Route path="/fundraising" element={<Fundraiser />} /> */}
         <Route path="/donations/:fundraiserId" element={<Donation />} />
         <Route path="/dashboard/:tab" element={<Dashboard />} />
+        <Route path="/navigation" element={<Navigator />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer
