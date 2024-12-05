@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile/widgets/header.dart';
 import 'package:mobile/widgets/footer.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RaiseIssueScreen extends StatefulWidget {
   const RaiseIssueScreen({super.key});
@@ -15,6 +16,79 @@ class RaiseIssueScreen extends StatefulWidget {
   @override
   State<RaiseIssueScreen> createState() => _RaiseIssueScreenState();
 }
+
+class PageTitle extends StatelessWidget {
+    const PageTitle({Key? key}) : super(key: key);
+
+    @override
+    Widget build(BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                text: 'Raise an ',
+                style: const TextStyle(
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2B3674),
+                ),
+                children: [
+                  TextSpan(
+                    text: 'Issue',
+                    style: const TextStyle(
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFFC7753),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 3,
+              color: const Color(0xFFFC7753),
+              width: 230,
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+
+Widget _styledButtonWithBorder({
+  required String text,
+  required IconData icon,
+  required VoidCallback onPressed,
+}) {
+  return ElevatedButton.icon(
+    onPressed: onPressed,
+    icon: Icon(icon, color: const Color(0xFF2B3674)),
+    label: Text(
+      text,
+      style: const TextStyle(
+        color: Color(0xFF2B3674),
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      side: const BorderSide(color: Color(0xFF2B3674), width: 1),
+      elevation: 3,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    ),
+  );
+}
+
+
 
 class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
   final PageController _pageController = PageController();
@@ -27,6 +101,7 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
   String? _selectedCategory;
   Position? _currentPosition;
   bool _isSubmitting = false;
+  String? _userId;
 
   final List<String> _categories = [
     "Natural Disaster",
@@ -35,6 +110,20 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
     "Infrastructure",
     "Other"
   ];
+
+  Future<void> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userId = prefs.getString('userId');
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserId();
+  }
+
 
   Future<void> _pickImage(ImageSource source) async {
     final permission = source == ImageSource.camera
@@ -111,7 +200,8 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
         _title == null ||
         _description == null ||
         _selectedCategory == null ||
-        _currentPosition == null) {
+        _currentPosition == null ||
+        _userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill in all the details")),
       );
@@ -123,10 +213,8 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
     });
 
     try {
-      // final bytes = await _selectedImage!.readAsBytes();
-      // final String photoBase64 = base64Encode(bytes);
+      // Read and compress the image
       final originalBytes = await _selectedImage!.readAsBytes();
-
       final compressedBytes = await FlutterImageCompress.compressWithList(
         originalBytes,
         quality: 70,
@@ -137,12 +225,14 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
       final String location =
           "${_currentPosition!.latitude},${_currentPosition!.longitude}";
 
+      // Make API call with userId included
       final response = await ApiService.addIssue(
         photoBase64: photoBase64,
         title: _title!,
         description: _description!,
         emergencyType: _selectedCategory!,
         location: location,
+        userId: _userId!, // Pass the userId here
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -171,15 +261,18 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: isPrimary ? 158 : 146,
-        height: 34,
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.4, // Responsive width
+          minWidth: 120, // Minimum width to prevent being too small
+        ),
+        height: 45, // Fixed height
         decoration: ShapeDecoration(
           color: isPrimary ? const Color(0xFF2B3674) : Colors.transparent,
           shape: RoundedRectangleBorder(
             side: isPrimary
                 ? BorderSide.none
                 : const BorderSide(width: 1, color: Color(0xFF2B3674)),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(25),
           ),
         ),
         child: Center(
@@ -197,6 +290,8 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,151 +307,232 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                 children: [
                   const Header(),
                   const SizedBox(height: 20),
+                  const PageTitle(),
+                  const SizedBox(height: 20),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Step 1: Upload Image',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: const Icon(Icons.camera),
-                          label: const Text("Camera"),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: const Icon(Icons.photo_library),
-                          label: const Text("Gallery"),
-                        ),
-                      ],
+                    child: Text(
+                      'Step 1: Upload Image',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Color(0xFF2B3674),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Container(
-                      height: 200,
-                      width: double.infinity,
+                      padding: const EdgeInsets.all(20.0),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.blue, width: 2),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8.0,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: _selectedImage != null
-                          ? ClipRRect(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _styledButtonWithBorder(
+                                text: "Camera",
+                                icon: Icons.camera,
+                                onPressed: () => _pickImage(ImageSource.camera),
+                              ),
+                              _styledButtonWithBorder(
+                                text: "Gallery",
+                                icon: Icons.photo_library,
+                                onPressed: () => _pickImage(ImageSource.gallery),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            height: 200,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.file(
-                                _selectedImage!,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : const Center(
-                              child: Text(
-                                'No image selected',
-                                style:
-                                    TextStyle(fontSize: 16, color: Colors.blue),
-                              ),
+                              border: Border.all(color: Colors.blue, width: 2),
                             ),
+                            child: _selectedImage != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.file(
+                                      _selectedImage!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : const Center(
+                                    child: Text(
+                                      'No image selected',
+                                      style: TextStyle(fontSize: 16, color: Colors.blue),
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: _styledButton("Next", true, () => _navigateToPage(1)),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child:
-                        _styledButton("Next", true, () => _navigateToPage(1)),
                   ),
                 ],
               ),
             ),
+
             // Page 2: Title, Description, and Category
             SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Header(),
-                    const SizedBox(height: 20),
-                    const Text('Step 2: Details',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    TextField(
-                      decoration: const InputDecoration(
-                          labelText: 'Title', border: OutlineInputBorder()),
-                      onChanged: (value) => _title = value,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Header(),
+                  const SizedBox(height: 20),
+                  const PageTitle(),
+                  const SizedBox(height: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      'Step 2: Details',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Color(0xFF2B3674),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      decoration: const InputDecoration(
-                          labelText: 'Description',
-                          border: OutlineInputBorder()),
-                      onChanged: (value) => _description = value,
-                      maxLines: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(20.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8.0,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          TextField(
+                            decoration: const InputDecoration(
+                                labelText: 'Title', border: OutlineInputBorder()),
+                            onChanged: (value) => _title = value,
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            decoration: const InputDecoration(
+                                labelText: 'Description', border: OutlineInputBorder()),
+                            onChanged: (value) => _description = value,
+                            maxLines: 3,
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            decoration: const InputDecoration(
+                                labelText: "Category", border: OutlineInputBorder()),
+                            value: _selectedCategory,
+                            items: _categories
+                                .map((category) => DropdownMenuItem(
+                                    value: category, child: Text(category)))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCategory = value;
+                              });
+                            },
+                            hint: const Text("Select a Category"),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: _styledButton("Previous", false, () => _navigateToPage(0)),
+                              ),
+                              const SizedBox(width: 10),
+                              Flexible(
+                                child: _styledButton("Next", true, () => _navigateToPage(2)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                          labelText: "Category", border: OutlineInputBorder()),
-                      value: _selectedCategory,
-                      items: _categories
-                          .map((category) => DropdownMenuItem(
-                              value: category, child: Text(category)))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategory = value;
-                        });
-                      },
-                      hint: const Text("Select a Category"),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _styledButton(
-                            "Previous", false, () => _navigateToPage(0)),
-                        _styledButton("Next", true, () => _navigateToPage(2)),
-                      ],
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+
+           SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Header(),
+            const SizedBox(height: 20),
+            const PageTitle(),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Step 3: Location & Submit',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Color(0xFF2B3674),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            // Page 3: Location and Submit
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8.0,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Header(),
-                    const SizedBox(height: 20),
-                    const Text('Step 3: Location & Submit',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
+                    _styledButtonWithBorder(
+                      text: "Get Current Location",
+                      icon: Icons.location_on,
                       onPressed: _locateUser,
-                      icon: const Icon(Icons.location_on),
-                      label: const Text("Get Current Location"),
                     ),
                     const SizedBox(height: 20),
                     if (_currentPosition != null)
                       Text(
                         "Location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}",
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF2B3674), // Styled location text
+                        ),
                       ),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _styledButton(
-                            "Previous", false, () => _navigateToPage(1)),
+                        _styledButton("Previous", false, () => _navigateToPage(1)),
                         _styledButton(
                           "Submit",
                           true,
@@ -368,6 +544,10 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+
           ],
         ),
       ),

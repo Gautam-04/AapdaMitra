@@ -48,8 +48,9 @@ class _ManualsScreenState extends State<ManualsScreen> {
                     const Text(
                       'Manuals',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 28, // Increased font size
                         fontWeight: FontWeight.bold,
+                        color: Color(0xFF2B3674), // Updated color to #2B3674
                       ),
                     ),
                     const SizedBox(height: 16.0),
@@ -59,8 +60,7 @@ class _ManualsScreenState extends State<ManualsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const CPRManualPage(),
+                            builder: (context) => const CPRManualPage(),
                           ),
                         );
                       },
@@ -93,8 +93,7 @@ class _ManualsScreenState extends State<ManualsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const FloodManualPage(),
+                            builder: (context) => const FloodManualPage(),
                           ),
                         );
                       },
@@ -126,23 +125,31 @@ class ManualButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.white,
-          elevation: 4,
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          foregroundColor: const Color(0xFF2B3674), // Text color set to #2B3674
+          backgroundColor: Colors.white, // Button background color set to white
+          elevation: 10, // Darker shadow with more depth
+          padding: const EdgeInsets.symmetric(vertical: 16.0), // Vertical padding for button
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(25.0), // Border radius set to 25
           ),
+          shadowColor: Colors.black.withOpacity(0.3), // Darker shadow color
         ),
         onPressed: onTap,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0), // Add padding to the left of the text
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20.0, // Increased font size
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2B3674), // Text color set to #2B3674
+                ),
+              ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16.0),
+            const Icon(Icons.arrow_forward_ios, size: 20.0, color: Color(0xFF2B3674)), // Icon color set to #2B3674
           ],
         ),
       ),
@@ -150,7 +157,7 @@ class ManualButton extends StatelessWidget {
   }
 }
 
-// Fire Extinguisher Manual Page
+
 class FireExtinguisherManualPage extends StatelessWidget {
   const FireExtinguisherManualPage({Key? key}) : super(key: key);
 
@@ -181,7 +188,7 @@ class FireExtinguisherManualPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
+                        borderRadius: BorderRadius.circular(25.0),
                       ),
                       elevation: 4,
                       child: Padding(
@@ -193,6 +200,30 @@ class FireExtinguisherManualPage extends StatelessWidget {
                       ),
                     );
                   },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Go back to the previous screen
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+                child: const Text(
+                  'Look at Other Manuals',
+                  style: TextStyle(
+                    color: Color(0xFF2B3674),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18, // Increased text size
+                  ),
                 ),
               ),
             ),
@@ -214,7 +245,6 @@ class FireExtinguisherManualPage extends StatelessWidget {
   }
 }
 
-// Earthquake Manual Page
 class EarthquakeManualPage extends StatelessWidget {
   const EarthquakeManualPage({Key? key}) : super(key: key);
 
@@ -247,7 +277,7 @@ class EarthquakeManualPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
+                        borderRadius: BorderRadius.circular(25.0),
                       ),
                       elevation: 4,
                       child: Padding(
@@ -259,6 +289,30 @@ class EarthquakeManualPage extends StatelessWidget {
                       ),
                     );
                   },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+                child: const Text(
+                  'Look at Other Manuals',
+                  style: TextStyle(
+                    color: Color(0xFF2B3674),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
@@ -280,7 +334,6 @@ class EarthquakeManualPage extends StatelessWidget {
   }
 }
 
-// Flood Manual Page
 class FloodManualPage extends StatelessWidget {
   const FloodManualPage({Key? key}) : super(key: key);
 
@@ -312,7 +365,7 @@ class FloodManualPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
+                        borderRadius: BorderRadius.circular(25.0),
                       ),
                       elevation: 4,
                       child: Padding(
@@ -324,6 +377,30 @@ class FloodManualPage extends StatelessWidget {
                       ),
                     );
                   },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+                child: const Text(
+                  'Look at Other Manuals',
+                  style: TextStyle(
+                    color: Color(0xFF2B3674),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
@@ -345,7 +422,6 @@ class FloodManualPage extends StatelessWidget {
   }
 }
 
-// CPR Manual Page
 class CPRManualPage extends StatelessWidget {
   const CPRManualPage({Key? key}) : super(key: key);
 
@@ -377,7 +453,7 @@ class CPRManualPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
+                        borderRadius: BorderRadius.circular(25.0),
                       ),
                       elevation: 4,
                       child: Padding(
@@ -389,6 +465,30 @@ class CPRManualPage extends StatelessWidget {
                       ),
                     );
                   },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+                child: const Text(
+                  'Look at Other Manuals',
+                  style: TextStyle(
+                    color: Color(0xFF2B3674),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
