@@ -26,7 +26,7 @@ import userRoutes from './routes/user.routes.js'
 import ndrfRoutes from './ndrfUser.js'
 import donationRoutes from './routes/donation.routes.js'
 import mobileRoutes from './mobile.js'
-import adminMobileRoutes from './routes/adminMobile.routes.js'
+import adminMobileRoutes from './mobileadmin.js'
 
 app.use("/v1/user",userRoutes)
 app.use("/v1/ndrfuser",ndrfRoutes)

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Router from 'express';
 import Twilio from "twilio";
+import jwt from "jsonwebtoken";
 
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -14,14 +15,23 @@ function generateToken(id) {
 }
 
 
-const mobileAdmin = await mongoose.Model(new mongoose.Schema({
+const mobileAdmin = await mongoose.model("MobileAdmin", new mongoose.Schema({
     name: {type: String},
     mobileNo: {type: String, required: true},
     fcmToken: {type: String, required: true},
-    type: {type: String,enum: "admin", default: "admin"},
+    type: {type: String,enum: ["admin"], default: "admin"},
 },{timestamps:true}));
 
-const adminIssue = await mongoose.Model(new mongoose.Schema({},{timestamps:true}));
+const adminIssue = await mongoose.model("adminIssue",new mongoose.Schema({
+    photo: { type: String, default: "" },
+    title: { type: String, trim: true, default: "Untitled Issue" },
+    description: {
+        type: String,
+        trim: true,
+        default: "No description provided.",
+      },
+    userId: { type: String, required: true },
+},{timestamps:true}));
 
 //sms
 const sendSMS = async (message, number) => {
@@ -125,6 +135,16 @@ const verifyLoggedInUser = async (req, res) => {
   }
 };
 
+const adminPostIssues = async (req, res) => {
+  try {
+    const { photo ,title, description, userId } = req.body;
+    return res.status(200).json(issues);
+  } catch (error) {
+    console.error("Error fetching issues:", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
 
 
 
@@ -132,7 +152,7 @@ const router = Router();
 
 ///v1/adminmobile prefix
 router.route('/login').post(adminLogin)
-routes.route('/login-admin').post(verifyLoggedInUser)
+router.route('/login-admin').post(verifyLoggedInUser)
 
 export default(router);
 
