@@ -371,9 +371,10 @@ def removePost():
         objId = request.form.get("objId", "")
         if objId:
             response = es.delete(index=INDEX_NAME, id=objId)
+            print(response)
         else:
             response = {"error": "No objId in form"}
-        return response
+        return {"success": json.dumps(response)}
     except Exception as e:
         print(e)
         return {"error": "Something went wrong"}

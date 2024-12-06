@@ -50,7 +50,7 @@
 .verify-card-container textarea {
   width: 60%;
   font-family: "Inter", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 11px;
   border: 1px solid var(--primary-color-light);
   height: 200px;
@@ -119,5 +119,49 @@
 }
 
 .remove:hover svg {
+  color: white !important;
+}
+
+#verify-card-dropdown {
+  font-family: "Inter", sans-serif;
+  background-color: white;
+  color: var(--primary-color);
+  font-weight: 600;
+  padding-block: 0.5rem;
+  border: 1px solid red;
+}
+
+#verify-card-dropdown svg {
+  transition: color 0.2s ease-in-out;
+}
+
+#verify-card-dropdown:hover {
+  background-color: var(--warning-red);
+  border: 1px solid transparent;
+  color: white;
+}
+
+#verify-card-dropdown:hover svg {
+  color: white !important;
+}
+
+.verify-card-remove-dropdown .dropdown-item:active {
+  background-color: var(--primary-color) !important;
+}
+
+.verify-card-remove-dropdown .dropdown-item {
+  transition: color 0.2s ease-in-out;
+}
+
+.verify-card-remove-dropdown .dropdown-item svg {
+  transition: color 0.2s ease-in-out;
+}
+
+.verify-card-remove-dropdown .dropdown-item:hover {
+  background-color: var(--warning-red);
+  color: white;
+}
+
+.verify-card-remove-dropdown .dropdown-item:hover svg {
   color: white !important;
 }

@@ -4,7 +4,7 @@ import Header from "../../components/header/header";
 import Footer from "../../components/footer/Footer";
 import "./VerifyPosts.css";
 import EventCard from "../../components/eventCard/EventCard";
-import { Button, Carousel } from "react-bootstrap";
+import { Button, Carousel, Dropdown, Form } from "react-bootstrap";
 import { MdDelete } from "react-icons/md";
 import { CiLink } from "react-icons/ci";
 import axios from "axios";
@@ -34,8 +34,8 @@ const VerifyPosts = (props) => {
           method: "POST",
           body: formData,
         });
-        if (response.status === 201) {
-          toast.success("Post Verified successfully!");
+        if (response.status === 200) {
+          toast.success("Comment added on post successfully!");
         }
       } else if (post.source === "AapdaMitra App") {
         const toSend = {
@@ -45,13 +45,17 @@ const VerifyPosts = (props) => {
           date: post.date,
           type: post.disaster_type,
           source: post.source,
-          postId: post._id,
+          postId: post.post_id,
           priority: "",
         };
 
-        const response = await axios.post("/api/v1/mobile/add-post", toSend, {
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await axios.post(
+          "http://localhost:8000/v1/mobile/add-post",
+          toSend,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         if (response.status === 201) {
           toast.success("Post Verified successfully!");
         }
@@ -66,12 +70,38 @@ const VerifyPosts = (props) => {
     var temp = postComments;
     temp[idx] = e.target.value;
     setPostComments(temp);
-    console.log(postComments);
+    // console.log(postComments);
+  };
+  const handleTemplateChange = (e, idx) => {
+    var temp = postComments;
+    temp[idx] = e.target.value;
+    setPostComments(temp);
+    // console.log(postComments);
   };
 
-  const handlePostRemove = (post, idx) => {
+  const handlePostRemoveSelection = (post, idx) => {
     console.log(idx);
     setPosts((prevPosts) => prevPosts.filter((e) => e !== post));
+  };
+
+  const handlePostRemoveDatabase = async (post, idx) => {
+    console.log(idx);
+    try {
+      const formData = new FormData();
+      formData.append("objId", post.objId);
+
+      const response = await fetch("http://localhost:5000/search/remove-post", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.status === 200) {
+        toast.success("Post removed from database!");
+        setPosts((prevPosts) => prevPosts.filter((e) => e !== post));
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Try again later.");
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -102,16 +132,47 @@ const VerifyPosts = (props) => {
               <Carousel.Item key={idx} className="verify-card-container">
                 <EventCard data={post} />
                 <div className="verify-card-bottom">
+                  {/* <Form>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Message Description</Form.Label>
+                      <Form.Select
+                        // value={postComments[idx].template}
+                        onChange={(e) => handleTemplateChange(e, idx)}
+                      >
+                        <option defaultValue disabled>
+                          Select Template
+                        </option>
+                        <option value="sms">SMS</option>
+                        <option value="push">
+                          Push Notification (through App)
+                        </option>
+                      </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Broadcast Description</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        placeholder="Enter Comment."
+                        value={postComments[idx]}
+                        defaultValue={
+                          "This post is Verified By NDRF.\n\n AapdaMitra | NDRF Team"
+                        }
+                        onChange={(e) => handleTextAreaChange(e, idx)}
+                      />
+                    </Form.Group>
+                  </Form> */}
                   <textarea
                     name=""
                     id=""
                     defaultValue={
                       "This post is Verified By NDRF.\n\n AapdaMitra | NDRF Team"
                     }
+                    value={postComments[idx]}
                     onChange={(e) => handleTextAreaChange(e, idx)}
                   ></textarea>
                   <div className="verify-card-buttons">
-                    <Button
+                    {/* <Button
                       className="verify-card-button remove"
                       onClick={() => handlePostRemove(post, idx)}
                     >
@@ -124,8 +185,50 @@ const VerifyPosts = (props) => {
                           marginBottom: "2px",
                         }}
                       />
-                    </Button>
-                    {post.id && post.username && (
+                    </Button> */}
+                    <Dropdown className="verify-card-remove-dropdown">
+                      <Dropdown.Toggle id="verify-card-dropdown">
+                        Remove Post{" "}
+                        <MdDelete
+                          size={"25px"}
+                          style={{
+                            color: "var(--warning-red)",
+                            marginInline: "5px",
+                            marginBottom: "2px",
+                          }}
+                        />
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          onClick={() => handlePostRemoveSelection(post, idx)}
+                        >
+                          Remove from Selection{" "}
+                          <MdDelete
+                            size={"25px"}
+                            style={{
+                              color: "var(--warning-red)",
+                              marginInline: "5px",
+                              marginBottom: "2px",
+                            }}
+                          />
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handlePostRemoveDatabase(post, idx)}
+                        >
+                          Remove from Database{" "}
+                          <MdDelete
+                            size={"25px"}
+                            style={{
+                              color: "var(--warning-red)",
+                              marginInline: "5px",
+                              marginBottom: "2px",
+                            }}
+                          />
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {post.source === "Twitter" && (
                       <Link
                         className="verify-card-button open"
                         style={{ textDecoration: "None" }}
@@ -133,8 +236,9 @@ const VerifyPosts = (props) => {
                           "https://twitter.com/" +
                           post.username +
                           "/status/" +
-                          post.id
+                          post.post_id
                         }
+                        target="_blank"
                       >
                         Open Tweet
                         <CiLink
