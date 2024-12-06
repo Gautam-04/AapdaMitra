@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mobile/screens/chatbot_screen.dart';
 import 'package:mobile/screens/donation_screen.dart';
 import 'package:mobile/screens/raiseIssue_screen.dart';
-import 'package:mobile/widgets/header.dart';
-import 'package:mobile/widgets/footer.dart';
 import 'package:mobile/screens/verifiedPost_screen.dart';
 import 'package:mobile/screens/sos_screen.dart';
 import 'package:mobile/screens/manuals_screen.dart';
-
+import 'package:mobile/widgets/header.dart';
+import 'package:mobile/widgets/footer.dart';
+import 'package:mobile/services/api_service.dart';
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,18 +21,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   String _userName = '';
   String _location = 'Mumbai';
-
-  final List<Map<String, String>> verifiedPosts = [
-    {"title": "Flash Floods Chennai", "date": "20 Sept, 2024"},
-    {"title": "Earthquake Delhi", "date": "15 Sept, 2024"},
-    {"title": "Cyclone Odisha", "date": "10 Sept, 2024"},
-    {"title": "Wildfires California", "date": "5 Sept, 2024"},
-  ];
+  bool isLoading = true;
+  List<Map<String, dynamic>> verifiedPosts = [];
 
   @override
   void initState() {
     super.initState();
     _loadUserName();
+    _fetchVerifiedPosts();
   }
 
   Future<void> _loadUserName() async {
@@ -40,6 +36,25 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _userName = prefs.getString('userName') ?? 'User';
     });
+  }
+
+  Future<void> _fetchVerifiedPosts() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final fetchedPosts = await ApiService.fetchVerifiedPosts();
+      setState(() {
+        verifiedPosts = fetchedPosts;
+      });
+    } catch (error) {
+      debugPrint('Error fetching verified posts: $error');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _navigateTo(int index) {
@@ -89,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      'Hi, $_userName\n📍 $_location',
+                      'Hi,\n$_userName',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -108,21 +123,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'Verified Posts',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
+                        color: Color(0xFF2B3674),
                         decoration: TextDecoration.underline,
+                        decorationColor: Color(0xFFFC7753),
                       ),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  _VerifiedPostsSection(verifiedPosts: verifiedPosts),
+                  _VerifiedPostsSection(
+                    verifiedPosts: verifiedPosts,
+                    isLoading: isLoading,
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
-      //floatingActionButton: const _ChatbotButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: Footer(
         currentIndex: _currentIndex,
@@ -131,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
 class _IssuesRaisedButton extends StatelessWidget {
   const _IssuesRaisedButton();
 
@@ -142,15 +160,19 @@ class _IssuesRaisedButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color(0xFF2B3674),
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(25),
           ),
         ),
         child: const Text(
-          '02 Issues raised around you',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          'Issues raised by you',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -176,15 +198,18 @@ class _ActionButtons extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                side: const BorderSide(color: Colors.blue),
+                side: const BorderSide(color: Color(0xFF2B3674)),
                 minimumSize: const Size(0, 50),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(25),
                 ),
               ),
               child: const Text(
                 'Manual',
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(
+                  color: Color(0xFF2B3674),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -201,15 +226,18 @@ class _ActionButtons extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                side: const BorderSide(color: Colors.blue),
+                side: const BorderSide(color: Color(0xFF2B3674)),
                 minimumSize: const Size(0, 50),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(25),
                 ),
               ),
               child: const Text(
                 'Raise an Issue',
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(
+                  color: Color(0xFF2B3674),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -238,15 +266,18 @@ class _SOSAndDonationButtons extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                side: const BorderSide(color: Colors.blue),
+                side: const BorderSide(color: Color(0xFF2B3674)),
                 minimumSize: const Size(0, 50),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(25),
                 ),
               ),
               child: const Text(
                 'Donation',
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(
+                  color: Color(0xFF2B3674),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -260,15 +291,18 @@ class _SOSAndDonationButtons extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: const Color(0xFFFF3600),
                 minimumSize: const Size(0, 50),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(25),
                 ),
               ),
               child: const Text(
                 'SOS',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -279,126 +313,140 @@ class _SOSAndDonationButtons extends StatelessWidget {
 }
 
 class _VerifiedPostsSection extends StatelessWidget {
-  final List<Map<String, String>> verifiedPosts;
+  final List<Map<String, dynamic>> verifiedPosts;
+  final bool isLoading;
 
-  const _VerifiedPostsSection({required this.verifiedPosts});
+  const _VerifiedPostsSection({
+    required this.verifiedPosts,
+    required this.isLoading,
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    final isMoreThanThree = verifiedPosts.length > 3;
-    final visiblePosts = isMoreThanThree ? verifiedPosts.sublist(0, 3) : verifiedPosts;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 200,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: visiblePosts.length,
-            itemBuilder: (context, index) {
-              final post = visiblePosts[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VerifiedPostsScreen(posts: verifiedPosts),
-                    ),
-                  );
-                },
-                child: VerifiedPostCard(post: post),
-              );
-            },
-          ),
-        ),
-        if (isMoreThanThree)
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => VerifiedPostsScreen(posts: verifiedPosts),
-                  ),
-                );
-              },
-              child: const Text(
-                'View More',
-                style: TextStyle(fontSize: 16),
+@override
+Widget build(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+    child: Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF2B3674),
+        borderRadius: BorderRadius.circular(25),
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
               ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class VerifiedPostCard extends StatelessWidget {
-  final Map<String, String> post;
-
-  const VerifiedPostCard({required this.post});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0),
-      child: SizedBox(
-        width: 300,
-        child: Card(
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+            )
+          : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  post['title']!,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                SizedBox(
+                  height: 250,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: verifiedPosts.length > 3 ? 3 : verifiedPosts.length,
+                    itemBuilder: (context, index) {
+                      final post = verifiedPosts[index];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        width: 300,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 300,
+                              height: 180,
+                              margin: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: const Color(0xFFF0F0F0),
+                              ),
+                              child: post['image'] != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(15),
+                                      child: Image.memory(
+                                        base64Decode(post['image']),
+                                        width: 250,
+                                        height: 180,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'No Image Available',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                              child: Text(
+                                post['source'] ?? 'Unknown Source',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  post['date']!,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Icon(Icons.share, size: 18),
-                    const SizedBox(width: 8),
-                    Icon(Icons.bookmark_outline, size: 18),
-                  ],
-                ),
+                const SizedBox(height: 10),
+                if (verifiedPosts.length > 3)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const VerifiedPostsScreen(posts: []),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF2B3674),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: const Text('View More'),
+                      ),
+                    ],
+                  ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
+    ),
+  );
 }
-
-// class _ChatbotButton extends StatelessWidget {
-//   const _ChatbotButton();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return FloatingActionButton(
-//       backgroundColor: Colors.blue,
-//       child: const Icon(Icons.chat),
-//       onPressed: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => ChatbotPage()),
-//         );
-//       },
-//     );
-//   }
-// }
+}

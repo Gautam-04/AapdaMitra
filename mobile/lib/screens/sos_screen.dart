@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/widgets/header.dart';
 import 'package:mobile/widgets/footer.dart';
-import 'package:mobile/services/api_service.dart'; // Import ApiService
+import 'package:mobile/services/api_service.dart';
 
 class SOSScreen extends StatefulWidget {
   const SOSScreen({super.key});
@@ -15,7 +15,7 @@ class SOSScreen extends StatefulWidget {
 
 class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMixin {
   bool _isEmergencySelected = false;
-  String _selectedEmergencyType = '';
+  String _selectedEmergencyType = 'Other'; // Default emergency type is "Other"
   String? _currentLocation;
   int _sosButtonClickCount = 0;
   late AnimationController _animationController;
@@ -76,20 +76,18 @@ class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMix
     }
   }
 
-  void _submitEmergency() async {
-    // Fetch location before submitting the SOS
+  Future<void> _submitEmergency() async {
     if (_currentLocation == null) {
       await _fetchLocation();
     }
 
     try {
-      // Retrieve stored user details
       final prefs = await SharedPreferences.getInstance();
       final String? name = prefs.getString('userName');
       final String? email = prefs.getString('userEmail');
+      final String? mobileNumber = prefs.getString('userPhoneNumber'); // Ensure correct key
 
-      // Check if name and email are available
-      if (name == null || email == null) {
+      if (name == null || email == null || mobileNumber == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User details not found. Please log in again.')),
         );
@@ -101,13 +99,13 @@ class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMix
         email: email,
         location: _currentLocation ?? 'Unknown Location',
         emergencyType: _selectedEmergencyType,
+        mobileNumber: mobileNumber,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('SOS sent successfully: ${response['message']}')),
       );
 
-      // Reset SOS UI
       _cancelSOS();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -168,7 +166,7 @@ class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMix
                             setState(() {
                               _selectedEmergencyType = tempSelectedType!;
                               _isEmergencySelected = true;
-                              _submitEmergency(); // Send SOS when submitting emergency
+                              _submitEmergency();
                             });
                           }
                         : null,
@@ -196,7 +194,7 @@ class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMix
   void _cancelSOS() {
     setState(() {
       _isEmergencySelected = false;
-      _selectedEmergencyType = '';
+      _selectedEmergencyType = 'Other';
       _currentLocation = null;
       _sosButtonClickCount = 0;
       _animationController.reset();
@@ -210,9 +208,9 @@ class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMix
 
       if (_sosButtonClickCount >= 5) {
         _isEmergencySelected = true;
-        _selectedEmergencyType = 'SOS Triggered';
-        _submitEmergency(); // Send SOS automatically
-        _animationController.forward(); // Start blinking animation
+        _selectedEmergencyType = 'Other'; // Default emergency type for auto-trigger
+        _submitEmergency();
+        _animationController.forward();
       } else if (!_isEmergencySelected) {
         _showEmergencyDropdown();
       }
