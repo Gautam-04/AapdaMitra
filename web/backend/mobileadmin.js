@@ -135,10 +135,15 @@ const verifyLoggedInUser = async (req, res) => {
   }
 };
 
-const adminPostIssues = async (req, res) => {
+const addAdminPostIssues = async (req, res) => {
   try {
     const { photo ,title, description, userId } = req.body;
-    return res.status(200).json(issues);
+    const createdIssue = await adminIssue.create({ photo, title, description, userId });
+    if(!createdIssue){
+      return res.status(400).json({ message: "Issue not created." });
+    }
+
+    return res.status(200).json({ message: "Issue created successfully.", createdIssue });
   } catch (error) {
     console.error("Error fetching issues:", error);
     return res.status(500).json({ message: "Server Error" });
@@ -148,11 +153,14 @@ const adminPostIssues = async (req, res) => {
 
 
 
+
+
 const router = Router();
 
 ///v1/adminmobile prefix
 router.route('/login').post(adminLogin)
 router.route('/login-admin').post(verifyLoggedInUser)
+router.route('/admin-add-issue').post(addAdminPostIssues)
 
 export default(router);
 
