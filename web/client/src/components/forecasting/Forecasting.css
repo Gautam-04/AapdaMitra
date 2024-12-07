@@ -1,0 +1,35 @@
+.forecasting-wrapper {
+  background: whitesmoke;
+}
+
+.forecasting {
+  height: 92vh;
+}
+
+.forecasting-map-popup {
+  font-family: "Inter", sans-serif;
+  /* background-color: blue; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.forecasting-map-popup-stat span {
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.forecasting-map-popup-stat {
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  min-width: 125px;
+  height: 75px;
+  display: flex;
+  flex-direction: column;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+  text-align: center;
+}
