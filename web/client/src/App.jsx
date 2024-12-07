@@ -21,7 +21,6 @@ import Navigator from "./pages/Navigator/Navigator";
 import { io } from "socket.io-client";
 import { useEffect } from "react";
 import CornerMenu from "./components/cornerMenu/CornerMenu";
-import WindyMap from "./components/windyMap/windyMap";
 
 function App() {
   const navigate = useNavigate();
@@ -51,7 +50,6 @@ function App() {
         <Route path="/donations/:fundraiserId" element={<Donation />} />
         <Route path="/dashboard/:tab" element={<Dashboard />} />
         <Route path="/navigation" element={<Navigator />} />
-        <Route path="/windy" element={<WindyMap />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer

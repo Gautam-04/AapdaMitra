@@ -36,12 +36,12 @@ const Forecasting = () => {
 
   return (
     <div className="forecasting-wrapper">
-      <Form.Select style={{ maxWidth: "30%" }}>
+      {/* <Form.Select style={{ maxWidth: "30%" }}>
         <option>Floods districtwise (1969 to 2019)</option>
         <option>Earthquake districtwise (1969 to 2019)</option>
         <option>Snowfall districtwise (1969 to 2019)</option>
         <option>Heatwave districtwise (1969 to 2019)</option>
-      </Form.Select>
+      </Form.Select> */}
       <div className="map-wrapper forecasting">
         <MapContainer center={[23, 80]} zoom={5} scrollWheelZoom={false}>
           <TileLayer
