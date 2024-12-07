@@ -25,6 +25,12 @@ app.set('io', io);
 io.on('connection',(socket)=>{
     console.log(`A user is connected: ` ,socket.id)
 
+    socket.on('updateLocation', (data)=>{
+        console.log("Received location update:", data);
+        console.log(`Location updated: `, data)
+        io.emit('locationUpdate', data)
+    })
+
     socket.on('disconnect', ()=>{
         console.log(`A user is disconnected: `, socket.id)
     })

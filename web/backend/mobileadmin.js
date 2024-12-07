@@ -150,6 +150,21 @@ const addAdminPostIssues = async (req, res) => {
   }
 };
 
+const getAdminLiveLocation = async(req,res) => {
+const {location, userId} = req.body;
+try {
+  const io = req.app.get("io");
+  io.emit("liveLocation", { location, userId });
+
+  console.log("Live location sent successfully.",location,userId);
+
+  return res.status(200).json({ message: "Live location is being sent successfully." });
+} catch (error) {
+  console.log('Error in fetching live location:', error);
+  return res.status(500).json({ message: "Server Error" });
+}
+}
+
 
 
 
@@ -161,6 +176,7 @@ const router = Router();
 router.route('/login').post(adminLogin)
 router.route('/login-admin').post(verifyLoggedInUser)
 router.route('/admin-add-issue').post(addAdminPostIssues)
+router.route('/get-admin-live-location').get(getAdminLiveLocation);
 
 export default(router);
 
