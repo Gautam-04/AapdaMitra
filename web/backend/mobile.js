@@ -94,6 +94,11 @@ const Sos = mongoose.model(
       mobileNo: {type: String, required: true, default: ""},
       location: { type: String, trim: true, required: true, default: "" },
       verified: { type: Boolean, default: false },
+      state: {type: String,trim: ""},
+      address: {type: String,trim: ""},
+      city: {type: String,trim: ""},
+      district: {type: String,trim: ""},
+      postcode: {type: String,trim: ""},
       emergencyType: {
         type: String,
         enum: [
@@ -181,6 +186,79 @@ const CONFIG = {
   MAX_ATTEMPTS: 10,
   RETRY_DELAY: 5000,
 };
+
+
+async function reverseGeolocation(latitude,longitude){
+  const config = {
+    POST_API_URL:
+      "https://eve.idfy.com/v3/tasks/async/generate/reverse_geocode", // POST req costs 3 creds
+    GET_API_URL: "https://eve.idfy.com/v3/tasks", // GET doesn't cost but requires req_id from POST
+    task_id: "74f4c926-250c-43ca-9c53-453e87ceacd1",
+    group_id: "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
+    MAX_ATTEMPTS: 10, // Maximum attempts to poll the GET API
+    POLLING_INTERVAL: 3000, // 3 seconds between attempts
+  };
+
+  try {
+    const axiosInstance = axios.create({
+      headers: {
+        "api-key": process.env.API_KEY,
+        "account-id": process.env.ACC_ID,
+        "Content-Type": "application/json",
+      },
+      timeout: 30000,
+    });
+    // Step 1: POST request to initiate reverse geocoding
+    const postResponse = await axiosInstance.post(config.POST_API_URL, {
+      task_id: config.task_id,
+      group_id: config.group_id,
+      data: { "latitude": latitude.trim(), "longitude": longitude.trim() }
+    });
+
+    if (!postResponse.data || !postResponse.data.request_id) {
+      console.error("No request ID returned from POST API.");
+      return null;
+    }
+
+    const requestId = postResponse.data.request_id;
+
+//    Step 2: Poll the GET API until the status is 'completed' or max attempts are reached
+    for (let attempt = 0; attempt < config.MAX_ATTEMPTS; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, config.POLLING_INTERVAL));
+
+      const getResponse = await axiosInstance.get(`${config.GET_API_URL}?request_id=${requestId}`);
+      const getResponseData = getResponse.data[0];
+
+      if (getResponseData && getResponseData.status === "completed") {
+        const result = getResponseData.result?.source_output;
+        if (result?.status === "location_found") {
+          // Step 3: Extract required fields
+          const formatted_address  = result.formatted_address;
+
+          return {
+            state: formatted_address?.state || "N/A",
+            city: formatted_address?.city || "N/A",
+            address: result?.address || "N/A",
+            district: formatted_address?.state_district || "N/A",
+            postcode: formatted_address?.postcode || "N/A", // Optional if API supports postcode
+          };
+        } else {
+          console.error("Location not found in response.");
+          return null;
+        }
+      } else if (getResponseData.status === "failed") {
+        console.error("Reverse geolocation task failed.");
+        return null;
+      }
+    }
+
+    console.error("Max polling attempts reached without result.");
+    return "";
+} catch (error) {
+    console.error("Error in reverseGeolocation:", error.message);
+    return "";
+  }
+}
 
 //aadhar app logics
 async function verifyAadhaar(aadharNo) {
@@ -622,7 +700,7 @@ const getAllIssue = async (req, res) => {
 
 const Radius = 2000;
 const SosThreshold = 10;
-let activeLocation = { location: null, count: 0 };;
+let activeLocation = { location: null, count: 0 };
 const sendSos = async (req, res) => {
   const { name, email, location, emergencyType,mobileNo } = req.body;
 
@@ -634,19 +712,35 @@ const sendSos = async (req, res) => {
     return res.status(400).json({ message: "Give location permission" });
   }
 
+  const [latStr, longStr] = location.split(",");
+  const response = await reverseGeolocation(latStr,longStr)
+
+  // Check if an SOS exists with the same mobileNo
+  const existingSos = await Sos.findOne({ mobileNo });
+
+  if (existingSos) {
+    // Delete the existing SOS
+    await Sos.findByIdAndDelete(existingSos._id);
+    console.log(`Deleted existing SOS with ID: ${existingSos._id}`);
+  }
+
   const newSos = await Sos.create({
     name,
     email,
     mobileNo,
     location,
     emergencyType,
-    code: "none"
+    code: "none",
+    state: response.state ,
+    address: response.address ,
+    city: response.city ,
+    district:response.district, 
+    postcode: response.postcode,
   });
 
   if (!newSos) {
     return res.status(400).json({ message: "Sos not raised" });
   }
-
 
   const [lat, long] = location.split(",").map(Number);
  if (activeLocation.location) {
@@ -674,7 +768,6 @@ const sendSos = async (req, res) => {
     activeLocation = { location: `${lat} ${long}`, count: 1 };
   }
 
-  console.log({ activeLocation });
 
   const io = req.app.get("io");
   io.emit("newSos", {
@@ -683,7 +776,12 @@ const sendSos = async (req, res) => {
     location: newSos.location,
     emergencyType: newSos.emergencyType,
     createdAt: newSos.createdAt,
-    code: newSos.code
+    code: newSos.code,
+    state: newSos.state,
+    address: newSos.address ,
+    city: newSos.city ,
+    district:newSos.district, 
+    postcode: newSos.postcode,
   });
 
   const createdSos = await Sos.findById(newSos._id)

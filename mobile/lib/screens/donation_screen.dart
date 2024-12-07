@@ -6,12 +6,64 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DonationPage extends StatefulWidget {
   const DonationPage({Key? key}) : super(key: key);
 
   @override
   _DonationPageState createState() => _DonationPageState();
+}
+
+class DonationReceiptGenerator {
+  static Future<File> generatePDFReceipt({
+    required String appName,
+    required String username,
+    required String paymentId,
+    required String fundraiserTitle,
+    required double donationAmount,
+  }) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(pw.Page(
+      build: (pw.Context context) {
+        return pw.Center(
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            mainAxisAlignment: pw.MainAxisAlignment.center,
+            children: [
+              pw.Text("Donation Receipt",
+                  style: pw.TextStyle(fontSize: 30, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 20),
+              pw.Text("Payment ID: $paymentId", style: pw.TextStyle(fontSize: 18)),
+              pw.Text("Fundraiser: $fundraiserTitle", style: pw.TextStyle(fontSize: 18)),
+              pw.Text("Amount: ₹$donationAmount", style: pw.TextStyle(fontSize: 18)),
+              pw.SizedBox(height: 20),
+              pw.Text("Thank you for your contribution!", style: pw.TextStyle(fontSize: 18)),
+            ],
+          ),
+        );
+      },
+    ));
+
+    // Save to Downloads directory
+    final directory = Directory('/storage/emulated/0/Download'); // Android Downloads directory
+    final filePath = "${directory.path}/DonationReceipt_$paymentId.pdf";
+    final file = File(filePath);
+
+    // Ensure the directory exists
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+
+    await file.writeAsBytes(await pdf.save());
+    return file;
+  }
 }
 
 class _DonationPageState extends State<DonationPage> {
@@ -21,9 +73,9 @@ class _DonationPageState extends State<DonationPage> {
   String _errorMessage = '';
   late Razorpay _razorpay;
   final TextEditingController _amountController = TextEditingController();
-  String _loggedInUserName = ""; // Hold the logged-in user's name.
+  String _loggedInUserName = ""; 
   String _selectfundRaiser = "";
-
+  
   String get fundraiserId => _selectfundRaiser;
   String get userId => _loggedInUserName;
 
@@ -50,7 +102,7 @@ class _DonationPageState extends State<DonationPage> {
       final prefs = await SharedPreferences.getInstance();
       setState(() {
         _loggedInUserName =
-            prefs.getString('userName') ?? 'Guest'; // Get username.
+            prefs.getString('userName') ?? 'Guest'; 
       });
     } catch (e) {
       print('Error fetching logged-in user: $e');
@@ -134,7 +186,7 @@ class _DonationPageState extends State<DonationPage> {
         body: jsonEncode({
           "amount": amount,
           "fundraiserId": fundraiserId,
-          "userName": _loggedInUserName, // Pass the logged-in user's name.
+          "userName": _loggedInUserName, 
         }),
       );
 
@@ -181,6 +233,10 @@ class _DonationPageState extends State<DonationPage> {
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     print("Payment Successful: ${response.paymentId}");
     final amount = int.tryParse(_amountController.text.trim()) ?? 0;
+    final fundraiser = _fundraisers.firstWhere((f) => f['_id'] == fundraiserId,
+        orElse: () => {'title': 'Unknown Fundraiser'});
+    final fundraiserTitle = fundraiser['title'] ?? 'Unknown Fundraiser';
+
     await _verifyPayment(
       response.orderId!,
       response.paymentId!,
@@ -189,10 +245,27 @@ class _DonationPageState extends State<DonationPage> {
       fundraiserId,
       amount,
     );
+
+    // Generate PDF receipt
+    final pdfFile = await DonationReceiptGenerator.generatePDFReceipt(
+      appName: 'Aapda Mitra | NDRF',
+      username: _loggedInUserName,
+      paymentId: response.paymentId!,
+      fundraiserTitle: fundraiserTitle,
+      donationAmount: amount.toDouble(),
+    );
+
+    // Log the saved file path
+    print("PDF Receipt saved to: ${pdfFile.path}");
+
+    // Notify the user
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Donation Successful! Thank you.")),
+      SnackBar(
+        content: Text("PDF saved to Downloads: ${pdfFile.path}"),
+      ),
     );
   }
+
 
   Future<void> _verifyPayment(String orderId, String paymentId,
     String signature,String userId, String fundraiserId, int amount) async {
@@ -228,72 +301,212 @@ class _DonationPageState extends State<DonationPage> {
     }
   }
 
+  Future<String> _generatePDFReceipt(String paymentId, String fundraiserTitle, int amount) async {
+    final pdf = pw.Document();
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = "${directory.path}/DonationReceipt_$paymentId.pdf";
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Center(
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              children: [
+                pw.Text("Donation Receipt", style: pw.TextStyle(fontSize: 30, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 20),
+                pw.Text("Payment ID: $paymentId", style: pw.TextStyle(fontSize: 18)),
+                pw.Text("Fundraiser: $fundraiserTitle", style: pw.TextStyle(fontSize: 18)),
+                pw.Text("Amount: ₹$amount", style: pw.TextStyle(fontSize: 18)),
+                pw.SizedBox(height: 20),
+                pw.Text("Thank you for your contribution!", style: pw.TextStyle(fontSize: 18)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    final file = File(filePath);
+    await file.writeAsBytes(await pdf.save());
+    return filePath;
+  }
+
   void _handlePaymentError(PaymentFailureResponse response) {
-    print("Payment Error: ${response.code} | ${response.message}");
+    print("Payment Failed: ${response.message}");
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Payment failed. Please try again.")),
+      SnackBar(content: Text("Payment Failed: ${response.message}")),
     );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    print("External Wallet Selected: ${response.walletName}");
+    print("External Wallet: ${response.walletName}");
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            const Header(),
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _errorMessage.isNotEmpty
-                      ? Center(
-                          child: Text(
-                            _errorMessage,
-                            style: const TextStyle(
-                                color: Colors.red, fontSize: 16),
-                          ),
-                        )
-                      : _fundraisers.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'No fundraisers available.',
-                                style: TextStyle(fontSize: 16),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: SafeArea(
+      child: Column(
+        children: [
+          const Header(), // Fixed header that won't scroll
+          Expanded(
+            child: SingleChildScrollView( // Make the rest of the content scrollable
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // Align all child widgets to the left
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 16.0), // Add extra padding from the top
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                      children: [
+                        // Main Heading: Rebuild Hope and Restore Lives
+                        RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Rebuild Hope,\n", // First line
+                                style: TextStyle(
+                                  color: Color(0xFFFC7753), // Orange
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 45, // Increased font size
+                                ),
                               ),
-                            )
-                          : ListView.builder(
-                              itemCount: _fundraisers.length,
-                              itemBuilder: (context, index) {
-                                final fundraiser = _fundraisers[index];
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(fundraiser['title'] ?? ''),
-                                    subtitle:
-                                        Text(fundraiser['description'] ?? ''),
-                                    trailing: ElevatedButton(
-                                      onPressed: () =>
-                                          _showDonationPopup(fundraiser['_id']),
-                                      child: const Text('Donate Now'),
+                              TextSpan(
+                                text: "Restore Lives", // Second line
+                                style: TextStyle(
+                                  color: Color(0xFF2B3674), // Dark Blue
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 45, // Increased font size
+                                ),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.left, // Align text to the left
+                        ),
+                        const SizedBox(height: 20.0), // Add padding between heading and subheading
+                        // Subheading: Every donation brings us closer to our Goal.
+                        const Text(
+                          "Every donation brings us closer to our Goal.",
+                          style: TextStyle(
+                            color: Color(0xFF2B3674), // Dark Blue
+                            fontSize: 20, // Increased font size
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.left, // Align text to the left
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24.0), // Add space between the text and the list
+                  if (_isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else if (_errorMessage.isNotEmpty)
+                    Center(
+                      child: Text(
+                        _errorMessage,
+                        style: const TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                    )
+                  else if (_fundraisers.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'No fundraisers available.',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.builder(
+                      shrinkWrap: true, // Prevent infinite height issue
+                      physics: const NeverScrollableScrollPhysics(), // Disable internal scroll
+                      itemCount: _fundraisers.length,
+                      itemBuilder: (context, index) {
+                        final fundraiser = _fundraisers[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16.0, // Consistent left and right spacing
+                            vertical: 8.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white, // White background
+                            borderRadius: BorderRadius.circular(25.0), // Rounded corners
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.3),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3), // Shadow position
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0), // Add padding inside the container
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fundraiser['title'] ?? '',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Color(0xFF2B3674), // Dark Blue
+                                  ),
+                                ),
+                                const SizedBox(height: 8.0), // Space between title and description
+                                Text(
+                                  fundraiser['description'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF2B3674), // Dark Blue
+                                  ),
+                                ),
+                                const SizedBox(height: 16.0), // Space between description and button
+                                ElevatedButton(
+                                  onPressed: () =>
+                                      _showDonationPopup(fundraiser['_id']),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF2B3674), // Dark Blue button
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25.0), // Rounded button
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0, vertical: 12.0,
                                     ),
                                   ),
-                                );
-                              },
+                                  child: const Text(
+                                    'Donate Now',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white, // White text
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                        );
+                      },
+                    ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      bottomNavigationBar: Footer(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
-  }
+    ),
+    bottomNavigationBar: Footer(
+      currentIndex: _currentIndex,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+    ),
+  );
+}
 }

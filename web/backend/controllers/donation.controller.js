@@ -1,3 +1,4 @@
+import moment from "moment-timezone";
 import { Donation, Fundraiser } from "../models/donations.models.js";
 import { createHmac } from "node:crypto";
 import Razorpay from "razorpay";
@@ -258,36 +259,43 @@ const getLast30DaysDonations = async (req, res) => {
         .json({ success: false, message: "Fundraiser not found" });
     }
 
+    const today = new Date();
     const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
 
+    // Fetch donations from the last 30 days
     const donations = await Donation.find({
       _id: { $in: fundraiser.donations },
       paymentDate: { $gte: thirtyDaysAgo },
     }).select("amount paymentDate");
 
-    if (!donations.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No donations found in the last 30 days",
-      });
+    // Initialize an object to store donation sums for each day
+    const dailyAmounts = {};
+
+    // Populate all 30 days with 0 as default
+    for (let i = 0; i < 30; i++) {
+      const date = new Date();
+      date.setDate(today.getDate() - i);
+      const dateString = moment(date).tz("Asia/Kolkata").format("YYYY-MM-DD");
+      dailyAmounts[dateString] = 0;
     }
 
-    const dailyAmounts = donations.reduce((acc, donation) => {
+    // Sum donations by day
+    donations.forEach(donation => {
       const date = donation.paymentDate.toISOString().split("T")[0];
-      if (!acc[date]) {
-        acc[date] = 0;
+      if (dailyAmounts[date] !== undefined) {
+        dailyAmounts[date] += donation.amount;
       }
-      acc[date] += donation.amount;
-      return acc;
-    }, {});
+    });
 
+    // Convert the dailyAmounts object into an array
     const dailyDonationArray = Object.entries(dailyAmounts).map(
       ([date, amount]) => ({
         date,
         amount,
       })
     );
+
 
     return res.status(200).json({
       success: true,
@@ -304,6 +312,10 @@ const getLast30DaysDonations = async (req, res) => {
   }
 };
 
+const getFundraiserAnalytics = async(req,res) => {
+
+}
+
 export {
   createOrder,
   verifyPayment,
@@ -313,4 +325,5 @@ export {
   getFundraiser,
   getFundraiserfromId,
   getLast30DaysDonations,
+  getFundraiserAnalytics
 };
