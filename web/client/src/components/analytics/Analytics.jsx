@@ -12,12 +12,21 @@ import { FaHourglassHalf } from "react-icons/fa";
 import { AiOutlineIssuesClose } from "react-icons/ai";
 import { MdOutlineSos } from "react-icons/md";
 import { GiSiren } from "react-icons/gi";
-import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  useMap,
+  Marker,
+  Popup,
+  GeoJSON,
+} from "react-leaflet";
 import { Icon } from "leaflet";
 import L from "leaflet";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import axios from "axios";
+import indiaGeo from "./india_geo.json";
+import indiaGeoNew from "./india_geo_new.json";
 
 Chart.register(CategoryScale);
 
@@ -360,6 +369,10 @@ const Analytics = () => {
     console.log(verifiedPostData.sourceCount);
   }, [verifiedPostData]);
 
+  const setColor = ({ properties }) => {
+    return { weight: 1 };
+  };
+
   return (
     <div className="analytics-wrapper">
       <div className="analytics-cards">
@@ -398,6 +411,17 @@ const Analytics = () => {
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors&ensp;'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {/* <TileLayer
+            url="https://tiles.windy.com/tiles/v9.0/wind/{z}/{x}/{y}.png?key=q6IIrk5CRoCaOspZyLUxmUO3OkDKmliR"
+            attribution='&copy; <a href="https://www.windy.com">Windy.com</a>'
+          /> */}
+          <GeoJSON
+            data={indiaGeo}
+            style={setColor}
+            onEachFeature={(feature, layer) => {
+              layer.bindPopup("<p>State: " + feature.properties.st_nm + "</p>");
+            }}
           />
           {/* <Marker position={[29, 77]} icon={earquakeIcon}>
             <Popup>Earthquake</Popup>

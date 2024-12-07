@@ -10,12 +10,13 @@ import Search from "../../components/Search/Search";
 import { MdCrisisAlert, MdOutlineAnalytics } from "react-icons/md";
 import { RiRefund2Fill } from "react-icons/ri";
 import { IoSearch } from "react-icons/io5";
+import { TiWeatherPartlySunny } from "react-icons/ti";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import { icon } from "leaflet";
 import Fundraiser from "../../components/Fundraiser/Fundraiser";
 import { useTranslation } from "react-i18next";
 import SOSDisplay from "../../components/sosDisplay/SOSDisplay";
 import { useNavigate, useParams } from "react-router-dom";
+import Forecasting from "../../components/forecasting/Forecasting";
 
 const Dashboard = () => {
   const [SOSToggle, setSOSToggle] = useState(false);
@@ -46,6 +47,12 @@ const Dashboard = () => {
       name: t("dashboard_donations"),
       icon: <RiRefund2Fill className="sidebar-icon" />,
       to: "donations",
+      color: "white",
+    },
+    {
+      name: "Forecasting",
+      icon: <TiWeatherPartlySunny className="sidebar-icon" />,
+      to: "forecasting",
       color: "white",
     },
   ];
@@ -117,6 +124,7 @@ const Dashboard = () => {
           {dashboardPage === "analytics" && <Analytics />}
           {dashboardPage === "search" && <Search />}
           {dashboardPage === "donations" && <Fundraiser />}
+          {dashboardPage === "forecasting" && <Forecasting />}
         </div>
         {SOSToggle && (
           <div className="dashboard-sos">
