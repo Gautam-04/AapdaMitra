@@ -1381,6 +1381,80 @@ const RejectedVerifiedPosts = async(req,res) =>{
   }
 }
 
+//sos analytics
+const getSosAnalytics = async(req,res) => {
+  const today = new Date();
+  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(today.setHours(23,59,59,999));
+
+  try {
+    const matchStage = {
+      $match: {
+        createdAt: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
+      },
+    }
+
+    const groupStages = {
+      postcode:{
+        $group:{
+          _id: "$postcode",
+          count: {$sum: 1},
+          avgResolutionTime: {
+            $avg:{$subtract:[ "$updatedAt", "$createdAt"]}
+          }
+        }
+      },
+      city: {
+        $group: {
+          _id: "$city",
+          count: { $sum: 1 },
+          avgResolutionTime: {
+            $avg: {
+              $subtract: ["$updatedAt", "$createdAt"],
+            },
+          },
+        },
+      },
+      state: {
+        $group: {
+          _id: "$state",
+          count: { $sum: 1 },
+          avgResolutionTime: {
+            $avg: {
+              $subtract: ["$updatedAt", "$createdAt"],
+            },
+          },
+        },
+      },
+      district: {
+        $group: {
+          _id: { state: "$state", district: "$district" },
+          count: { $sum: 1 },
+          avgResolutionTime: {
+            $avg: {
+              $subtract: ["$updatedAt", "$createdAt"],
+            },
+          },
+        },
+    }
+  }
+
+  //daily analysis
+  const postcodeAnalytics = await Sos.aggregate([matchStage,groupStages.postcode]);
+  const cityAnalytics = await Sos.aggregate([matchStage, groupStages.city]);
+  const stateAnalytics = await Sos.aggregate([matchStage, groupStages.state]);
+  const districtAnalytics = await Sos.aggregate([matchStage, groupStages.district]);
+
+    return res.status(200).json({postcodeAnalytics,cityAnalytics,stateAnalytics,districtAnalytics})
+  } catch (error) {
+    console.log('Error in extracting the sos information',error)
+    return res.status(400).json({message: "Error in connecting the Sos"})
+  }
+}
+
 //Heavy analytics dashabord
 const getAnalytics = async (req, res) => {
   try {
@@ -1569,5 +1643,6 @@ routes.route("/send-message").post(smsTesting);
 routes.route("/get-verified-data").get(getTotalCountVerifiedPosts);
 routes.route("/get-analytics").get(getAnalytics);
 routes.route("/reject-issue").post(RejectedVerifiedPosts);
+routes.route("/get-sos-detailed-sos").get(getSosAnalytics);
 
 export default routes;
