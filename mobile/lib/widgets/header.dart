@@ -47,6 +47,7 @@ class Header extends StatelessWidget {
                   Navigator.pop(context);
                   try {
                     final issues = await ApiService.fetchPersonalIssues();
+                    print(issues);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

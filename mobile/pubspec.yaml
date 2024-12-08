@@ -27,7 +27,8 @@ dependencies:
   pdf: ^3.6.0 # Added for PDF generation
   path_provider: ^2.0.10 # Added for file storage location
   open_file: ^3.2.1 # Added for opening files after download
-
+  socket_io_client: ^3.0.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

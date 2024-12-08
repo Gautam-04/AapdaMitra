@@ -57,7 +57,7 @@ class _SOSScreenState extends State<SOSScreen> with SingleTickerProviderStateMix
   Future<Position?> _getLocationWithPermission() async {
     if (await Permission.location.request().isGranted) {
       return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.bestForNavigation,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
