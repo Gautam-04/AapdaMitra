@@ -15,8 +15,10 @@ const provider = new OpenStreetMapProvider();
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { Icon, LatLng } from "leaflet";
 import { GiTemporaryShield } from "react-icons/gi";
+import { io } from "socket.io-client";
 
 const SOSDisplay = () => {
+  const socket = io("http://localhost:8000");
   const [pendingSOS, setPendingSOS] = useState([]);
   const [currentSOS, setCurrentSOS] = useState(null);
   const [currentSOSLocation, setCurrentSOSLocation] = useState([23, 80]);
@@ -116,8 +118,18 @@ const SOSDisplay = () => {
   };
 
   useEffect(() => {
+    socket.on("newSos", () => {
+      toast.success("New SOS!");
+      console.log("new SOS");
+    });
+
     fetchSOS();
     console.log(emergencyLocations);
+    return () => {
+      socket.off("newSos", () => {
+        toast.success("New SOS!");
+      }); // Clean up listener on unmount
+    };
   }, []);
 
   const fetchGeoFromLocation = async (location) => {
@@ -129,7 +141,9 @@ const SOSDisplay = () => {
   function SetViewOnClick(location) {
     const map = useMap();
     if (location) {
-      map.setView([location["location"][0], location["location"][1]], 12);
+      map.flyTo([location["location"][0], location["location"][1]], 12, {
+        duration: 1,
+      });
     }
 
     return null;
