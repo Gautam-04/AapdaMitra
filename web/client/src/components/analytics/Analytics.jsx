@@ -563,8 +563,6 @@ const Analytics = () => {
             );
           })} */}
         </MapContainer>
-
-        <HiBuildingLibrary size={"35px"} />
       </div>
     </div>
   );
