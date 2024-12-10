@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/admin_profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,52 +11,51 @@ import 'package:mobile/screens/manuals_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:mobile/screens/profile_screen.dart';
+import 'package:mobile/screens/admin_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await EasyLocalization.ensureInitialized();
+
+  final String initialRoute = await _determineInitialRoute();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [
-        Locale('en'), 
-        Locale('hi'), 
+        Locale('en'),
+        Locale('hi'),
         Locale('mr'),
-        Locale('or'), 
-        Locale('bn'), 
+        Locale('or'),
+        Locale('bn'),
       ],
-      path: 'assets/translation', 
+      path: 'assets/translation',
       fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+      child: MyApp(initialRoute: initialRoute),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+Future<String> _determineInitialRoute() async {
+  final prefs = await SharedPreferences.getInstance();
+  final bool isAdminLoggedIn = prefs.getBool('isAdminLoggedIn') ?? false;
+  final bool isUserLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-  @override
-  State<MyApp> createState() => _MyAppState();
+  if (isAdminLoggedIn) {
+    return '/admin_home_screen';
+  } else if (isUserLoggedIn) {
+    return '/home_screen';
+  } else {
+    return '/auth_screen';
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  bool _isLoggedIn = false;
+class MyApp extends StatelessWidget {
+  final String initialRoute;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    setState(() {
-      _isLoggedIn = isLoggedIn;
-    });
-  }
+  const MyApp({Key? key, required this.initialRoute}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> {
           bodyMedium: TextStyle(fontFamily: 'Inter'),
         ),
       ),
-      initialRoute: _isLoggedIn ? '/home_screen' : '/auth_screen',
+      initialRoute: initialRoute,
       routes: {
         '/auth_screen': (context) => const AuthScreen(),
         '/home_screen': (context) => const HomeScreen(),
@@ -86,7 +86,8 @@ class _MyAppState extends State<MyApp> {
         '/raiseIssue_screen': (context) => const RaiseIssueScreen(),
         '/manuals_screen': (context) => const ManualsScreen(),
         '/profile_screen': (context) => ProfileScreen(),
-        
+        '/admin_home_screen': (context) => AdminHomeScreen(),
+        '/admin_profile_screen': (context) => const AdminProfileScreen(),
       },
     );
   }
