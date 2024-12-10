@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:mobile/services/api_service.dart';
 import 'package:mobile/widgets/header.dart';
@@ -421,57 +422,92 @@ Widget build(BuildContext context) {
                     )
                   else
                     ListView.builder(
-                      shrinkWrap: true, // Prevent infinite height issue
-                      physics: const NeverScrollableScrollPhysics(), // Disable internal scroll
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: _fundraisers.length,
                       itemBuilder: (context, index) {
                         final fundraiser = _fundraisers[index];
                         return Container(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 16.0, // Consistent left and right spacing
-                            vertical: 8.0,
-                          ),
+                          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                           decoration: BoxDecoration(
-                            color: Colors.white, // White background
-                            borderRadius: BorderRadius.circular(25.0), // Rounded corners
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25.0),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.grey.withOpacity(0.3),
                                 spreadRadius: 2,
                                 blurRadius: 5,
-                                offset: const Offset(0, 3), // Shadow position
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0), // Add padding inside the container
+                            padding: const EdgeInsets.all(16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  fundraiser['title'] ?? '',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Color(0xFF2B3674), // Dark Blue
-                                  ),
+                                Row(
+                                  children: [
+                                    // Logo display
+                                    // In the DonationPage build method, modify the logo display
+                                  if (fundraiser['logo'] != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 12.0),
+                                      child: Image.memory(
+                                        fundraiser['logo'],
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          // Fallback to a default icon if image fails to load
+                                          return Icon(
+                                            Icons.image_not_supported,
+                                            size: 60,
+                                            color: Colors.grey,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            fundraiser['title'] ?? '',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: Color(0xFF2B3674),
+                                            ),
+                                          ),
+                                          Text(
+                                            fundraiser['fullForm'] ?? '',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                              color: Color(0xFF2B3674),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 8.0), // Space between title and description
+                                const SizedBox(height: 8.0),
                                 Text(
                                   fundraiser['description'] ?? '',
                                   style: const TextStyle(
                                     fontSize: 16,
-                                    color: Color(0xFF2B3674), // Dark Blue
+                                    color: Color(0xFF2B3674),
                                   ),
                                 ),
-                                const SizedBox(height: 16.0), // Space between description and button
+                                const SizedBox(height: 16.0),
                                 ElevatedButton(
-                                  onPressed: () =>
-                                      _showDonationPopup(fundraiser['_id']),
+                                  onPressed: () => _showDonationPopup(fundraiser['_id']),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2B3674), // Dark Blue button
+                                    backgroundColor: const Color(0xFF2B3674),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25.0), // Rounded button
+                                      borderRadius: BorderRadius.circular(25.0),
                                     ),
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 24.0, vertical: 12.0,
@@ -482,7 +518,7 @@ Widget build(BuildContext context) {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white, // White text
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -491,7 +527,7 @@ Widget build(BuildContext context) {
                           ),
                         );
                       },
-                    ),
+                    )
                 ],
               ),
             ),
@@ -510,3 +546,7 @@ Widget build(BuildContext context) {
   );
 }
 }
+
+
+
+

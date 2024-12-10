@@ -17,6 +17,34 @@ class Header extends StatelessWidget {
     );
   }
 
+  Future<void> _navigateToIssuesRaised(BuildContext context) async {
+    // Use a ScaffoldState to show SnackBar more reliably
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    
+    try {
+      final issues = await ApiService.fetchPersonalIssues();
+      print(issues);
+      
+      // Check if the context is still valid before navigating
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => IssuesRaisedScreen(),
+          ),
+        );
+      }
+    } catch (error) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Error fetching issues: $error'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
   void _openUserSidebar(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -43,25 +71,9 @@ class Header extends StatelessWidget {
                 context,
                 icon: Icons.report_problem,
                 text: 'Issues Raised by You',
-                onTap: () async {
+                onTap: () {
                   Navigator.pop(context);
-                  try {
-                    final issues = await ApiService.fetchPersonalIssues();
-                    print(issues);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => IssuesRaisedScreen(issues: issues),
-                      ),
-                    );
-                  } catch (error) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error fetching issues: $error'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
+                  Navigator.pushNamed(context, '/issues_raised_screen');
                 },
               ),
               const SizedBox(height: 15),

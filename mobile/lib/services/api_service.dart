@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -108,7 +109,7 @@ class ApiService {
     }
   }
 
-  // Fetch Fundraisers API
+  // In ApiService.fetchFundraisers() method
   static Future<List<Map<String, dynamic>>> fetchFundraisers() async {
     final Uri url = Uri.parse('$_baseUrl/get-fundraisers');
     final response = await http.get(
@@ -119,7 +120,36 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['success'] == true && data['fundraiser'] != null) {
-        return List<Map<String, dynamic>>.from(data['fundraiser']);
+        return List<Map<String, dynamic>>.from(data['fundraiser']).map((item) {
+          Uint8List? logoBytes;
+          if (item['logo'] != null) {
+            try {
+              // Check if logo is already a String (base64)
+              if (item['logo'] is String) {
+                // Remove data:image/*;base64, prefix if exists
+                String base64Logo = item['logo'].contains(',') 
+                    ? item['logo'].split(',').last 
+                    : item['logo'];
+                logoBytes = base64Decode(base64Logo);
+              } else if (item['logo'] is Uint8List) {
+                logoBytes = item['logo'];
+              }
+            } catch (e) {
+              print('Error decoding logo: $e');
+              logoBytes = null;
+            }
+          }
+
+          return {
+            'title': item['title'] ?? '',
+            'fullForm': item['fullForm'] ?? '',
+            'description': item['description'] ?? '',
+            'logo': logoBytes,
+            'goal': item['goal'] ?? 0,
+            'amountCollected': item['amountCollected'] ?? 0,
+            '_id': item['_id'] ?? '',
+          };
+        }).toList();
       } else {
         throw Exception('Invalid response structure: ${response.body}');
       }
@@ -222,7 +252,7 @@ class ApiService {
     }
   }
 
-  // Fetch Personal Issues API
+    // Fetch Personal Issues
   static Future<List<Map<String, dynamic>>> fetchPersonalIssues() async {
     final Uri url = Uri.parse('$_baseUrl/get-personal-issue');
     final prefs = await SharedPreferences.getInstance();
@@ -241,7 +271,26 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['personalIssues'] != null) {
-        return List<Map<String, dynamic>>.from(data['personalIssues']);
+        return List<Map<String, dynamic>>.from(data['personalIssues']).map((item) {
+          Uint8List? photoBytes;
+          if (item['photo'] != null) {
+            try {
+              photoBytes = base64Decode(item['photo']);
+            } catch (e) {
+              print("Error decoding photo: $e");
+            }
+          }
+          return {
+            '_id': item['_id'] ?? '',
+            'photo': photoBytes,
+            'title': item['title'] ?? '',
+            'description': item['description'] ?? '',
+            'emergencyType': item['emergencyType'] ?? '',
+            'location': item['location'] ?? '',
+            'currentStatus': item['currentStatus'] ?? 'unknown',
+            'comment': item['comment'] ?? '',
+          };
+        }).toList();
       } else {
         throw Exception('No issues found for the user');
       }
