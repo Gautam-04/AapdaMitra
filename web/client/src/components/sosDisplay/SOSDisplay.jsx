@@ -14,6 +14,7 @@ import { OpenStreetMapProvider } from "leaflet-geosearch";
 const provider = new OpenStreetMapProvider();
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { Icon, LatLng } from "leaflet";
+import { GiTemporaryShield } from "react-icons/gi";
 
 const SOSDisplay = () => {
   const [pendingSOS, setPendingSOS] = useState([]);
@@ -48,9 +49,11 @@ const SOSDisplay = () => {
 
     setShow(true);
   };
+
   const handleCloseResolver = () => {
     setShow(false);
   };
+
   const emergencyIconMap = {
     Medical: (
       <MdMedicalServices className="sos-type-icon" color="var(--warning-red)" />
@@ -70,10 +73,19 @@ const SOSDisplay = () => {
   };
 
   const fetchSOS = async () => {
+    const codeOrder = ["none", "red"];
     try {
       const response = await axios.get("/api/v1/mobile/get-all-sos");
       if (response.status === 200) {
-        setPendingSOS(filterPendingSOS(response.data));
+        var temp = filterPendingSOS(response.data);
+        temp.sort((a, b) => {
+          return codeOrder.indexOf(a.code) - codeOrder.indexOf(b.code);
+        });
+
+        setPendingSOS(temp);
+
+        console.log(temp);
+
         console.log(response.data);
       }
     } catch (error) {
@@ -93,12 +105,12 @@ const SOSDisplay = () => {
         }
       );
       if (response.status === 200) {
-        toast.success("SOS sent successfully!");
+        toast.success("SOS relayed successfully!");
         handleCloseResolver();
         fetchSOS();
       }
     } catch (error) {
-      toast.error("Error sending SOS. Try again later.");
+      toast.error("Error relaying SOS. Try again later.");
       console.error(error);
     }
   };
@@ -154,7 +166,13 @@ const SOSDisplay = () => {
                   <Card.Text>
                     <span className="sos-label">Location:</span>
                     <br />
-                    {req.location}
+                    {req.city && req.state ? (
+                      <>
+                        {req.city}, {req.state}
+                      </>
+                    ) : (
+                      <>{req.location}</>
+                    )}
                   </Card.Text>
                   <Card.Text>
                     <span className="sos-label">Code: </span>
@@ -195,13 +213,19 @@ const SOSDisplay = () => {
                 </div>
                 <div className="sos-resolver-location">
                   <span>Location:</span>
-                  {currentSOS.location}
+                  {currentSOS.city && currentSOS.state ? (
+                    <>
+                      {currentSOS.city}, {currentSOS.state}
+                    </>
+                  ) : (
+                    <>{currentSOS.location}</>
+                  )}
                 </div>
               </div>
               <div className="sos-group-wrapper">
                 <div className="sos-resolver-email">
-                  <span>Email:</span>
-                  {currentSOS.email}
+                  <span>Phone:</span>
+                  +91 {currentSOS.mobileNo}
                 </div>
                 <div className="sos-resolver-type">
                   <span>Type:</span>
@@ -261,7 +285,13 @@ const SOSDisplay = () => {
                 })}
 
                 <Marker position={currentSOSLocation} icon={sosIcon}>
-                  <Popup>{currentSOS.emergencyType}</Popup>
+                  <Popup>
+                    {currentSOS.name}
+                    <br />
+                    {currentSOS.mobileNo}
+                    <br />
+                    {currentSOS.emergencyType}
+                  </Popup>
                 </Marker>
 
                 <SetViewOnClick location={currentSOSLocation} />

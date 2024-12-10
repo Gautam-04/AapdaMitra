@@ -36,6 +36,7 @@ const VerifyPosts = (props) => {
         });
         if (response.status === 200) {
           toast.success("Comment added on post successfully!");
+          handlePostRemoveDatabase(post);
         }
       } else if (post.source === "AapdaMitra App") {
         const toSend = {
@@ -44,6 +45,7 @@ const VerifyPosts = (props) => {
           location: post.location,
           date: post.date,
           type: post.disaster_type,
+          imageUrl: post.post_image_b64,
           source: post.source,
           postId: post.post_id,
           priority: "",
@@ -58,6 +60,7 @@ const VerifyPosts = (props) => {
         );
         if (response.status === 201) {
           toast.success("Post Verified successfully!");
+          handlePostRemoveDatabase(post);
         }
       }
     } catch (error) {
@@ -85,7 +88,6 @@ const VerifyPosts = (props) => {
   };
 
   const handlePostRemoveDatabase = async (post, idx) => {
-    console.log(idx);
     try {
       const formData = new FormData();
       formData.append("objId", post.objId);

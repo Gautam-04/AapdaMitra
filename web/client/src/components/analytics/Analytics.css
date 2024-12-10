@@ -180,3 +180,8 @@
 .map-popup-card {
   font-size: 2rem;
 }
+
+.map-popup-card.popup-state {
+  font-size: 1.3rem;
+  text-align: center;
+}

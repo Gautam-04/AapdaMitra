@@ -10,6 +10,7 @@ import { MdOutlinePendingActions } from "react-icons/md";
 import { MdCrisisAlert } from "react-icons/md";
 import { FaHourglassHalf } from "react-icons/fa";
 import { AiOutlineIssuesClose } from "react-icons/ai";
+import { HiBuildingLibrary } from "react-icons/hi2";
 import { MdOutlineSos } from "react-icons/md";
 import { GiSiren } from "react-icons/gi";
 import {
@@ -27,10 +28,12 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import indiaGeo from "./india_geo.json";
 import indiaGeoNew from "./india_geo_new.json";
+// import { io } from "socket.io-client";
 
 Chart.register(CategoryScale);
 
 const Analytics = () => {
+  // const socket = io("http://localhost:8000");
   const [SOSTimelineData, setSOSTimelineData] = useState([]);
   const [verifiedPostData, setVerifiedPostData] = useState({
     sourceCount: [],
@@ -42,6 +45,7 @@ const Analytics = () => {
   const [unverifiedPostCount, setUnverifiedPostCount] = useState("0");
   const [sosResolvedToday, setSOSResolvedToday] = useState("0");
   const [sosTurnaround, setSOSTurnaround] = useState("0s");
+  const [regionalData, setRegionalData] = useState({ stateAnalytics: [] });
 
   const getPastSixHoursData = (inputData) => {
     const currentHour = new Date().getHours();
@@ -129,6 +133,19 @@ const Analytics = () => {
       const response = await axios.get("/api/v1/mobile/sos-average-time");
       if (response.status === 200) {
         setSOSTurnaround(response.data.averageTimeFormatted);
+      }
+    } catch (error) {
+      toast.error("Error fetching SOS Turnaround Data. Try again later.");
+      console.error(error);
+    }
+  };
+
+  const fetchDetailedSOSData = async () => {
+    try {
+      const response = await axios.get("/api/v1/mobile/get-sos-detailed-sos");
+      if (response.status === 200) {
+        setRegionalData(response.data);
+        console.log(response.data);
       }
     } catch (error) {
       toast.error("Error fetching SOS Turnaround Data. Try again later.");
@@ -316,13 +333,22 @@ const Analytics = () => {
   ];
 
   useEffect(() => {
+    // socket.on("newSos", () => {
+    //   console.log("New SOS received!");
+    // });
+
     fetchUnverifiedPostCount();
     fetchSOSTimelineData();
     fetchSOSTurnaroundData();
     fetchSOSResolvedData();
     fetchVerifiedPostData();
     fetchAnalyticsData();
+    fetchDetailedSOSData();
     // console.log(SOSTimelineData);
+
+    // return () => {
+    //   socket.off("newSos", handleNewSos);
+    // };
   }, []);
 
   useEffect(() => {
@@ -416,13 +442,55 @@ const Analytics = () => {
             url="https://tiles.windy.com/tiles/v9.0/wind/{z}/{x}/{y}.png?key=q6IIrk5CRoCaOspZyLUxmUO3OkDKmliR"
             attribution='&copy; <a href="https://www.windy.com">Windy.com</a>'
           /> */}
-          <GeoJSON
-            data={indiaGeo}
-            style={setColor}
-            onEachFeature={(feature, layer) => {
-              layer.bindPopup("<p>State: " + feature.properties.st_nm + "</p>");
-            }}
-          />
+          {regionalData.stateAnalytics.length > 0 && (
+            <GeoJSON
+              data={indiaGeo}
+              style={setColor}
+              onEachFeature={(feature, layer) => {
+                layer.bindPopup(() => {
+                  var sosCount = 0;
+                  var resolutionTime = "-";
+                  console.log(regionalData);
+                  for (var i = 0; i < regionalData.stateAnalytics.length; i++) {
+                    if (
+                      regionalData.stateAnalytics[i]._id ===
+                      feature.properties.st_nm
+                    ) {
+                      sosCount = regionalData.stateAnalytics[i].count;
+                      resolutionTime =
+                        regionalData.stateAnalytics[i].avgResolutionTime;
+                    }
+                  }
+                  return `<div class='map-popup-cards'>
+                    <div
+                      class="map-popup-card popup-state"
+                      style="background-color:#C6E7FF"
+                    >
+                      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" height="25px" width="25px" xmlns="http://www.w3.org/2000/svg"><path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z"></path><path fill-rule="evenodd" d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z" clip-rule="evenodd"></path><path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z"></path></svg>
+                      <span>State</span>
+                      ${feature.properties.st_nm}
+                    </div>
+                    <div
+                      class="map-popup-card"
+                      style="background-color:#FBFBDF"
+                    >
+                      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="35px" width="35px" xmlns="http://www.w3.org/2000/svg"><path d="M157.705 400.355h193.09v17.53h-193.09v-17.53zm180.8-17.53h-165v-96.82a53.29 53.29 0 0 1 53.29-53.29h58.43a53.29 53.29 0 0 1 53.28 53.29v96.79zm-106.64-135.77h-10.44a37.83 37.83 0 0 0-37.83 37.83v77.22h48.27v-115zm-197 79.59h103.58v-17.53H34.875v17.53zm137.41-107.9l-73.22-73.23-12.4 12.4 73.23 73.23zm92.5-124.63h-17.54v103.57h17.53V94.115zm149 51.39l-73.23 73.23 12.4 12.4 73.23-73.23zm-40.18 163.6v17.53h103.54v-17.52h-103.57z"></path></svg>
+                      <span>SOS Last 7 Days</span>
+                      ${sosCount}
+                    </div>
+                    <div
+                      class="map-popup-card"
+                      style="background-color:#FFDDAA"
+                    >
+                      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="35px" width="35px" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M13.5 7h-3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h3c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm0 8h-3V9h3v6zM1 15h4v-2H3c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2h4v2H3v2h2c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H1v-2zm16 0h4v-2h-2c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2h4v2h-4v2h2c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2h-4v-2z"></path></svg>
+                      <span>SOS Response Time</span>
+                      ${resolutionTime}
+                    </div>
+                </div>`;
+                });
+              }}
+            />
+          )}
           {/* <Marker position={[29, 77]} icon={earquakeIcon}>
             <Popup>Earthquake</Popup>
           </Marker>
@@ -445,13 +513,13 @@ const Analytics = () => {
               </Popup>
             </Marker>
           ))} */}
-          {allAnalyticsData.regional.map((region, idx) => {
+          {/* {allAnalyticsData.regional.map((region, idx) => {
             return (
               <Marker
                 key={idx}
                 position={[
-                  region.location.split(", ")[0],
-                  region.location.split(", ")[1],
+                  region.location.split(",")[0],
+                  region.location.split(",")[1],
                 ]}
                 icon={regionIcon}
               >
@@ -493,8 +561,10 @@ const Analytics = () => {
                 </Popup>
               </Marker>
             );
-          })}
+          })} */}
         </MapContainer>
+
+        <HiBuildingLibrary size={"35px"} />
       </div>
     </div>
   );

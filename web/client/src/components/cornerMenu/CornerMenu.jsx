@@ -229,7 +229,7 @@ const CornerMenu = () => {
     try {
       var mode;
       if (newBroadcast.mode === "sms") {
-        mode = "send-sms";
+        mode = "send-message";
       } else if (newBroadcast.mode === "push") {
         mode = "send-notification";
       } else {
@@ -392,9 +392,7 @@ const CornerMenu = () => {
                   })
                 }
               >
-                <option defaultValue disabled>
-                  Select Mode
-                </option>
+                <option defaultValue>Select Mode</option>
                 <option value="sms">SMS</option>
                 <option value="push">Push Notification (through App)</option>
               </Form.Select>
