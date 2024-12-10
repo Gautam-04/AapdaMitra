@@ -6,7 +6,7 @@ import admin from "firebase-admin";
 import axios from "axios";
 import Twilio from "twilio";
 import moment from "moment-timezone";
-import haversine from "haversine-distance"
+import haversine from "haversine-distance";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -74,7 +74,7 @@ const Issue = mongoose.model(
       userId: { type: String, required: true },
       currentStatus: {
         type: String,
-        enum: ["Rejected","Pending", "Resolved"],
+        enum: ["Rejected", "Pending", "Resolved"],
         default: "Pending",
       },
       comment: { type: String, default: "" },
@@ -91,14 +91,14 @@ const Sos = mongoose.model(
     {
       name: { type: String, required: true, default: "" },
       email: { type: String, required: true, default: "" },
-      mobileNo: {type: String, required: true, default: ""},
+      mobileNo: { type: String, required: true, default: "" },
       location: { type: String, trim: true, required: true, default: "" },
       verified: { type: Boolean, default: false },
-      state: {type: String,trim: ""},
-      address: {type: String,trim: ""},
-      city: {type: String,trim: ""},
-      district: {type: String,trim: ""},
-      postcode: {type: String,trim: ""},
+      state: { type: String, trim: "" },
+      address: { type: String, trim: "" },
+      city: { type: String, trim: "" },
+      district: { type: String, trim: "" },
+      postcode: { type: String, trim: "" },
       emergencyType: {
         type: String,
         enum: [
@@ -110,7 +110,7 @@ const Sos = mongoose.model(
         ],
         default: "Other",
       },
-      code: {type: String,enum:["none","red"],default: "none"}
+      code: { type: String, enum: ["none", "red"], default: "none" },
     },
     {
       timestamps: true,
@@ -187,8 +187,7 @@ const CONFIG = {
   RETRY_DELAY: 5000,
 };
 
-
-async function reverseGeolocation(latitude,longitude){
+async function reverseGeolocation(latitude, longitude) {
   const config = {
     POST_API_URL:
       "https://eve.idfy.com/v3/tasks/async/generate/reverse_geocode", // POST req costs 3 creds
@@ -212,7 +211,7 @@ async function reverseGeolocation(latitude,longitude){
     const postResponse = await axiosInstance.post(config.POST_API_URL, {
       task_id: config.task_id,
       group_id: config.group_id,
-      data: { "latitude": latitude.trim(), "longitude": longitude.trim() }
+      data: { latitude: latitude.trim(), longitude: longitude.trim() },
     });
 
     if (!postResponse.data || !postResponse.data.request_id) {
@@ -222,18 +221,22 @@ async function reverseGeolocation(latitude,longitude){
 
     const requestId = postResponse.data.request_id;
 
-//    Step 2: Poll the GET API until the status is 'completed' or max attempts are reached
+    //    Step 2: Poll the GET API until the status is 'completed' or max attempts are reached
     for (let attempt = 0; attempt < config.MAX_ATTEMPTS; attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, config.POLLING_INTERVAL));
+      await new Promise((resolve) =>
+        setTimeout(resolve, config.POLLING_INTERVAL)
+      );
 
-      const getResponse = await axiosInstance.get(`${config.GET_API_URL}?request_id=${requestId}`);
+      const getResponse = await axiosInstance.get(
+        `${config.GET_API_URL}?request_id=${requestId}`
+      );
       const getResponseData = getResponse.data[0];
 
       if (getResponseData && getResponseData.status === "completed") {
         const result = getResponseData.result?.source_output;
         if (result?.status === "location_found") {
           // Step 3: Extract required fields
-          const formatted_address  = result.formatted_address;
+          const formatted_address = result.formatted_address;
 
           return {
             state: formatted_address?.state || "N/A",
@@ -254,7 +257,7 @@ async function reverseGeolocation(latitude,longitude){
 
     console.error("Max polling attempts reached without result.");
     return "";
-} catch (error) {
+  } catch (error) {
     console.error("Error in reverseGeolocation:", error.message);
     return "";
   }
@@ -702,7 +705,7 @@ const Radius = 2000;
 const SosThreshold = 10;
 let activeLocation = { location: null, count: 0 };
 const sendSos = async (req, res) => {
-  const { name, email, location, emergencyType,mobileNo } = req.body;
+  const { name, email, location, emergencyType, mobileNo } = req.body;
 
   if (!name || !email) {
     return res.status(400).json({ message: "Login again" });
@@ -713,7 +716,7 @@ const sendSos = async (req, res) => {
   }
 
   const [latStr, longStr] = location.split(",");
-  const response = await reverseGeolocation(latStr,longStr)
+  const response = await reverseGeolocation(latStr, longStr);
 
   // Check if an SOS exists with the same mobileNo
   const existingSos = await Sos.findOne({ mobileNo });
@@ -731,10 +734,10 @@ const sendSos = async (req, res) => {
     location,
     emergencyType,
     code: "none",
-    state: response.state ,
-    address: response.address ,
-    city: response.city ,
-    district:response.district, 
+    state: response.state,
+    address: response.address,
+    city: response.city,
+    district: response.district,
     postcode: response.postcode,
   });
 
@@ -743,23 +746,19 @@ const sendSos = async (req, res) => {
   }
 
   const [lat, long] = location.split(",").map(Number);
- if (activeLocation.location) {
+  if (activeLocation.location) {
     // Calculate distance between active location and current location
     const activeLatLong = activeLocation.location.split(" ").map(Number);
     const activeLatLongObj = { lat: activeLatLong[0], lng: activeLatLong[1] };
     const currentLatLongObj = { lat, lng: long };
     const distance = haversine(activeLatLongObj, currentLatLongObj);
-    console.log(distance)
+    console.log(distance);
 
     if (distance <= Radius) {
       activeLocation.count += 1;
 
       if (activeLocation.count > SosThreshold) {
-        await Sos.findByIdAndUpdate(
-          newSos._id,
-          { code: "red" },
-          { new: true }
-        );
+        await Sos.findByIdAndUpdate(newSos._id, { code: "red" }, { new: true });
       }
     } else {
       activeLocation = { location: `${lat} ${long}`, count: 1 };
@@ -767,7 +766,6 @@ const sendSos = async (req, res) => {
   } else {
     activeLocation = { location: `${lat} ${long}`, count: 1 };
   }
-
 
   const io = req.app.get("io");
   io.emit("newSos", {
@@ -778,15 +776,15 @@ const sendSos = async (req, res) => {
     createdAt: newSos.createdAt,
     code: newSos.code,
     state: newSos.state,
-    address: newSos.address ,
-    city: newSos.city ,
-    district:newSos.district, 
+    address: newSos.address,
+    city: newSos.city,
+    district: newSos.district,
     postcode: newSos.postcode,
   })
 
-  const createdSos = await Sos.findById(newSos._id)
-  
-  return res.status(200).json({ message: "Sos sent",createdSos });
+  const createdSos = await Sos.findById(newSos._id);
+
+  return res.status(200).json({ message: "Sos sent", createdSos });
 };
 
 const getSos = async (req, res) => {
@@ -1350,7 +1348,7 @@ const getTotalCountVerifiedPosts = async (req, res) => {
   }
 };
 
-const RejectedVerifiedPosts = async(req,res) =>{
+const RejectedVerifiedPosts = async (req, res) => {
   const {
     title,
     body,
@@ -1374,18 +1372,18 @@ const RejectedVerifiedPosts = async(req,res) =>{
       return res.status(404).json({ message: "No issue found" });
     }
 
-    res.status(201).json({ message: 'Issue rejected successfully', response });
+    res.status(201).json({ message: "Issue rejected successfully", response });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
-}
+};
 
 //sos analytics
-const getSosAnalytics = async(req,res) => {
+const getSosAnalytics = async (req, res) => {
   const today = new Date();
   const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-  const endOfDay = new Date(today.setHours(23,59,59,999));
+  const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
   try {
     const matchStage = {
@@ -1395,17 +1393,17 @@ const getSosAnalytics = async(req,res) => {
           $lte: endOfDay,
         },
       },
-    }
+    };
 
     const groupStages = {
-      postcode:{
-        $group:{
+      postcode: {
+        $group: {
           _id: "$postcode",
-          count: {$sum: 1},
+          count: { $sum: 1 },
           avgResolutionTime: {
-            $avg:{$subtract:[ "$updatedAt", "$createdAt"]}
-          }
-        }
+            $avg: { $subtract: ["$updatedAt", "$createdAt"] },
+          },
+        },
       },
       city: {
         $group: {
@@ -1439,21 +1437,34 @@ const getSosAnalytics = async(req,res) => {
             },
           },
         },
-    }
-  }
+      },
+    };
 
-  //daily analysis
-  const postcodeAnalytics = await Sos.aggregate([matchStage,groupStages.postcode]);
-  const cityAnalytics = await Sos.aggregate([matchStage, groupStages.city]);
-  const stateAnalytics = await Sos.aggregate([matchStage, groupStages.state]);
-  const districtAnalytics = await Sos.aggregate([matchStage, groupStages.district]);
+    //daily analysis
+    const postcodeAnalytics = await Sos.aggregate([
+      matchStage,
+      groupStages.postcode,
+    ]);
+    const cityAnalytics = await Sos.aggregate([matchStage, groupStages.city]);
+    const stateAnalytics = await Sos.aggregate([matchStage, groupStages.state]);
+    const districtAnalytics = await Sos.aggregate([
+      matchStage,
+      groupStages.district,
+    ]);
 
-    return res.status(200).json({postcodeAnalytics,cityAnalytics,stateAnalytics,districtAnalytics})
+    return res
+      .status(200)
+      .json({
+        postcodeAnalytics,
+        cityAnalytics,
+        stateAnalytics,
+        districtAnalytics,
+      });
   } catch (error) {
-    console.log('Error in extracting the sos information',error)
-    return res.status(400).json({message: "Error in connecting the Sos"})
+    console.log("Error in extracting the sos information", error);
+    return res.status(400).json({ message: "Error in connecting the Sos" });
   }
-}
+};
 
 //Heavy analytics dashabord
 const getAnalytics = async (req, res) => {
@@ -1468,7 +1479,9 @@ const getAnalytics = async (req, res) => {
         { $match: matchQuery },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: `$${dateField}` } },
+            _id: {
+              $dateToString: { format: "%Y-%m-%d", date: `$${dateField}` },
+            },
             count: { $sum: 1 },
           },
         },
@@ -1494,12 +1507,20 @@ const getAnalytics = async (req, res) => {
       resolved: false,
     });
 
-    const sosTrendsLast30Days = await getTrends(Sos, { createdAt: { $gte: last30Days } });
-    const issueTrendsLast30Days = await getTrends(Issue, { createdAt: { $gte: last30Days } });
+    const sosTrendsLast30Days = await getTrends(Sos, {
+      createdAt: { $gte: last30Days },
+    });
+    const issueTrendsLast30Days = await getTrends(Issue, {
+      createdAt: { $gte: last30Days },
+    });
 
     const avgSosResolutionTime = await Sos.aggregate([
       { $match: { resolved: true } },
-      { $project: { resolutionTime: { $subtract: ["$updatedAt", "$createdAt"] } } },
+      {
+        $project: {
+          resolutionTime: { $subtract: ["$updatedAt", "$createdAt"] },
+        },
+      },
       { $group: { _id: null, avgResolutionTime: { $avg: "$resolutionTime" } } },
     ]);
 
@@ -1509,7 +1530,9 @@ const getAnalytics = async (req, res) => {
         $group: {
           _id: "$location",
           totalSos: { $sum: 1 },
-          unresolvedSos: { $sum: { $cond: [{ $eq: ["$resolved", false] }, 1, 0] } },
+          unresolvedSos: {
+            $sum: { $cond: [{ $eq: ["$resolved", false] }, 1, 0] },
+          },
           last7Days: {
             $sum: {
               $cond: [{ $gte: ["$createdAt", last7Days] }, 1, 0],
@@ -1530,7 +1553,9 @@ const getAnalytics = async (req, res) => {
         $group: {
           _id: "$location",
           totalIssues: { $sum: 1 },
-          unresolvedIssues: { $sum: { $cond: [{ $eq: ["$resolved", false] }, 1, 0] } },
+          unresolvedIssues: {
+            $sum: { $cond: [{ $eq: ["$resolved", false] }, 1, 0] },
+          },
           last7Days: {
             $sum: {
               $cond: [{ $gte: ["$createdAt", last7Days] }, 1, 0],
@@ -1548,7 +1573,9 @@ const getAnalytics = async (req, res) => {
 
     const regionalAnalytics = sosByRegion.map((sosData) => {
       const location = sosData._id;
-      const issueData = issuesByRegion.find((issue) => issue._id === location) || {
+      const issueData = issuesByRegion.find(
+        (issue) => issue._id === location
+      ) || {
         totalIssues: 0,
         unresolvedIssues: 0,
         last7Days: 0,
@@ -1563,20 +1590,26 @@ const getAnalytics = async (req, res) => {
           unresolved: sosData.unresolvedSos,
           last7Days: sosData.last7Days,
           last30Days: sosData.last30Days,
-          emergencyTypeDistribution: sosData.emergencyTypeDistribution.reduce((acc, type) => {
-            acc[type] = (acc[type] || 0) + 1;
-            return acc;
-          }, {}),
+          emergencyTypeDistribution: sosData.emergencyTypeDistribution.reduce(
+            (acc, type) => {
+              acc[type] = (acc[type] || 0) + 1;
+              return acc;
+            },
+            {}
+          ),
         },
         issues: {
           total: issueData.totalIssues,
           unresolved: issueData.unresolvedIssues,
           last7Days: issueData.last7Days,
           last30Days: issueData.last30Days,
-          issueTypeDistribution: issueData.issueTypeDistribution.reduce((acc, type) => {
-            acc[type] = (acc[type] || 0) + 1;
-            return acc;
-          }, {}),
+          issueTypeDistribution: issueData.issueTypeDistribution.reduce(
+            (acc, type) => {
+              acc[type] = (acc[type] || 0) + 1;
+              return acc;
+            },
+            {}
+          ),
         },
       };
     });
@@ -1604,7 +1637,6 @@ const getAnalytics = async (req, res) => {
     return res.status(400).json({ message: "Error in getting analytics" });
   }
 };
-
 
 //raise a req controller
 

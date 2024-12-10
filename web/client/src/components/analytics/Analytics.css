@@ -17,7 +17,7 @@
 }
 
 .analytics-card {
-  min-width: 220px;
+  min-width: 275px;
   font-family: "Inter", sans-serif !important;
   width: 20%;
   max-width: 275px;
@@ -179,4 +179,9 @@
 
 .map-popup-card {
   font-size: 2rem;
+}
+
+.map-popup-card.popup-state {
+  font-size: 1.3rem;
+  text-align: center;
 }
