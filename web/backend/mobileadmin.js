@@ -150,6 +150,19 @@ const addAdminPostIssues = async (req, res) => {
   }
 };
 
+const getAdminPostIssue = async(req,res) =>{
+  try {
+    const issues = await adminIssue.find();
+    if (!issues) {
+      return res.status(400).json({ message: "No issues found." });
+    }
+    return res.status(200).json({ issues })
+  } catch (error) {
+    console.log('Error in fetching issues:', error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+}
+
 const getAdminLiveLocation = async(req,res) => {
 const {location, userId} = req.body;
 try {
@@ -176,6 +189,7 @@ const router = Router();
 router.route('/login').post(adminLogin)
 router.route('/login-admin').post(verifyLoggedInUser)
 router.route('/admin-add-issue').post(addAdminPostIssues)
+router.route('/get-admin-issue').get(getAdminPostIssue)
 router.route('/get-admin-live-location').get(getAdminLiveLocation);
 
 export default(router);
