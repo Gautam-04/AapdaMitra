@@ -780,7 +780,7 @@ const sendSos = async (req, res) => {
     city: newSos.city,
     district: newSos.district,
     postcode: newSos.postcode,
-  });
+  })
 
   const createdSos = await Sos.findById(newSos._id);
 

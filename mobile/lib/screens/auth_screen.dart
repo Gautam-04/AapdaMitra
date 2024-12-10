@@ -17,6 +17,12 @@ class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _aadharController = TextEditingController();
 
+  final TextEditingController _adminPhoneController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+  bool _isAdminLoginMode = false;
+  bool _isOtpSent = false;
+
+
   bool _isRegistrationMode = true;
   bool _isLoading = false;
   String? _fcmToken;
@@ -102,6 +108,88 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  Future<void> _loginAsAdmin() async {
+    if (_adminPhoneController.text.length != 10 ||
+        int.tryParse(_adminPhoneController.text) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('invalid_phone_number'.tr())),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Call adminLogin to trigger OTP
+      await ApiService.adminLogin(
+        phoneNumber: _adminPhoneController.text,
+        fcmToken: _fcmToken ?? '',
+      );
+      setState(() => _isOtpSent = true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('otp_send_failed'.tr(args: [e.toString()]))),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _submitAdminOtp() async {
+  if (_otpController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('enter_valid_otp'.tr())),
+    );
+    return;
+  }
+
+  setState(() => _isLoading = true);
+
+  try {
+    // Call API and log the full response for debugging
+    final response = await ApiService.verifyAdminLogin(
+      phoneNumber: _adminPhoneController.text,
+      otp: _otpController.text,
+      fcmToken: _fcmToken ?? '',
+    );
+
+    print('Response from server: $response'); // Log the raw response
+    print('Response keys: ${response.keys}'); // Log keys for structure debugging
+
+    // Save admin data and navigate
+    await _saveAdminDataAndNavigate(response);
+  } catch (e) {
+    print('Error during OTP verification: $e'); // Log the error for debugging
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('otp_verification_failed'.tr(args: [e.toString()]))),
+    );
+  } finally {
+    setState(() => _isLoading = false);
+  }
+}
+
+  Future<void> _saveAdminDataAndNavigate(Map<String, dynamic> response) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Save admin data to SharedPreferences
+      await prefs.setString('adminMobileNumber', response["loggedInUser"]['mobileNo']);
+      await prefs.setString('adminFcmToken', response["loggedInUser"]['fcmToken']);
+      await prefs.setString('adminUserId', response["loggedInUser"]['_id']);
+      await prefs.setString('adminJwtToken', response['accessToken']);
+      await prefs.setString('adminType', response["loggedInUser"]['type']);
+      await prefs.setBool('isAdminLoggedIn', true);
+      // Navigate to the admin home screen
+      Navigator.of(context).pushReplacementNamed('/admin_home_screen');
+    } catch (e) {
+      // Handle errors gracefully and show a snackbar
+      print('Error saving admin data: ${e.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('save_admin_data_failed'.tr(args: [e.toString()]))),
+      );
+    }
+  }
+
+
   Future<void> _saveUserDataAndNavigate(Map<String, dynamic> response) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -182,19 +270,29 @@ class _AuthScreenState extends State<AuthScreen> {
                         border: Border.all(color: Colors.grey[400]!, width: 1.5),
                       ),
                       child: DropdownButtonHideUnderline(
-                        child: DropdownButton<bool>(
-                          value: _isRegistrationMode,
+                        child: DropdownButton<String>(
+                          value: _isAdminLoginMode
+                              ? 'admin'
+                              : _isRegistrationMode
+                                  ? 'register'
+                                  : 'login',
                           items: [
-                            DropdownMenuItem(value: true, child: Text('register'.tr())),
-                            DropdownMenuItem(value: false, child: Text('login'.tr())),
+                            DropdownMenuItem(value: 'register', child: Text('register'.tr())),
+                            DropdownMenuItem(value: 'login', child: Text('login'.tr())),
+                            DropdownMenuItem(value: 'admin', child: Text('Login As Admin'.tr())),
                           ],
                           onChanged: (value) {
-                            setState(() => _isRegistrationMode = value ?? true);
+                            setState(() {
+                              _isRegistrationMode = value == 'register';
+                              _isAdminLoginMode = value == 'admin';
+                              _isOtpSent = false; // Reset OTP state
+                            });
                           },
                           isExpanded: true,
                           icon: const Icon(Icons.arrow_drop_down),
                           iconSize: 30,
                         ),
+
                       ),
                     ),
                   ),
@@ -253,24 +351,60 @@ class _AuthScreenState extends State<AuthScreen> {
                   ],
                 ),
               const SizedBox(height: 20),
-              _buildTextField(
-                controller: _phoneNumberController,
-                label: 'phone_number'.tr(),
-                icon: Icons.phone,
-              ),
-              const SizedBox(height: 20),
-              _buildButton(
-                label: _isRegistrationMode ? 'register'.tr() : 'login'.tr(),
-                onPressed: _isLoading
-                    ? null
-                    : (_isRegistrationMode ? _registerWithAadhar : _loginWithAadhar),
-              ),
+              if (!_isAdminLoginMode)
+                _buildTextField(
+                  controller: _phoneNumberController,
+                  label: 'phone_number'.tr(),
+                  icon: Icons.phone,
+                ),
+              if (!_isAdminLoginMode)
+                const SizedBox(height: 20),
+              if (!_isAdminLoginMode)
+                _buildButton(
+                  label: _isRegistrationMode ? 'register'.tr() : 'login'.tr(),
+                  onPressed: _isLoading
+                      ? null
+                      : (_isRegistrationMode ? _registerWithAadhar : _loginWithAadhar),
+                ),
+              if (_isAdminLoginMode) ...[
+                if (!_isOtpSent)
+                  Column(
+                    children: [
+                      _buildTextField(
+                        controller: _adminPhoneController,
+                        label: 'mobile_number'.tr(),
+                        icon: Icons.phone,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildButton(
+                        label: 'send_otp'.tr(),
+                        onPressed: _isLoading ? null : _loginAsAdmin,
+                      ),
+                    ],
+                  ),
+                if (_isOtpSent)
+                  Column(
+                    children: [
+                      _buildTextField(
+                        controller: _otpController,
+                        label: 'enter_otp'.tr(),
+                        icon: Icons.lock,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildButton(
+                        label: 'submit'.tr(),
+                        onPressed: _isLoading ? null : _submitAdminOtp,
+                      ),
+                    ],
+                  ),
+              ],
             ],
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildTextField({
     required TextEditingController controller,

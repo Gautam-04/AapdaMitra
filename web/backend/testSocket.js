@@ -16,6 +16,10 @@ socket.on('connect_timeout', () => {
     console.error('Connection timed out.');
 });
 
+socket.on('newSos', (data) => {
+    console.log('Received message:', data);
+}); 
+
 
 socket.on('disconnect', () => {
     console.log('Disconnected from server');
