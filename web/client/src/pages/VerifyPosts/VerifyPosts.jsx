@@ -45,7 +45,7 @@ const VerifyPosts = (props) => {
           location: post.location,
           date: post.date,
           type: post.disaster_type,
-          imageUrl: post.post_image_b64,
+          imageUrl: post.post_image_b64 || post.post_image_url,
           source: post.source,
           postId: post.post_id,
           priority: "",
