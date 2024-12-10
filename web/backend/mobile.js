@@ -135,6 +135,17 @@ const verifiedPostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const ElasticAnalytics = new mongoose.model("ElasticAnalytics", 
+  mongoose.Schema({
+    totalUnverifiedPosts: { type: Number, default: 0 },
+    totalPostsFromX: { type: Number, default: 0 },
+    totalPostsFromRss: { type: Number, default: 0 },
+    totalPostsFromApp: { type: Number, default: 0 },
+    createdAt: { type: Date, unique: true },
+    updatedAt: { type: Date },
+  })
+)
+
 // Function to increment likes
 verifiedPostSchema.methods.incrementLikes = async function () {
   this.likes += 1;
@@ -1638,6 +1649,104 @@ const getAnalytics = async (req, res) => {
   }
 };
 
+
+const addElasticAnalytics = async (req, res) => {
+  const { totalPostsFromX = 0, totalPostsFromRss = 0 } = req.body;
+  const totalPostsFromApp = await Issue.countDocuments();
+  const totalUnverifiedPosts = totalPostsFromX + totalPostsFromRss + totalPostsFromApp;
+
+  try {
+    const date = moment.tz("Asia/Kolkata").format('YYYY-MM-DD');
+
+    const dataExists = await ElasticAnalytics.findOne({ createdAt: date });
+
+    if (dataExists) {
+      const updatedAnalytics = await ElasticAnalytics.findByIdAndUpdate(
+        dataExists._id,
+        {
+          totalPostsFromX: dataExists.totalPostsFromX + totalPostsFromX,
+          totalPostsFromRss: dataExists.totalPostsFromRss + totalPostsFromRss,
+          totalPostsFromApp: totalPostsFromApp !== dataExists.totalPostsFromApp
+            ? totalPostsFromApp
+            : dataExists.totalPostsFromApp + (totalPostsFromApp - dataExists.totalPostsFromApp),
+          updatedAt: date,
+        },
+        { new: true }
+      );
+
+      updatedAnalytics.totalUnverifiedPosts =
+        updatedAnalytics.totalPostsFromX +
+        updatedAnalytics.totalPostsFromRss +
+        updatedAnalytics.totalPostsFromApp;
+
+      await updatedAnalytics.save();
+
+      return res.status(200).json({
+        message: "Analytics updated successfully",
+        updatedAnalytics,
+      });
+    } else {
+      const analytics = await ElasticAnalytics.create({
+        totalUnverifiedPosts,
+        totalPostsFromX,
+        totalPostsFromRss,
+        totalPostsFromApp,
+        createdAt: date,
+        updatedAt: date,
+      });
+      return res.status(200).json({ message: "Analytics created successfully", analytics });
+    }
+  } catch (error) {
+    console.log("Error in adding analytics", error);
+    return res.status(500).json({ message: "Error in adding analytics", error });
+  }
+};
+
+
+
+const getFinalReportData = async (req, res) => {
+  const { startDate, endDate } = req.body;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  try {
+    const getSourcesData = await ElasticAnalytics.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }, 
+          },
+          totalPostsFromX: { $sum: "$totalPostsFromX" },
+          totalPostsFromRss: { $sum: "$totalPostsFromRss" },
+          totalPostsFromApp: { $sum: "$totalPostsFromApp" },
+          totalUnverifiedPosts: { $sum: "$totalUnverifiedPosts" },
+        },
+      },
+      {
+        $sort: { _id: 1 }, 
+      },
+    ]);
+
+    if (getSourcesData.length === 0) {
+      return res.status(200).json({ message: "No data found for the given date range." });
+    }
+
+    return res.status(200).json({
+      message: "Final report data retrieved successfully",
+      data: getSourcesData, 
+    });
+  } catch (error) {
+    console.log("Error in getting final report", error);
+    return res.status(500).json({ message: "Error in getting final report" });
+  }
+};
+
+
 //raise a req controller
 
 //routes
@@ -1654,6 +1763,8 @@ routes.route("/get-fundraisers").get(getFundraiser);
 routes.route("/add-issue").post(AddIssue);
 routes.route("/send-sos").post(sendSos);
 routes.route("/get-personal-issue").post(getPersonalIssue);
+routes.route("/get-all-elastic").post(addElasticAnalytics);
+routes.route("/get-all-report-data").post(getFinalReportData);
 
 //verified posts
 routes.route("/add-post").post(addVerifiedPost);
