@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/admin_profile_page.dart';
+import 'package:mobile/screens/issuesRaised_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +13,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:mobile/screens/profile_screen.dart';
 import 'package:mobile/screens/admin_home_screen.dart';
+import 'package:mobile/services/api_service.dart'; // Added for fetching issues
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,6 +90,10 @@ class MyApp extends StatelessWidget {
         '/profile_screen': (context) => ProfileScreen(),
         '/admin_home_screen': (context) => AdminHomeScreen(),
         '/admin_profile_screen': (context) => const AdminProfileScreen(),
+        // Updated route for IssuesRaisedScreen
+        '/issues_raised_screen': (context) => IssuesRaisedScreen(
+           // Default empty list, will be fetched in the screen
+        ),
       },
     );
   }

@@ -1,13 +1,11 @@
-import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:mobile/services/api_service.dart';
 import 'package:mobile/widgets/header.dart';
 import 'package:mobile/widgets/footer.dart';
 
 class IssuesRaisedScreen extends StatefulWidget {
-  const IssuesRaisedScreen({Key? key, required this.issues}) : super(key: key);
-
-  final List<Map<String, dynamic>> issues;
+  const IssuesRaisedScreen({Key? key}) : super(key: key);
 
   @override
   _IssuesRaisedScreenState createState() => _IssuesRaisedScreenState();
@@ -19,13 +17,23 @@ class _IssuesRaisedScreenState extends State<IssuesRaisedScreen> {
   @override
   void initState() {
     super.initState();
-    _issuesFuture = ApiService.fetchPersonalIssues(); // Initial fetch
+    _issuesFuture = ApiService.fetchPersonalIssues();
   }
 
   Future<void> _refreshIssues() async {
-    setState(() {
-      _issuesFuture = ApiService.fetchPersonalIssues();
-    });
+    try {
+      final updatedIssues = await ApiService.fetchPersonalIssues();
+      setState(() {
+        _issuesFuture = Future.value(updatedIssues);
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error refreshing issues: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -76,15 +84,14 @@ class _IssuesRaisedScreenState extends State<IssuesRaisedScreen> {
                       );
                     }
 
-                    // Debug the fetched issues
-                    print('Fetched Issues: $issues');
-
                     return RefreshIndicator(
                       onRefresh: _refreshIssues,
                       child: ListView.builder(
                         itemCount: issues.length,
                         itemBuilder: (context, index) {
                           final issue = issues[index];
+                          final Uint8List? photo = issue['photo'];
+
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                             elevation: 6,
@@ -100,13 +107,13 @@ class _IssuesRaisedScreenState extends State<IssuesRaisedScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (issue['photo'] != null && issue['photo'].isNotEmpty)
+                                  if (photo != null)
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(15),
                                       child: Padding(
                                         padding: const EdgeInsets.only(bottom: 8),
                                         child: Image.memory(
-                                          base64Decode(issue['photo']),
+                                          photo,
                                           width: double.infinity,
                                           height: 220,
                                           fit: BoxFit.cover,
@@ -117,7 +124,7 @@ class _IssuesRaisedScreenState extends State<IssuesRaisedScreen> {
                                     ),
                                   ListTile(
                                     title: Text(
-                                      issue['issueTitle'] ?? 'No Title',
+                                      issue['title'] ?? 'No Title',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF2B3674),
@@ -130,9 +137,9 @@ class _IssuesRaisedScreenState extends State<IssuesRaisedScreen> {
                                       ),
                                     ),
                                     trailing: Text(
-                                      issue['status'] ?? 'Pending',
+                                      issue['currentStatus'] ?? 'Pending',
                                       style: TextStyle(
-                                        color: issue['status'] == 'Verified'
+                                        color: issue['currentStatus'] == 'Resolved'
                                             ? Colors.green
                                             : Colors.red,
                                         fontWeight: FontWeight.bold,
@@ -162,7 +169,9 @@ class _IssuesRaisedScreenState extends State<IssuesRaisedScreen> {
       ),
       bottomNavigationBar: Footer(
         currentIndex: 2,
-        onTap: (index) {},
+        onTap: (index) {
+          // Handle navigation
+        },
       ),
     );
   }

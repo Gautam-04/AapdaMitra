@@ -1,26 +1,30 @@
 [
     {
-        "merged": "com.example.mobile.app-merged_res-40:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.example.mobile.app-main-34:/mipmap-hdpi/ic_launcher.png"
+        "merged": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-merged_res-40:\\drawable-v21_launch_background.xml.flat",
+        "source": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-main-34:\\drawable-v21\\launch_background.xml"
     },
     {
-        "merged": "com.example.mobile.app-merged_res-40:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.example.mobile.app-main-34:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-merged_res-40:\\mipmap-hdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-main-34:\\mipmap-hdpi\\ic_launcher.png"
     },
     {
-        "merged": "com.example.mobile.app-merged_res-40:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.example.mobile.app-main-34:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-merged_res-40:\\mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-main-34:\\mipmap-xxxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "com.example.mobile.app-merged_res-40:/drawable-v21_launch_background.xml.flat",
-        "source": "com.example.mobile.app-main-34:/drawable-v21/launch_background.xml"
+        "merged": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-merged_res-40:\\mipmap-mdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-main-34:\\mipmap-mdpi\\ic_launcher.png"
     },
     {
-        "merged": "com.example.mobile.app-merged_res-40:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.example.mobile.app-main-34:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "com.example.mobile.app-merged_res-40:/raw_notification_sound.mp3.flat",
+        "source": "com.example.mobile.app-main-34:/raw/notification_sound.mp3"
     },
     {
-        "merged": "com.example.mobile.app-merged_res-40:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.example.mobile.app-main-34:/mipmap-mdpi/ic_launcher.png"
+        "merged": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-merged_res-40:\\mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-main-34:\\mipmap-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-merged_res-40:\\mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\shaan\\.gradle\\daemon\\8.3\\com.example.mobile.app-main-34:\\mipmap-xxhdpi\\ic_launcher.png"
     }
 ]
