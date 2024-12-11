@@ -2,6 +2,9 @@ import "./Search.css";
 import MainLogo from "../../assets/main_logo.svg";
 
 function Search() {
+  const [searchbarContent, setSearchbarContent] = useState("");
+
+  const handleSubmit = () => {};
   return (
     <div className="search-page">
       <div className="search-container">
@@ -9,6 +12,9 @@ function Search() {
 
         <div className="search-bar">
           <input type="text" placeholder="Search" className="search-input" />
+          <div className="searchbar-submit">
+            <button>Search</button>
+          </div>
         </div>
 
         <div className="disaster-buttons">

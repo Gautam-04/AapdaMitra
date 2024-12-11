@@ -137,6 +137,7 @@ def preprocess_query(query, entities):
 
 def parse_date_range(phrase):
     today = datetime.now()
+    start_date, end_date = None, None
 
     if "last week" in phrase:
         start_date = today - timedelta(days=today.weekday() + 7)
@@ -195,16 +196,32 @@ def parse_date_range(phrase):
     elif "past 30 days" in phrase:
         start_date = today - timedelta(days=30)
         end_date = today
-    elif "last 6 months" in phrase:
-        six_months_ago = today - timedelta(days=182)
-        start_date = six_months_ago.replace(day=1)
+    elif "last 15 days" in phrase:
+        start_date = today - timedelta(days=15)
+        end_date = today
+    elif "last 2 weeks" in phrase:
+        start_date = today - timedelta(days=14)
+        end_date = today
+    elif "last 3 weeks" in phrase:
+        start_date = today - timedelta(days=21)
         end_date = today
     else:
-        # start_date = dateparser.parse(phrase)
-        # end_date = None if not start_date or start_date > today else start_date
-        start_date, end_date = None, None
+        months = [
+            "january", "february", "march", "april", "may", "june",
+            "july", "august", "september", "october", "november", "december"
+        ]
+        for i, month in enumerate(months, start=1):
+            if f"last {month}" in phrase.lower():
+                year = today.year - 1 if today.month <= i else today.year
+                start_date = datetime(year, i, 1)
+                if i == 12:  # December
+                    end_date = datetime(year, 12, 31)
+                else:
+                    end_date = datetime(year, i + 1, 1) - timedelta(days=1)
+                break
 
-    return start_date, end_date
+    return (start_date, end_date)
+
 
 
 def build_es_query(entities):
@@ -222,8 +239,12 @@ def build_es_query(entities):
     if entities['priority']:
         query["bool"]["must"].append({"match_phrase": {"priority": entities['priority']}})
 
+    if entities['source']:
+        query["bool"]["must"].append({"match": {"source": entities['source']}})
+
     if entities['date']:
-        start_date, end_date= entities['date']
+        print(entities['date'])
+        start_date, end_date = entities['date']
         query["bool"]["filter"].append({
             "range": {
                 "date": {
@@ -233,7 +254,26 @@ def build_es_query(entities):
             }
         })
     
-    return {"query": query, "size": 1000}
+    return {"query": query, "sort": [
+        {
+            "_script": {
+                "type": "number",
+                "script": {
+                    "source": """
+                        if (doc['source.keyword'].value == 'RSS') {
+                            return 0;
+                        } else if (doc['source.keyword'].value == 'Twitter') {
+                            return 1;
+                        } else {
+                            return 2;
+                        }
+                    """,
+                    "lang": "painless"
+                },
+                "order": "asc"
+            }
+        }
+    ], "size": 1000}
 
 
 def search_elastic_db(es, index, query):
@@ -252,7 +292,8 @@ def elasticSearch():
         "disaster_type": None,
         "location": None,
         "date": None,
-        "priority": None
+        "priority": None,
+        "source": None
     }
     print(request.form)
     query_string = request.form.get('query')
@@ -263,17 +304,19 @@ def elasticSearch():
         location = request.form.get('location')
         date = request.form.get('date')
         try:
-            date = dateparser.parse(date)
+            date = (dateparser.parse(date), None)
         except:
             date = None
         # print(date, type(date))
+        source = request.form.get('source')
         priority = request.form.get('priority')
         entities = {
             "query": query_string,
             "disaster_type": disaster_type,
             "location": location,
             "date": date,
-            "priority": priority
+            "priority": priority,
+            "source": source
         }
         print("Manuel: ", entities)
     else:

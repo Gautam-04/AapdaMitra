@@ -111,7 +111,7 @@
   border-radius: 12px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 2000px) {
   .card-content {
     flex-direction: column;
   }

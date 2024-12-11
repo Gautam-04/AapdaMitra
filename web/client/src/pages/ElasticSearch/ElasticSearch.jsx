@@ -12,9 +12,12 @@ import { IoGrid } from "react-icons/io5";
 import Button from "react-bootstrap/Button";
 import { FaThList } from "react-icons/fa";
 import $ from "jquery";
-import { Badge } from "react-bootstrap";
+import { Badge, Spinner } from "react-bootstrap";
 import CardContainer from "../../components/cardContainer/cardContainer";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 const ElasticSearch = () => {
   const [query, setQuery] = useState("");
@@ -22,12 +25,14 @@ const ElasticSearch = () => {
   const [date, setDate] = useState("");
   const [disaster, setDisaster] = useState("");
   const [priority, setPriority] = useState("");
+  const [source, setSource] = useState("");
   const [view, setView] = useState("grid");
   const [isNLP, setIsNLP] = useState(true);
   const [responseObjects, setResponseObjects] = useState([]);
   const [selectedPosts, setSelectedPosts] = useState({});
   const [selectedPostsLength, setSelectedPostsLength] = useState(0);
   const responseRef = useRef(null);
+  const [newsSummary, setNewsSummary] = useState("Initial");
   const mainSearchBar = useRef(null);
 
   //   const handleAutocomplete = async (e) => {
@@ -86,6 +91,23 @@ const ElasticSearch = () => {
     }
   };
 
+  const generateNewsSummary = async (data) => {
+    const newsData = data;
+    const summarizeNewsURL = "http://127.0.0.1:5000/gemini/summarize-news";
+    try {
+      const response = await axios({
+        method: "post",
+        url: summarizeNewsURL,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        data: { newsData },
+      });
+      console.log(response);
+      setNewsSummary(response.data["summary"]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubmit = async () => {
     const request = {
       query: query,
@@ -93,12 +115,14 @@ const ElasticSearch = () => {
       date: date,
       disaster: disaster,
       priority: priority,
+      source: source,
       nlp: isNLP,
     };
     console.log(request);
 
     setSelectedPosts({});
-    clearCheckboxes();
+    setNewsSummary("");
+    // clearCheckboxes();
 
     const endpoint = "http://localhost:5000/search/elastic";
 
@@ -120,6 +144,9 @@ const ElasticSearch = () => {
         if (priority) {
           formData.append("priority", priority);
         }
+        if (source) {
+          formData.append("source", source);
+        }
       }
 
       const response = await fetch(endpoint, {
@@ -135,6 +162,11 @@ const ElasticSearch = () => {
 
       console.log(responseData);
       setResponseObjects(responseData);
+      const onlyRSS = responseData["results"].filter(
+        (item) => item["source"] === "RSS"
+      );
+      console.log(onlyRSS);
+      await generateNewsSummary(onlyRSS);
       //   console.log(responseObjects);
       // setResponseCounts(newResponseCounts);
     } catch (error) {
@@ -378,6 +410,19 @@ const ElasticSearch = () => {
                 <option value="high">High</option>
               </select>
             </div>
+            <div className="searchbar-parameter">
+              <label htmlFor="source">Source</label>
+              <select
+                className="searchbar-select"
+                name="source"
+                onChange={(e) => setSource(e.target.value)}
+              >
+                <option value="">Set Source</option>
+                <option value="Twitter">Twitter</option>
+                <option value="RSS">RSS</option>
+                <option value="AapdaMitra App">AapdaMitra App</option>
+              </select>
+            </div>
           </div>
         )}
 
@@ -421,35 +466,63 @@ const ElasticSearch = () => {
             </div>
           </div>
         )}
-      <div className="result-cards">
-        {responseObjects["results"] &&
-          responseObjects["results"].length > 0 && <h4>Results: </h4>}
-        {responseObjects && responseObjects.length <= 0 && (
-          <h4>Get started by searching for something.</h4>
-        )}
-        {responseObjects["results"] && responseObjects["results"].length > 0 ? (
-          <div className="response" ref={responseRef}>
-            {responseObjects["results"].map((response, idx) => (
-              <div className="card-wrapper">
-                <label className="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    className="card-checkbox"
-                    onChange={(e) => {
-                      handlePostSelect(e, idx, response);
-                    }}
-                  />
-                </label>
-                <EventCard key={idx} data={response} />
-              </div>
-            ))}
+      <div className="document-summary-wrapper">
+        <div className="result-cards">
+          {responseObjects["results"] &&
+            responseObjects["results"].length > 0 && (
+              <h4>Results ({responseObjects["results"].length}): </h4>
+            )}
+          {responseObjects && responseObjects.length <= 0 && (
+            <h4>Get started by searching for something.</h4>
+          )}
+          {responseObjects["results"] &&
+          responseObjects["results"].length > 0 ? (
+            <div className="response" ref={responseRef}>
+              {responseObjects["results"].map((response, idx) => (
+                <div className="card-wrapper">
+                  <label className="checkbox-wrapper">
+                    {/* <input
+                      type="checkbox"
+                      className="card-checkbox"
+                      onChange={(e) => {
+                        handlePostSelect(e, idx, response);
+                      }}
+                    /> */}
+                  </label>
+                  <EventCard key={idx} data={response} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            responseObjects["results"] && (
+              <h4>Nothing Found. Please try with a different query.</h4>
+            )
+          )}
+        </div>
+        {newsSummary === "" && (
+          <div className="news-summary-final">
+            <ReactMarkdown
+              children={"Summary is Loading. Please wait..."}
+              className={"md-format"}
+            />
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
           </div>
-        ) : (
-          responseObjects["results"] && (
-            <h4>Nothing Found. Please try with a different query.</h4>
-          )
+        )}
+        {newsSummary !== "Initial" && newsSummary !== "" && (
+          <div className="news-summary-final">
+            <h4>Summary</h4>
+            <ReactMarkdown
+              children={newsSummary}
+              class="md-format"
+              urlTransform={(value) => value}
+              rehypePlugins={[rehypeRaw]}
+            />
+          </div>
         )}
       </div>
+
       {Object.keys(selectedPosts).length > 0 && selectedPostsLength > 0 && (
         <div className="selected-posts-wrapper">
           <div className="selected-posts">

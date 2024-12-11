@@ -44,14 +44,14 @@ function Header() {
             SEARCH
           </Link>
         </div>
-        <div className="header-nav-item">
+        {/* <div className="header-nav-item">
           <Link
             to={"/dashboard/donations"}
             style={{ textDecoration: "None", color: "black" }}
           >
             DONATIONS
           </Link>{" "}
-        </div>
+        </div> */}
         <div className="header-nav-item">
           <Link
             to={"https://www.ndrf.gov.in/"}

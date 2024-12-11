@@ -182,7 +182,8 @@ const SOSDisplay = () => {
                     <br />
                     {req.city && req.state ? (
                       <>
-                        {req.city}, {req.state}
+                        {req.city === "N/A" ? req.district : req.city},{" "}
+                        {req.state}
                       </>
                     ) : (
                       <>{req.location}</>
@@ -229,7 +230,10 @@ const SOSDisplay = () => {
                   <span>Location:</span>
                   {currentSOS.city && currentSOS.state ? (
                     <>
-                      {currentSOS.city}, {currentSOS.state}
+                      {currentSOS.city === "N/A"
+                        ? currentSOS.district
+                        : currentSOS.city}
+                      , {currentSOS.state}
                     </>
                   ) : (
                     <>{currentSOS.location}</>
