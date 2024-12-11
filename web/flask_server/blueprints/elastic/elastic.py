@@ -432,3 +432,17 @@ def unverifiedCount():
     except Exception as e:
         print(e)
         return {"error": "Couldn't get count"}
+
+@search.post('/find-by-id')
+def findByID():
+    req = request.json()
+    received_id = req['id']
+    try:
+        return {"count": es.count(index=INDEX_NAME, query={
+        "match": {
+          "_id": received_id
+        }
+    })}
+    except Exception as e:
+        print(e)
+        return {"error": "Couldn't get count"}
