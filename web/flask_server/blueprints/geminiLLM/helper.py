@@ -39,6 +39,12 @@ def generateSummary(data):
                                     The summary aims to summarize news articles for NDRF to get information from. {data}''')
     print(response.text)
     return response.text
+
+
+def generateOneLiner(data):
+    return (MODEL.generate_content(f'''Read the given data and generate a one liner summary of it.
+                                    Make sure the summary is short (one-line).
+                                    The summary must include the disaster type, location and time mentioned in the data. {data}''').text)
         
 
 class DisasterAnalysis:

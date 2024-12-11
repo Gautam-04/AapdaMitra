@@ -87,3 +87,14 @@ def newsToSummary():
     except Exception as e:
         print(e)
         return {"error": "something"}
+    
+@geminiLLM.route('/get-one-liner', methods=['POST'])
+def getOneLiner():
+    try:
+        data = request.json
+        response = generateOneLiner(data)
+        return {'one-liner': response}
+    
+    except Exception as e:
+        print(e)
+        return {"error": "An error occurred!"}
