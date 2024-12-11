@@ -17,6 +17,7 @@ import SummarizePosts from "./pages/SummarizePosts/SummarizePosts";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Search from "./components/Search/Search";
 import Navigator from "./pages/Navigator/Navigator";
+import Realtime from "./pages/Realtime/Realtime";
 // import Fundraiser from "./pages/Fundraiser/Fundraiser";
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path="/donations/:fundraiserId" element={<Donation />} />
         <Route path="/dashboard/:tab" element={<Dashboard />} />
         <Route path="/navigation" element={<Navigator />} />
+        <Route path="/realtime" element={<Realtime />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer
