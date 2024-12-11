@@ -74,4 +74,16 @@ def generateReport():
 
     else:
         return "Hit this endpoint with a POST request"
-    
+
+
+@geminiLLM.route('/summarize-news', methods=['POST'])
+def newsToSummary():
+    try:
+        # data = request.form.get('posts')
+        data = request.json
+        print(data)
+        response = generateSummary(data['newsData'])
+        return {"summary": response}
+    except Exception as e:
+        print(e)
+        return {"error": "something"}

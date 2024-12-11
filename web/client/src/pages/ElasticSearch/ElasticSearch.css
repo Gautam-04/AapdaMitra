@@ -93,6 +93,7 @@
 
 .result-cards {
   min-height: 70vh;
+  width: 60%;
   display: flex;
   padding-block: 2rem;
   flex-direction: column;
@@ -100,7 +101,7 @@
 }
 
 .result-cards > h4 {
-  width: 80%;
+  width: 90%;
   font-weight: 600;
 }
 
@@ -112,7 +113,7 @@
   flex-direction: column;
   padding: 2rem;
   background: #f4f7fe;
-  max-width: 80%;
+  max-width: 90%;
 }
 
 .parameters-response {
@@ -226,4 +227,29 @@
   .searchbar-input {
     font-size: 14px;
   }
+}
+
+.document-summary-wrapper {
+  display: flex;
+  position: relative;
+  width: 100%;
+  padding: 1rem;
+}
+.news-summary-final > h4 {
+  font-weight: 600;
+}
+
+.news-summary-final {
+  width: 40%;
+  padding-block: 2rem;
+  padding-inline: 1rem;
+  position: sticky;
+  top: 0;
+  height: fit-content;
+}
+.news-summary-final p {
+  font-family: "Inter", sans-serif;
+  background: #f4f7fe;
+  padding: 2rem;
+  border-radius: 14px;
 }

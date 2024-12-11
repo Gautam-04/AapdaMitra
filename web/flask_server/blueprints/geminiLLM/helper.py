@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 matplotlib.use('agg')
+genai.configure(api_key=os.environ['GEMINI_API_KEY'])
+MODEL = genai.GenerativeModel('gemini-1.5-flash')
 
 def load_data(pathToData):
     with open(pathToData, "r") as f:
@@ -27,15 +29,24 @@ def executeCodeFromArray(codeArray: list[str]):
 def imageToB64(image):
     pass
 
+def generateSummary(data):
+    for post in data:
+        post['post_body_full'] = ""
+    response = MODEL.generate_content(f'''The data given below is multiple news articles scraped from different sources related to disasters.
+                                    Read the data and generate a brief summary aggregating the data from multiple posts into a singular quick read paragraph with color coding and markdown.
+                                      Don't change the font only give colors and boldness in the markdown. Only keep a maximum of three colors.
+                                      Return nothing if the input is an empty array.
+                                    The summary aims to summarize news articles for NDRF to get information from. {data}''')
+    print(response.text)
+    return response.text
+        
 
 class DisasterAnalysis:
     def __init__(self, data):
         self.data = data
 
-        genai.configure(api_key=os.environ['GEMINI_API_KEY'])
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
         
-        self.chat = self.model.start_chat()
+        self.chat = MODEL.start_chat()
         print("new object for gemini created")
 
     def generateReportFromData(self):
