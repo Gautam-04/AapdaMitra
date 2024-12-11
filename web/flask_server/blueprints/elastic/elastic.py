@@ -385,6 +385,7 @@ def addPost():
             "post_id": "",
             "post_title": "",
             "post_body": "",
+            "post_body_full": "",
             "date": None,
             "likes": 0,
             "retweets": 0,
@@ -393,7 +394,8 @@ def addPost():
             "location": "",
             "url": "",
             "disaster_type": "",
-            "source": "AapdaMitra App",
+            "source": "",
+            "createdAt": "",
         }
 
         data = request.json
@@ -402,7 +404,7 @@ def addPost():
 
         print(template)
 
-        es.index(index=INDEX_NAME, document=dict(template))
+        es.index(index="archived_posts", document=dict(template))
         return {"onload": "Successful"}
     except Exception as e:
         print(e)

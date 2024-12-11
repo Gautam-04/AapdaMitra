@@ -7,6 +7,7 @@ import axios from "axios";
 import Twilio from "twilio";
 import moment from "moment-timezone";
 import haversine from "haversine-distance";
+import googleTrends from "google-trends-api"
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -1736,15 +1737,137 @@ const getFinalReportData = async (req, res) => {
       return res.status(200).json({ message: "No data found for the given date range." });
     }
 
+    const sosData = await Sos.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+          },
+          verifiedSos: { $sum: { $cond: [{ $eq: ["$verified", true] }, 1, 0] } },
+          unverifiedSos: { $sum: { $cond: [{ $eq: ["$verified", false] }, 1, 0] } },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ])
+
+    const VerifiedPostCount = await VerifiedPosts.aggregate([
+  {
+    $match: {
+      createdAt: { $gte: start, $lte: end },
+    },
+  },
+  {
+    $group: {
+      _id: {
+        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+      },
+      VerifiedDoc: { $sum: 1 },
+    },
+  },
+  {
+    $sort: { _id: 1 },
+  },
+]);
+
+const UnverifiedCount = await ElasticAnalytics.aggregate([
+  {
+    $group: {
+      _id: {
+        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+      },
+      totalUnverifiedPosts: { $sum: "$totalUnverifiedPosts" },
+    },
+  },
+  {
+    $sort: { _id: 1 }, // Sort by date in ascending order
+  },
+]);
+
     return res.status(200).json({
       message: "Final report data retrieved successfully",
       data: getSourcesData, 
+      sosData: sosData,
+      verifiedPostData: VerifiedPostCount,
+      UnverifiedPostData: UnverifiedCount
     });
   } catch (error) {
     console.log("Error in getting final report", error);
     return res.status(500).json({ message: "Error in getting final report" });
   }
 };
+
+
+const AnalyticsDb = new mongoose.model("AnalyticsDb", 
+  mongoose.Schema({
+    location: {type: String, required: true},
+    totalSos: {type: Number, required: true},
+  },{timestamps: true})
+)
+
+const postIssuesMapData = async (req, res) => {
+  const {location,totalSos} = req.body;
+try {
+  const dataExists = await AnalyticsDb.findOne({ location: location });
+
+    if (dataExists) {
+      const updatedAnalytics = await AnalyticsDb.findByIdAndUpdate(
+        dataExists._id,
+        {
+          totalSos: dataExists.totalSos + totalSos
+        },
+        { new: true }
+      );
+
+      await updatedAnalytics.save();
+
+      return res.status(200).json({
+        message: "Analytics updated successfully",
+        updatedAnalytics,
+      });
+    } else {
+      const analytics = await AnalyticsDb.create({
+        location,
+        totalSos
+      });
+      return res.status(200).json({ message: "Analytics created successfully", analytics });
+}} catch (error) {
+  console.log("Error in getting map data", error);
+  return res.status(200).json({message: "Error in loading message"})
+}
+}
+
+const getIssuesMapData = async(req,res)=>{
+try {
+  const getSourcesData = await AnalyticsDb.aggregate([
+      {
+        $group: {
+          _id: "$location", // Group by location
+          location: { $first: "$location" }, // Include the location in the result
+          totalSos: { $sum: "$totalSos" }, // Sum the totalSos for each location
+        },
+      },
+      {
+        $sort: { _id: 1 }, 
+      },
+    ]);
+
+    if (getSourcesData.length === 0) {
+      return res.status(200).json({ message: "No data found for the given date range." });
+    }
+
+    return res.status(200).json({message: "Message sos data sent", getSourcesData})
+} catch (error) {
+  console.log("Error in getting", error);
+  return res.status(400).json({message: "Error"})
+}
+}
 
 
 //raise a req controller
@@ -1772,6 +1895,8 @@ routes.route("/get-all-post").get(getVerifiedPost);
 routes.route("/like-post").post(increaseLike);
 routes.route("/dislike-post").post(increaseDislike);
 routes.route("/update-post").post(updatePost);
+routes.route("/post-map-location-data").post(postIssuesMapData);
+routes.route("/get-map-location-data").get(getIssuesMapData);
 
 //for admin routes
 routes.route("/sos-count").get(sosCounter);
