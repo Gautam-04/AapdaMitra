@@ -1,0 +1,118 @@
+[   
+ {
+      "Unit": "1st Battalion NDRF",
+      "Address": "3JV7+V38, Chhaygaon - Guwahati Rd, Azara, Guwahati, Garbhanga F.V., Assam 781018",
+      "control_room": "0361-2840027",
+      "latitude": 26.094773464636315,
+      "longitude":  91.61343122779328
+    },
+ {
+      "Unit": "2nd Battalion NDRF",
+      "Address": "2nd BN NDRF, Near RRI Camp. Haringhata, Mohanpur, Nadia, (West Bengal)Pin - 741246",
+      "control_room": "033-25875032",
+      "latitude": 22.948040052790752,
+      "longitude":  88.51120632473082
+    },
+ {
+      "Unit": "3rd Battalion NDRF",
+      "Address": "3rd BN NDRF, PO-Mundali, Cuttack - Odisha Pin - 754013",
+      "control_room": "0671-2879710",
+      "latitude": 20.427569581732186, 
+      "longitude":  85.77680825326362
+    },
+ {
+      "Unit": "4th Battalion NDRF",
+      "Address": "4th BN NDRF, Suraksha Campus , Arrakonam , Distt. Ranipet, Tamilnadu-631152",
+      "control_room": "04177-246594",
+      "latitude": 13.048525285781144, 
+      "longitude":  79.75079451231714
+    },
+ {
+      "Unit": "5th Battalion NDRF",
+      "Address": "5th BN NDRF, Sudumbare, Mavel, PuneMaharashtra-412109",
+      "control_room": "null",
+      "latitude": 18.762971262600942, 
+      "longitude":  73.75775192461802
+    },
+ {
+      "Unit": "6th Battalion NDRF",
+      "Address": "6th BN NDRF, Jarod Camp,Teh-Wagodia, Vadodara, (Gujarat) Pin - 391510",
+      "control_room": "null",
+      "latitude": 22.432952080404345, 
+      "longitude":  73.31547821554523
+    },
+ {
+      "Unit": "7th Battalion NDRF",
+      "Address": "7th BN NDRF, Bibiwala Road, Bhatinda ( Punjab ) Pin 151001",
+      "control_room": "0164 - 2246570",
+      "latitude": 30.244654649486247, 
+      "longitude": 74.9713454673068
+    },
+ {
+      "Unit": "8th Battalion NDRF",
+      "Address": "8th BN NDRF, Kamla Nehru Nagar, Ghaziabad (UP) Pin - 201002",
+      "control_room": "0120 - 27666012",
+      "latitude": 28.6818219112267, 
+      "longitude": 77.47357045375539
+    },
+
+
+ {
+        "Unit":"9th Battalion NDRF",
+        "Address":"9th BN NDRF, Bihata Patna, Bihar Pin - 801103",
+        "control_room":"8544415050",
+      "latitude": 25.553795802702318, 
+      "longitude": 84.86938389782537	
+    },
+    {
+        "Unit":"10th Battalion NDRF",
+        "Address":"10th BN NDRF, Village Kondapavuluru, PO- Surampalli, Gannavaram Mandal Krishna, AP PIN - 521212",
+        "control_room":"8333068540",
+      "latitude": 16.618204494873897, 
+      "longitude": 80.74020918039082 
+    },
+    {
+        "Unit":"11th Battalion NDRF",
+        "Address":"11th BN NDRF, Sanskritik Sankul, Maqbool Alam Road, Varanasi, UP - 221002",
+        "control_room":"8004931410",
+      "latitude": 25.339063080995327, 
+      "longitude": 82.99549699014722
+    },
+    {
+        "Unit":"12th Battalion NDRF",
+        "Address":"12th BN NDRF, Itanagar, Arunachal Pradesh-791112",
+        "control_room":"9485235464",
+      "latitude": 26.963468727471835, 
+      "longitude": 93.60196559602352
+    },
+    {
+        "Unit":"13th Battalion NDRF",
+        "Address":"13th BN NDRF, Ladhowal, Ludhiana, Punjab-141008",
+        "control_room":"0161-2921304",
+        "latitude": 75.76154249677461,
+      "longitude": 30.99913849652098 
+
+    },
+    {
+        "Unit":"14th Battalion NDRF",
+        "Address":"14th BN NDRF, Nurpur, Jassur, Kangra, Himachal Pradesh PIN- 176201",
+        "control_room":"01893-292602",
+      "latitude": 32.283782372245575, 
+      "longitude": 75.85804689622249
+    },
+    {
+        "Unit":"15th Battalion NDRF",
+        "Address":"15th BN NDRF, PO-Gadarpur, Distt - Udhamsingh Nagar, Uttarakhand PIN-263152",
+        "control_room":"7579098442",
+      "latitude": 29.037997980703878, 
+      "longitude": 79.26655589609723
+    },
+    {
+        "Unit":"16th Battalion NDRF",
+        "Address":"16th BN NDRF, Near Dada Dev Mandir Road, Sector-7, Dwarka, New Delhi, PIN-110077",
+        "control_room":"011-20893564",
+      "latitude": 28.578605230579335,
+      "longitude": 77.07750733840928
+    }
+]
+
