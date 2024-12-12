@@ -28,6 +28,8 @@ const Realtime = () => {
   const [posts, setPosts] = useState([]);
   const [topPost, setTopPost] = useState(null);
   const [topLocation, setTopLocation] = useState([23, 80]);
+  const [mainMapMarkers, setMainMapMarkers] = useState([]);
+  const [countsMap, setCountsMap] = useState(new Map());
 
   const setColor = ({ properties }) => {
     return { weight: 1 };
@@ -44,10 +46,24 @@ const Realtime = () => {
     iconSize: [30, 30],
   });
 
-  const handleNewPostFromSocket = (newPost) => {
+const handleNewPostFromSocket = (newPost) => {
     console.log("New post received:", newPost);
+    const key = `${newPost.disaster_type}-${newPost.location}-${
+      newPost.date.split("T")[0]
+    }`;
+    setCountsMap((prevCountsMap) => {
+      const newCountsMap = new Map(prevCountsMap); // Create a copy
+      if (newCountsMap.has(key)) {
+        newCountsMap.set(key, newCountsMap.get(key) + 1);
+      } else {
+        newCountsMap.set(key, 1);
+      }
+      return newCountsMap; // Return the updated Map
+    });
 
-    // Append the current `topPost` to `posts` and update `topPost`
+    console.log(countsMap);
+
+    // Append the current topPost to posts and update topPost
     setPosts((prevPosts) => {
       return topPost ? [topPost, ...prevPosts] : prevPosts; // Only append if topPost exists
     });
@@ -145,6 +161,7 @@ const Realtime = () => {
     // //   marker: [results[0]["y"], results[0]["x"]],
     // // }));
     setTopLocation([results[0]["y"], results[0]["x"]]);
+    setMainMapMarkers(prev => [...prev, [results[0]["y"], results[0]["x"]]])
   };
 
   function SetViewOnClick(location) {
@@ -210,6 +227,15 @@ const Realtime = () => {
                   </Marker>
                 );
               })}
+              {mainMapMarkers.map((marker, idx) => {
+                return (
+                  <Marker
+                    key={idx}
+                    position={[marker[0], marker[1]]}
+                    icon={postIcon}
+                  ></Marker>
+                );
+                })}
               <GeoJSON data={indiaGeo} style={setColor} />
               {}
             </MapContainer>
@@ -289,11 +315,17 @@ const Realtime = () => {
                     <SetViewOnClick location={topLocation} />
                   </MapContainer>
                 </div>
-                <div className="top-post-insights">
-                  <PiSealWarningBold /> This post matched with 2 other recent
-                  posts.
-                  <Button>View related posts</Button>
-                </div>
+                {countsMap.get(
+                  `${topPost.disaster_type}-${topPost.location}-${
+                    topPost.date.split("T")[0]
+                  }`
+                ) > 1 && (
+                  <div className="top-post-insights">
+                    <PiSealWarningBold /> This post matched with other recent
+                    posts.
+                    {/* <Button>View related posts</Button> */}
+                  </div>
+                )}
               </div>
             </div>
           )}
