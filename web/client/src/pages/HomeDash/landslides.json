@@ -1,0 +1,67 @@
+[
+    {
+      "date": "2024-09-27T09:00:00",
+      "disaster_type": "Flood",
+      "location": "Mangan, Sikkim, India",
+      "post_body": "With the Rang-Rang bridge down, Mangan district headquarters in Sikkim is cut off from the rest of the state after heavy rains triggered multiple landslides.",
+      "post_body_full": "Heavy rains in Sikkim over the last three days have caused significant damage to the old Rang-Rang bridge, the key gateway to the northern part of the state. Mangan district headquarters is now cut off, with the alternative route via Dzongu also blocked due to the Sankhalang bridge damage from last year. The district administration is assessing the situation and working to restore connectivity.",
+      "post_id": "s1f2d3s4",
+      "post_image_url": "https://th-i.thgim.com/public/incoming/8gd634/article68689154.ece/alternates/LANDSCAPE_1200/PTI08_20_2024_000296B.jpg",
+      "post_title": "Sikkim Floods: Mangan Cut Off Due to Landslides and Bridge Damage",
+      "priority": "high",
+      "source": "The Hindu",
+      "url": "https://www.thehindu.com/news/national/sikkim/heavy-rain-in-sikkim-triggers-multiple-landslides-bridge-damaged/article68689143.ece"
+    },
+    {
+      "date": "2024-09-28T10:00:00",
+      "disaster_type": "Landslide",
+      "location": "Pelling, Sikkim, India",
+      "post_body": "Landslides in Pelling disrupt road access to key tourist destinations in Sikkim.",
+      "post_body_full": "Continuous rainfall over the past days has caused several landslides near Pelling, blocking roads that lead to popular tourist spots. Local authorities are working to clear debris and restore access.",
+      "post_id": "s2f3d4s5",
+      "post_image_url": "https://th-i.thgim.com/public/incoming/8gd634/article68689154.ece/alternates/LANDSCAPE_1200/PTI08_20_2024_000296B.jpg",
+      "post_title": "Sikkim Landslides: Road Access Disrupted in Pelling",
+      "priority": "medium",
+      "source": "The Hindu",
+      "url": "https://www.thehindu.com/news/national/sikkim/landslides-pelling-disrupted/article68689143.ece"
+    },
+    {
+      "date": "2024-09-29T08:00:00",
+      "disaster_type": "Flood",
+      "location": "Gangtok, Sikkim, India",
+      "post_body": "Floods in Gangtok following heavy rains have left several areas submerged.",
+      "post_body_full": "Flash floods caused by persistent heavy rainfall have affected several low-lying areas in Gangtok, with authorities urging residents to stay on higher ground. Emergency teams are being deployed to provide aid.",
+      "post_id": "s3f4d5s6",
+      "post_image_url": "https://th-i.thgim.com/public/incoming/8gd634/article68689154.ece/alternates/LANDSCAPE_1200/PTI08_20_2024_000296B.jpg",
+      "post_title": "Sikkim Floods: Gangtok Faces Severe Flooding After Heavy Rain",
+      "priority": "high",
+      "source": "The Hindu",
+      "url": "https://www.thehindu.com/news/national/sikkim/gangtok-floods-heavy-rain-article68689143.ece"
+    },
+    {
+      "date": "2024-08-30T09:00:00",
+      "disaster_type": "Landslide",
+      "location": "Wayanad, Kerala, India",
+      "post_body": "A month after India’s deadliest landslide ever, Wayanad villages begin to recover, but many lives remain shattered.",
+      "post_body_full": "On July 30, 2024, Wayanad in Kerala witnessed India’s worst-ever landslide, causing the death of over 231 people and affecting the villages of Punchirimattam, Chooralmala, and Mundakkai. The region is still recovering, with many areas abandoned, debris scattered, and many people still missing. Survivors struggle to salvage belongings, while local authorities work to prevent thefts. The post office in Chooralmala remains one of the few operational places, with packages piling up for the deceased or missing residents.",
+      "post_id": "s4f5d6s7",
+      "post_image_url": "https://gumlet.assettype.com/downtoearth%2F2024-09-06%2F95mu6a9s%2FWayanad1.JPG?w=1024&auto=format%2Ccompress&fit=max",
+      "post_title": "Wayanad Landslide Recovery: A Month After India’s Deadliest Landslide",
+      "priority": "high",
+      "source": "Down to Earth",
+      "url": "https://www.downtoearth.org.in/natural-disasters/a-month-after-indias-deadliest-landslide-ever-wayanad-villages-begin-to-recover"
+    },
+    {
+      "date": "2024-09-06T09:00:00",
+      "disaster_type": "Landslide",
+      "location": "Chooralmala, Kerala, India",
+      "post_body": "A month after India’s deadliest landslide ever, life in Chooralmala is beginning to recover, though many packages still pile up at the local post office.",
+      "post_body_full": "A month after the devastating landslide in Wayanad, Kerala, where over 231 lives were lost, Chooralmala's post office remains one of the few functional establishments. Packages, mostly addressed to the deceased or missing, continue to accumulate. Locals are still in shock, and the community remains under recovery as the authorities work to maintain order and prevent theft in the abandoned areas.",
+      "post_id": "s4f7d9s10",
+      "post_image_url": "https://gumlet.assettype.com/downtoearth%2F2024-09-06%2F95mu6a9s%2FWayanad1.JPG?w=1024&auto=format%2Ccompress&fit=max",
+      "post_title": "Chooralmala Struggles to Recover: One Month After Wayanad’s Deadliest Landslide",
+      "priority": "high",
+      "source": "Down to Earth",
+      "url": "https://www.downtoearth.org.in/natural-disasters/a-month-after-indias-deadliest-landslide-ever-wayanad-villages-begin-to-recover"
+    }
+  ]

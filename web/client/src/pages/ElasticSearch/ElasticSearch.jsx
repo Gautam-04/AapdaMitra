@@ -12,7 +12,7 @@ import { IoGrid } from "react-icons/io5";
 import Button from "react-bootstrap/Button";
 import { FaThList } from "react-icons/fa";
 import $ from "jquery";
-import { Badge, Spinner } from "react-bootstrap";
+import { Badge, Spinner, Tab, Tabs } from "react-bootstrap";
 import CardContainer from "../../components/cardContainer/cardContainer";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -524,33 +524,55 @@ const ElasticSearch = () => {
             )
           )}
         </div>
-        {newsSummary === "" && (
-          <div className="news-summary-final">
-            <ReactMarkdown
-              children={"Summary is Loading. Please wait..."}
-              className={"md-format"}
-            />
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </div>
-        )}
-        {newsSummary !== "Initial" && newsSummary !== "" && (
-          <div className="news-summary-final">
-            <h4>Summary</h4>
-            <div ref={summaryRef}>
-              <ReactMarkdown
-                children={newsSummary}
-                className="md-format"
-                urlTransform={(value) => value}
-                rehypePlugins={[rehypeRaw]}
-              />
-            </div>
-            <Button variant="primary" onClick={printSummary} className="mt-3">
-              Print Summary
-            </Button>
-          </div>
-        )}
+        <div className="news-summary-final">
+          <Tabs
+            defaultActiveKey="summary"
+            id="uncontrolled-tab-example"
+            className="mb-3"
+          >
+            <Tab eventKey="summary" title="Summary" className="search-summary">
+              {newsSummary === "" && (
+                <div className="news-summary-wrapper">
+                  <ReactMarkdown
+                    children={"Summary is Loading. Please wait..."}
+                    className={"md-format"}
+                  />
+                  <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </Spinner>
+                </div>
+              )}
+              {newsSummary !== "Initial" && newsSummary !== "" && (
+                <div className="news-summary-wrapper">
+                  <div ref={summaryRef}>
+                    <ReactMarkdown
+                      children={newsSummary}
+                      className="md-format"
+                      urlTransform={(value) => value}
+                      rehypePlugins={[rehypeRaw]}
+                    />
+                  </div>
+                  <Button
+                    variant="primary"
+                    onClick={printSummary}
+                    className="mt-3"
+                  >
+                    Print Summary
+                  </Button>
+                </div>
+              )}
+            </Tab>
+            <Tab eventKey="images" title="Images" className="search-images">
+              <div className="response-image-wrapper">
+                {responseObjects["results"] &&
+                  responseObjects["results"].length > 0 &&
+                  responseObjects["results"].map((object, idx) => {
+                    return <img key={idx} src={object.post_image_url} />;
+                  })}
+              </div>
+            </Tab>
+          </Tabs>
+        </div>
       </div>
 
       {Object.keys(selectedPosts).length > 0 && selectedPostsLength > 0 && (
