@@ -18,6 +18,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Search from "./components/Search/Search";
 import Navigator from "./pages/Navigator/Navigator";
 import Realtime from "./pages/Realtime/Realtime";
+import HomeDash from "./pages/HomeDash/HomeDash";
 // import Fundraiser from "./pages/Fundraiser/Fundraiser";
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
         <Route path="/dashboard/:tab" element={<Dashboard />} />
         <Route path="/navigation" element={<Navigator />} />
         <Route path="/realtime" element={<Realtime />} />
+        <Route path="/home" element={<HomeDash />} />
       </Routes>
       {/* <Footer /> */}
       <ToastContainer

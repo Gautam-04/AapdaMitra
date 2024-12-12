@@ -245,11 +245,48 @@
   padding-inline: 1rem;
   position: sticky;
   top: 0;
-  height: fit-content;
+  height: 100vh;
+  overflow-y: scroll;
 }
 .news-summary-final p {
   font-family: "Inter", sans-serif;
   background: #f4f7fe;
-  padding: 2rem;
+  padding: 1rem 2rem;
   border-radius: 14px;
+}
+
+.news-summary-final .md-format {
+  padding-block: 1rem;
+}
+
+.news-summary-final .nav-tabs {
+  justify-content: left;
+  background-color: white;
+}
+
+.news-summary-final .nav-tabs .nav-item button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.response-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.search-images img {
+  width: 80%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.search-images {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }

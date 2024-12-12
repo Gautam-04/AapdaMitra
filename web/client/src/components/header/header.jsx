@@ -19,29 +19,23 @@ function Header() {
   return (
     <div className="header">
       <div className="header-logo-container">
-        <Link
-          to={"/dashboard/analytics"}
-          style={{ textDecoration: "None", color: "black" }}
-        >
+        <Link to={"/home"} style={{ textDecoration: "None", color: "black" }}>
           <img src={MainLogo} alt="mainlogo.svg" className="header-logo" />
         </Link>
       </div>
 
       <nav className="header-nav-container">
         <div className="header-nav-item">
-          <Link
-            to={"/dashboard/analytics"}
-            style={{ textDecoration: "None", color: "black" }}
-          >
-            DASHBOARD
+          <Link to={"/home"} style={{ textDecoration: "None", color: "black" }}>
+            HOME
           </Link>
         </div>
         <div className="header-nav-item">
           <Link
-            to={"/elastic"}
+            to={"/dashboard"}
             style={{ textDecoration: "None", color: "black" }}
           >
-            SEARCH
+            DASHBOARD
           </Link>
         </div>
         {/* <div className="header-nav-item">
@@ -54,10 +48,10 @@ function Header() {
         </div> */}
         <div className="header-nav-item">
           <Link
-            to={"https://www.ndrf.gov.in/"}
+            to={"/elastic"}
             style={{ textDecoration: "None", color: "black" }}
           >
-            NDRF
+            ARCHIVES
           </Link>{" "}
         </div>
       </nav>
