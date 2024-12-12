@@ -98,3 +98,31 @@ def getOneLiner():
     except Exception as e:
         print(e)
         return {"error": "An error occurred!"}
+    
+@geminiLLM.route('/dailyreport', methods=['POST'])
+def dailyReport():
+    try:
+        data = request.json
+
+        # model = DisasterAnalysis(data)
+
+        report = generateDailyReport(data)
+
+        return {"daily-report": report}
+    except Exception as e:
+        print(f"Error in generating daily report: {e}")
+        return {"error": "Failed to generate daily report."}, 500
+    
+@geminiLLM.route('/finalreport', methods=['POST'])
+def RandomReport():
+    try:
+        data = request.json
+
+        # model = DisasterAnalysis(data)
+
+        report = generateRandomReport(data)
+
+        return {"daily-report": report}
+    except Exception as e:
+        print(f"Error in generating daily report: {e}")
+        return {"error": "Failed to generate daily report."}, 500
