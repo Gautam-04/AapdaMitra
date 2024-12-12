@@ -48,7 +48,7 @@ const Realtime = () => {
     iconSize: [30, 30],
   });
 
-const handleNewPostFromSocket = (newPost) => {
+  const handleNewPostFromSocket = (newPost) => {
     console.log("New post received:", newPost);
     const key = `${newPost.disaster_type}-${newPost.location}-${
       newPost.date.split("T")[0]
@@ -85,7 +85,6 @@ const handleNewPostFromSocket = (newPost) => {
         console.log("Initial Request Successful");
       }
     } catch (error) {
-      toast.error("Error getting post. Try again later.");
       console.error(error);
     }
   };
