@@ -34,6 +34,7 @@ const ElasticSearch = () => {
   const responseRef = useRef(null);
   const [newsSummary, setNewsSummary] = useState("Initial");
   const mainSearchBar = useRef(null);
+  const summaryRef = useRef(null);
 
   //   const handleAutocomplete = async (e) => {
   //     console.log(e.target.value);
@@ -43,7 +44,7 @@ const ElasticSearch = () => {
   //         "http://localhost:5000/search/autocomplete?query=" + e.target.value
   //       );
   //       if (!response.ok) {
-  //         throw new Error(`Response status: ${response.status}`);
+  //         throw new Error(Response status: ${response.status});
   //       }
 
   //       const json = await response.json();
@@ -180,6 +181,30 @@ const ElasticSearch = () => {
     const onlyValues = Objects.values(posts);
     console.log(onlyValues);
     return onlyValues;
+  };
+
+  const printSummary = () => {
+    if (summaryRef.current) {
+      const printContents = summaryRef.current.innerHTML;
+      const originalContents = document.body.innerHTML;
+
+      document.body.innerHTML = `
+        <div style="white-space: pre-wrap; font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; text-align: center;">
+          <img src=${MainLogo} alt="Logo" style="width: 60%; height: 20%; margin-bottom: 10px;" />
+          <h3 style="border-bottom: 2px solid #ccc; padding-bottom: 10px;">News Summary</h3>
+          <div style="text-align: left; margin-top: 20px;">
+            ${printContents}
+          </div>
+        </div>
+      `;
+
+      window.print();
+
+      // Restore the original page content
+      document.body.innerHTML = originalContents;
+      // Reload the page to restore event listeners and React functionality
+      window.location.reload();
+    }
   };
 
   return (
@@ -513,12 +538,17 @@ const ElasticSearch = () => {
         {newsSummary !== "Initial" && newsSummary !== "" && (
           <div className="news-summary-final">
             <h4>Summary</h4>
-            <ReactMarkdown
-              children={newsSummary}
-              class="md-format"
-              urlTransform={(value) => value}
-              rehypePlugins={[rehypeRaw]}
-            />
+            <div ref={summaryRef}>
+              <ReactMarkdown
+                children={newsSummary}
+                className="md-format"
+                urlTransform={(value) => value}
+                rehypePlugins={[rehypeRaw]}
+              />
+            </div>
+            <Button variant="primary" onClick={printSummary} className="mt-3">
+              Print Summary
+            </Button>
           </div>
         )}
       </div>
