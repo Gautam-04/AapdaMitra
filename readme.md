@@ -1,4 +1,4 @@
-Here is the direct copy of the `README.md` for your project:
+
 
 ```markdown
 # SIH Final Project
