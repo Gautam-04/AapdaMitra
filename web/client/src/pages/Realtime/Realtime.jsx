@@ -65,7 +65,7 @@ const Realtime = () => {
 
     console.log(countsMap);
 
-    // Append the current topPost to posts and update topPost
+    // Append the current `topPost` to `posts` and update `topPost`
     setPosts((prevPosts) => {
       return topPost ? [topPost, ...prevPosts] : prevPosts; // Only append if topPost exists
     });
@@ -85,6 +85,7 @@ const Realtime = () => {
         console.log("Initial Request Successful");
       }
     } catch (error) {
+      toast.error("Error getting post. Try again later.");
       console.error(error);
     }
   };
