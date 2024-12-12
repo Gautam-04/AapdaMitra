@@ -35,8 +35,12 @@ def generateSummary(data):
     response = MODEL.generate_content(f'''The data given below is multiple news articles scraped from different sources related to disasters.
                                     Read the data and generate a brief summary aggregating the data from multiple posts into a singular quick read paragraph with color coding and markdown.
                                       Don't change the font only give colors and boldness in the markdown. Only keep a maximum of three colors.
-                                      Return nothing if the input is an empty array.
-                                    The summary aims to summarize news articles for NDRF to get information from. {data}''')
+                                      Return nothing if the input is an empty array. Try to extract information about specific details related to specific disasters. For example if the content is of cyclone
+                                        then the summary should include the location, time, impact of the cyclone, speed of cyclone, landfall location, deaths, people affected, and various NDRF safe shelters which were
+                                      created for the help of the people affected by the cyclone. Similarly for flood area affected, people affected, deaths, and various NDRF safe shelters which were created for the help of the people affected by the flood. and other such details.
+                                      I want the summary to be extremely detailed and informative with at least 1-2 pages of relevant content in paragraph format. Use markdown color as green and red to show good and bad information respectively.
+                                      In the start just give a basic smaller summary of the data in points format like No of total people died, No of people affected, No of safe shelters created, site of landfall or site/ground location of disaster etc. and then give a detailed summary of the data.
+                                        The summary aims to summarize news articles for NDRF to get information from. {data}''')
     print(response.text)
     return response.text
 
@@ -45,6 +49,14 @@ def generateOneLiner(data):
     return (MODEL.generate_content(f'''Read the given data and generate a one liner summary of it.
                                     Make sure the summary is short (one-line).
                                     The summary must include the disaster type, location and time mentioned in the data. {data}''').text)
+        
+def generateDailyReport(data):
+    return (MODEL.generate_content(f'''Create a detailed report about the data which is recieved from the one liner information and try to add details about deaths, people lost house, damged occured to the goverment property and all related information which can be usefull for the 
+                                    showing of good report. Try to divide the report in 2 part the first part is the points wise statistics about the topic related to deduce. After the points give a detailed information about the topic and try to make it ectremely detailed with 
+                                   information being accurate{data}''').text)
+
+def generateRandomReport(data):
+    return (MODEL.generate_content(f'''Create a detailed Report from the data which is shared by the system for the same. {data}''').text)
         
 
 class DisasterAnalysis:
