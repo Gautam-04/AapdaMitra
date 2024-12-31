@@ -356,33 +356,51 @@ Widget build(BuildContext context) {
                                 color: const Color(0xFFF0F0F0),
                               ),
                               child: post['image'] != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Image.memory(
-                                        base64Decode(post['image']),
-                                        width: 250,
-                                        height: 180,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.image_not_supported,
-                                          size: 50,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          'No Image Available',
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontStyle: FontStyle.italic,
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.memory(
+                                      post['image'],
+                                      width: 250,
+                                      height: 180,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.error_outline,
+                                            size: 50,
+                                            color: Colors.grey,
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            'Error loading image',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
+                                  )
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.image_not_supported,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        'No Image Available',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),

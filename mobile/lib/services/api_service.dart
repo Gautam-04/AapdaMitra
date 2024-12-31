@@ -8,9 +8,10 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ApiService {
   // Base API URL
-  static const String _baseUrl = 'http://10.0.2.2:8000/v1/mobile';
-  static const String _adminBaseUrl = 'http://10.0.2.2:8000/v1/adminmobile';
-  static const String _webSocketUrl = 'http://10.0.2.2:8000'; // WebSocket server URL
+  static const String _baseUrl = 'http://192.168.81.113:8000/v1/mobile';
+  static const String _adminBaseUrl = 'http://192.168.81.113:8000/v1/adminmobile';
+  static const String _webSocketUrl = 'http://192.168.81.113:8000'; // WebSocket server URL
+
   static IO.Socket? _socket;
 
   // Admin Login API
@@ -201,14 +202,13 @@ class ApiService {
     required String description,
     required String emergencyType,
     required String location,
-    required String userId,
+    required String userId,  // Keep this parameter
   }) async {
     final Uri url = Uri.parse('$_baseUrl/add-issue');
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId') ?? '';
-
+    
+    // Remove the redundant userId fetch since it's passed as a parameter
     if (userId.isEmpty) {
-      throw Exception('User ID not found in local storage');
+      throw Exception('User ID is empty');
     }
 
     final response = await http.post(
@@ -220,7 +220,7 @@ class ApiService {
         'description': description,
         'emergencyType': emergencyType,
         'location': location,
-        'userId': userId,
+        'userId': userId,  // Use the passed userId
       }),
     );
 
@@ -231,27 +231,51 @@ class ApiService {
     }
   }
 
-  // Fetch Verified Posts API
-  static Future<List<Map<String, dynamic>>> fetchVerifiedPosts() async {
-    final Uri url = Uri.parse('$_baseUrl/get-all-post');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['success'] == true && data['verified'] != null) {
-        return List<Map<String, dynamic>>.from(data['verified']);
-      } else {
-        throw Exception('Invalid response structure: ${response.body}');
-      }
+//Fetch verified posts
+static Future<List<Map<String, dynamic>>> fetchVerifiedPosts() async {
+  final Uri url = Uri.parse('$_baseUrl/get-all-post');
+  final response = await http.get(
+    url,
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    if (data['success'] == true && data['verified'] != null) {
+      final posts = List<Map<String, dynamic>>.from(data['verified']);
+      
+      return posts.map((post) {
+        Uint8List? imageBytes;
+        if (post['imageUrl'] != null) {
+          try {
+            // Handle base64 image data
+            if (post['imageUrl'].toString().startsWith('data:image')) {
+              // Remove the data:image/xyz;base64, prefix
+              final base64String = post['imageUrl'].toString().split(',').last;
+              imageBytes = base64Decode(base64String);
+            } else if (post['imageUrl'].toString().startsWith('/9j/')) {
+              // Direct base64 string
+              imageBytes = base64Decode(post['imageUrl']);
+            }
+          } catch (e) {
+            print("Error decoding image: $e");
+          }
+        }
+        
+        return {
+          ...post,
+          'image': imageBytes,
+        };
+      }).toList();
     } else {
-      throw Exception(
-          'Failed to fetch verified posts: ${response.statusCode} - ${response.body}');
+      throw Exception('Invalid response structure: ${response.body}');
     }
+  } else {
+    throw Exception(
+        'Failed to fetch verified posts: ${response.statusCode} - ${response.body}');
   }
-
+}
     // Fetch Personal Issues
   static Future<List<Map<String, dynamic>>> fetchPersonalIssues() async {
     final Uri url = Uri.parse('$_baseUrl/get-personal-issue');

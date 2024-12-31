@@ -15,7 +15,7 @@ class Footer extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: (index) {
-        onTap(index); // Notify the parent widget of the index change
+        onTap(index);
         switch (index) {
           case 0:
             _navigateWithoutAnimation(context, '/home_screen');
@@ -31,17 +31,21 @@ class Footer extends StatelessWidget {
             break;
         }
       },
-      selectedItemColor: Colors.blue, // Highlight selected item
-      unselectedItemColor: Colors.black54, // Color for unselected items
-      backgroundColor: Colors.white, // Footer background color
-      showUnselectedLabels: true, // Show labels for unselected items
-      type: BottomNavigationBarType.fixed, // Ensures equidistant items
+      selectedItemColor: Colors.black54, // Changed to match unselected color
+      unselectedItemColor: Colors.black54,
+      backgroundColor: Colors.white,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      type: BottomNavigationBarType.fixed,
+      selectedFontSize: 12, // Match unselected font size
+      unselectedFontSize: 12,
       items: [
         BottomNavigationBarItem(
           icon: Image.asset(
             'assets/images/footer_home.png',
             width: 24,
             height: 24,
+            color: Colors.black54, // Added consistent color
           ),
           label: 'Home',
         ),
@@ -50,6 +54,7 @@ class Footer extends StatelessWidget {
             'assets/images/footer_donation.png',
             width: 24,
             height: 24,
+            color: Colors.black54, // Added consistent color
           ),
           label: 'Donations',
         ),
@@ -58,6 +63,7 @@ class Footer extends StatelessWidget {
             'assets/images/footer_raiseIssue.png',
             width: 24,
             height: 24,
+            color: Colors.black54, // Added consistent color
           ),
           label: 'Raise Issue',
         ),
@@ -66,6 +72,7 @@ class Footer extends StatelessWidget {
             'assets/images/footer_manual.png',
             width: 24,
             height: 24,
+            color: Colors.black54, // Added consistent color
           ),
           label: 'Manuals',
         ),
@@ -77,15 +84,14 @@ class Footer extends StatelessWidget {
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => _getScreen(context, routeName),
-        transitionDuration: Duration.zero, // Remove the animation duration
+        transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
-      (route) => false, // Clear all previous routes
+      (route) => false,
     );
   }
 
   Widget _getScreen(BuildContext context, String routeName) {
-    // Define your routes to return the appropriate widget here
     switch (routeName) {
       case '/home_screen':
         return const HomeScreen();
@@ -100,4 +106,3 @@ class Footer extends StatelessWidget {
     }
   }
 }
-
