@@ -372,12 +372,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       _buildTextField(
                         controller: _adminPhoneController,
-                        label: 'mobile_number'.tr(),
+                        label: 'Mobile Number'.tr(),
                         icon: Icons.phone,
                       ),
                       const SizedBox(height: 20),
                       _buildButton(
-                        label: 'send_otp'.tr(),
+                        label: 'Send OTP'.tr(),
                         onPressed: _isLoading ? null : _loginAsAdmin,
                       ),
                     ],
@@ -387,12 +387,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       _buildTextField(
                         controller: _otpController,
-                        label: 'enter_otp'.tr(),
+                        label: 'Enter OTP'.tr(),
                         icon: Icons.lock,
                       ),
                       const SizedBox(height: 20),
                       _buildButton(
-                        label: 'submit'.tr(),
+                        label: 'Submit'.tr(),
                         onPressed: _isLoading ? null : _submitAdminOtp,
                       ),
                     ],

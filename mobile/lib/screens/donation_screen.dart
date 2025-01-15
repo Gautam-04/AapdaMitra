@@ -179,7 +179,7 @@ class _DonationPageState extends State<DonationPage> {
       return;
     }
 
-    final url = Uri.parse("http://10.0.2.2:8000/v1/donation/create-order");
+    final url = Uri.parse("http://192.168.81.113:8000/v1/donation/create-order");
     try {
       final response = await http.post(
         url,
@@ -270,7 +270,7 @@ class _DonationPageState extends State<DonationPage> {
 
   Future<void> _verifyPayment(String orderId, String paymentId,
     String signature,String userId, String fundraiserId, int amount) async {
-    final url = Uri.parse("http://10.0.2.2:8000/v1/donation/verify-payment");
+    final url = Uri.parse("http://192.168.81.113:8000/v1/donation/verify-payment");
     try {
       final response = await http.post(
         url,

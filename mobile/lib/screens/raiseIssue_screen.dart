@@ -63,10 +63,10 @@ class PageTitle extends StatelessWidget {
 Widget _styledButtonWithBorder({
   required String text,
   required IconData icon,
-  required VoidCallback onPressed,
+  VoidCallback? onPressed,  // Make it nullable
 }) {
   return ElevatedButton.icon(
-    onPressed: onPressed,
+    onPressed: onPressed,  // ElevatedButton accepts nullable callback
     icon: Icon(icon, color: const Color(0xFF2B3674)),
     label: Text(
       text,
@@ -121,27 +121,44 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
   @override
   void initState() {
     super.initState();
-    _getUserId();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userId = prefs.getString('userId');
+    });
   }
 
 
   Future<void> _pickImage(ImageSource source) async {
-    final permission = source == ImageSource.camera
-        ? await Permission.camera.request()
-        : await Permission.storage.request();
-
-    if (permission.isGranted) {
-      final pickedFile = await _imagePicker.pickImage(source: source);
-      if (pickedFile != null) {
-        setState(() {
-          _selectedImage = File(pickedFile.path);
-        });
+    if (source == ImageSource.camera) {
+      // Keep existing camera permission logic
+      final permission = await Permission.camera.request();
+      
+      if (!permission.isGranted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Camera permission is required to take a photo.'),
+          ),
+        );
+        return;
       }
+    }
+
+    // Use ImagePicker directly without storage permission check for gallery
+    final pickedFile = await _imagePicker.pickImage(source: source);
+    
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                "${source == ImageSource.camera ? 'Camera' : 'Storage'} permission is required to select an image")),
+        const SnackBar(
+          content: Text('No image selected.'),
+        ),
       );
     }
   }
@@ -196,58 +213,123 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
   }
 
   Future<void> _submitIssue() async {
-    if (_selectedImage == null ||
-        _title == null ||
-        _description == null ||
-        _selectedCategory == null ||
-        _currentPosition == null ||
-        _userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all the details")),
-      );
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      // Read and compress the image
-      final originalBytes = await _selectedImage!.readAsBytes();
-      final compressedBytes = await FlutterImageCompress.compressWithList(
-        originalBytes,
-        quality: 70,
-      );
-
-      // Encode the compressed image to Base64
-      final String photoBase64 = base64Encode(compressedBytes);
-      final String location =
-          "${_currentPosition!.latitude},${_currentPosition!.longitude}";
-
-      // Make API call with userId included
-      final response = await ApiService.addIssue(
-        photoBase64: photoBase64,
-        title: _title!,
-        description: _description!,
-        emergencyType: _selectedCategory!,
-        location: location,
-        userId: _userId!, // Pass the userId here
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to submit issue: $e")),
-      );
-    } finally {
-      setState(() {
-        _isSubmitting = false;
-      });
-    }
+  // Validate all required fields
+  if (_selectedImage == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please select an image")),
+    );
+    return;
   }
+
+  if (_title == null || _title!.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please enter a title")),
+    );
+    return;
+  }
+
+  if (_description == null || _description!.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please enter a description")),
+    );
+    return;
+  }
+
+  if (_selectedCategory == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please select a category")),
+    );
+    return;
+  }
+
+  if (_currentPosition == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please get your current location")),
+    );
+    return;
+  }
+
+  setState(() {
+    _isSubmitting = true;
+  });
+
+  try {
+    // Read and compress the image
+    final originalBytes = await _selectedImage!.readAsBytes();
+    final compressedBytes = await FlutterImageCompress.compressWithList(
+      originalBytes,
+      quality: 70,
+    );
+
+    // Encode the compressed image to Base64
+    final String photoBase64 = base64Encode(compressedBytes);
+    final String location =
+        "${_currentPosition!.latitude},${_currentPosition!.longitude}";
+
+    // Make API call
+    final response = await ApiService.addIssue(
+      photoBase64: photoBase64,
+      title: _title!,
+      description: _description!,
+      emergencyType: _selectedCategory!,
+      location: location,
+      userId: _userId!, // This is no longer needed in the method
+    );
+
+    // Check if response is not null and has a message
+    if (response != null) {
+      String message = 'Issue submitted successfully';
+      
+      // Try to get message from response, fallback to default
+      if (response is Map && response.containsKey('message')) {
+        message = response['message'] ?? message;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Reset form
+      _resetForm();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Received null response from server'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    // More detailed error handling
+    print('Submission error: $e'); // Log the full error
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Failed to submit issue: ${e.toString()}"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  } finally {
+    setState(() {
+      _isSubmitting = false;
+    });
+  }
+}
+
+void _resetForm() {
+  setState(() {
+    _selectedImage = null;
+    _title = null;
+    _description = null;
+    _selectedCategory = null;
+    _currentPosition = null;
+  });
+  
+  // Navigate back to the first page
+  _navigateToPage(0);
+}
 
   void _navigateToPage(int pageIndex) {
     _pageController.animateToPage(
@@ -257,15 +339,15 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
     );
   }
 
-  Widget _styledButton(String text, bool isPrimary, VoidCallback onPressed) {
+  Widget _styledButton(String text, bool isPrimary, VoidCallback? onPressed) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: onPressed != null && !_isSubmitting ? onPressed : null,  // Only call if not null and not submitting
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.4, // Responsive width
-          minWidth: 120, // Minimum width to prevent being too small
+          maxWidth: MediaQuery.of(context).size.width * 0.4,
+          minWidth: 120,
         ),
-        height: 45, // Fixed height
+        height: 45,
         decoration: ShapeDecoration(
           color: isPrimary ? const Color(0xFF2B3674) : Colors.transparent,
           shape: RoundedRectangleBorder(
@@ -536,7 +618,7 @@ class _RaiseIssueScreenState extends State<RaiseIssueScreen> {
                         _styledButton(
                           "Submit",
                           true,
-                          (_isSubmitting ? null : _submitIssue) as VoidCallback,
+                          _isSubmitting ? null : _submitIssue,
                         ),
                       ],
                     ),
